@@ -3,17 +3,23 @@
 ## Directory Layout:
 
 BALSAM/LLM_DUNEGPT/
-├── balsam-service.pid      # Balsam service process ID
-├── data/                   # Stores job output directories
-├── job-template.sh         # Optional job script template
-├── log/                    # Logs for job submissions and site
-├── qsubmit/                # Internal Balsam scheduling metadata
-├── scripts/
-│   ├── app/                # Registered Balsam application(s)
-│   ├── workflow/           # Workflow/job creation logic
-│   └── utils/              # Analytics, monitoring tools
-├── settings.yml            # Site-level configuration
-├── specs/                  # Job specification metadata
+├── balsam-service.pid         # Process ID of active Balsam site (if running)
+├── settings.yml               # Site-level Balsam configuration
+├── job-template.sh            # Optional PBS/SLURM job script template (unused)
+├── qsubmit/                   # Internal Balsam job queue metadata
+├── log/                       # Logs from site and launcher (stdout, stderr)
+├── data/                      # Output directories for job execution
+│   └── workdir/               # Per-job output (e.g. logs, checkpoints)
+│
+├── specs/                     # Metadata about job specs, app registry
+│
+├── scripts/                   # Custom Balsam logic
+│   ├── app/                   # App registration 
+│   ├── workflow/              # Job creation/submission scripts
+│   │   └── embed_docdb_indico.py     # Creates jobs for batch submission
+│   └── utils/                 # Plotting, analytics, monitoring
+│       └── analytics.py       # Utilization and throughput plot generator
+               # Job specification metadata
 Getting Started
 
 ## Activate Balsam environment:
