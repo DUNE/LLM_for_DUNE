@@ -1,6 +1,6 @@
-#BALSAM README
+# BALSAM README
 
-Directory Layout:
+## Directory Layout:
 
 BALSAM/LLM_DUNEGPT/
 ├── balsam-service.pid      # Balsam service process ID
@@ -16,16 +16,16 @@ BALSAM/LLM_DUNEGPT/
 ├── specs/                  # Job specification metadata
 Getting Started
 
-Activate Balsam environment:
+## Activate Balsam environment:
 source balsam_venv/bin/activate
 
-FIRST TIME ONLY: Initialize and activate site:
+### FIRST TIME ONLY: Initialize and activate site:
 balsam site init LLM_DUNEGPT (names site LLM_DUNEGPT
 balsam site activate LLM_DUNEGPT
 
 
 
-Configure job submission
+## Configure job submission
 Edit scripts/workflow/embed_docdb_indico.py to define job range, node packing, and duration:
 i.e.
 begin_index = 0
@@ -36,17 +36,17 @@ wall_time_min = 180
 Create Balsam jobs:
 
 
-Run jobs:
+## Run jobs:
 First, register the app: python /scripts/app/embed_docdb_indico.py
 Then, make sure your site is active by running balsam site start
 Once site is running, submit jobs using python /scripts/workflow/embed_docdb_indico.py
 (You can stop the site using balsam site stop)
 
-Monitor jobs:
+## Monitor jobs:
 balsam queue ls
 balsam job ls
 
-Analytics:
+## Analytics:
 python scripts/utils/analytics.py
 
 if you make edits to the app in /scripts/app/embed_docdb_indico.py, simply stop the site (balsam site stop), rerun: python /scripts/app/embed_docdb_indico.py
