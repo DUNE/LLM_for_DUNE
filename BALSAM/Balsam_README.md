@@ -1,7 +1,7 @@
 # BALSAM README
 
 ## Directory Layout:
-
+```
 BALSAM/LLM_DUNEGPT/
 ├── balsam-service.pid         # Process ID of active Balsam site (if running)
 ├── settings.yml               # Site-level Balsam configuration
@@ -21,7 +21,7 @@ BALSAM/LLM_DUNEGPT/
 │       └── analytics.py       # Utilization and throughput plot generator
                # Job specification metadata
 Getting Started
-
+```
 ## Activate Balsam environment:
 source balsam_venv/bin/activate
 
