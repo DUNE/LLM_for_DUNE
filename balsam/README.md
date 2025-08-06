@@ -209,6 +209,5 @@ balsam site stop
 
 
 
----
 
-**BALSAM + LLM_DUNEGPT**: Scalable, reliable, and fast document processing for the DUNE collaboration.
+
