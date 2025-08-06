@@ -1,0 +1,25 @@
+title: "Cooley (ALCF)"
+compute_node: balsam.platform.compute_node.CooleyNode
+mpi_app_launcher: balsam.platform.app_run.MPICHRun
+local_app_launcher: balsam.platform.app_run.LocalAppRun
+mpirun_allows_node_packing: true
+
+serial_mode_startup_params: {}
+
+scheduler_class: balsam.platform.scheduler.CobaltScheduler
+allowed_queues:
+    debug:
+        max_nodes: 16
+        max_queued_jobs: 2
+        max_walltime: 120
+    default:
+        max_nodes: 110
+        max_queued_jobs: 20
+        max_walltime: 720
+
+allowed_projects:
+- datascience
+- APSWorkflows
+
+optional_batch_job_params: {}
+globus_endpoint_id: 08925f04-569f-11e7-bef8-22000b9a448b # The local Globus endpoint ID

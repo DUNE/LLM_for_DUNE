@@ -1,0 +1,35 @@
+Metadata-Version: 2.1
+Name: balsam
+Version: 0.7.0a24
+Summary: HPC Workflows & Edge Service
+Home-page: https://balsam.readthedocs.io
+Author: Misha Salim, Thomas Uram, J. Taylor Childers
+Author-email: turam@anl.gov
+License: BSD 3-Clause License
+Project-URL: Source, https://github.com/argonne-lcf/balsam
+Project-URL: Documentation, https://argonne-lcf.github.io/balsam
+Keywords: workflows,hpc,scientific,workflow
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Development Status :: 3 - Alpha
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Scientific/Engineering
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+Requires-Dist: PyYAML <7.0.0,>=5.4.1
+Requires-Dist: multiprocessing-logging <1.0.0,>=0.3.1
+Requires-Dist: Click <9.0.0,>=8.0.1
+Requires-Dist: inquirer <3.0.0,>=2.7.0
+Requires-Dist: pydantic[dotenv] <2.0.0,>=1.8.2
+Requires-Dist: python-dateutil <3.0.0,>=2.8.1
+Requires-Dist: jinja2 <4.0.0,>=3.0.1
+Requires-Dist: requests <3.0.0,>=2.25.1
+Requires-Dist: psutil <6.0.0,>=5.8.0
+Requires-Dist: globus-sdk <4.0.0,>=3.0.1
+Requires-Dist: configobj <6.0.0,>=5.0.6
+Requires-Dist: pyzmq >=24.0.1
+Requires-Dist: dill <1.0.0,>=0.3.4
+Requires-Dist: tblib <2.0.0,>=1.7.0
+
