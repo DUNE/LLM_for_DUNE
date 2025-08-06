@@ -1,0 +1,84 @@
+2025-08-06 13:53:45.491 | 46788 | INFO | balsam:114] Configured logging on aurora-uan-0011
+2025-08-06 13:53:45.491 | 46788 | INFO | balsam.site.service.main:38] Launching service for 216h:57m:21s
+2025-08-06 13:53:45.716 | 46788 | INFO | balsam.site.service.main:46] Starting service: SchedulerService
+2025-08-06 13:53:45.716 | 46788 | INFO | balsam.site.service.main:47] {'client': <balsam.client.requests_oauth.OAuthRequestsClient object at 0x7fece300c400>, 'service_period': 10, 'site_id': 708, 'scheduler': <balsam.platform.scheduler.pbs_sched.PBSScheduler object at 0x7fece2e8d630>, 'allowed_queues': {'debug': AllowedQueue(max_nodes=2, max_walltime=60, max_queued_jobs=100), 'prod': AllowedQueue(max_nodes=496, max_walltime=1440, max_queued_jobs=100), 'preemptable': AllowedQueue(max_nodes=10, max_walltime=4320, max_queued_jobs=20)}, 'allowed_projects': ['LLM_for_DUNE'], 'optional_batch_job_params': {'mig_count': '0'}, 'job_template': <balsam.site.script_template.ScriptTemplate object at 0x7fece2e8df60>, 'submit_directory': PosixPath('/lus/flare/projects/LLM_for_DUNE/users/aditya/BALSAM/LLM_DUNEGPT/qsubmit'), 'username': 'aditya-singh', 'filter_tags': {}}
+2025-08-06 13:53:45.717 | 46788 | INFO | balsam.site.service.main:46] Starting service: ProcessingService
+2025-08-06 13:53:45.717 | 46788 | INFO | balsam.site.service.main:47] {'site_id': 708, 'job_source': <FixedDepthJobSource name='FixedDepthJobSource-2' parent=46788 initial>, 'status_updater': <BulkStatusUpdater name='BulkStatusUpdater-3' parent=46788 initial>, 'workers': [<Process name='Process-4' parent=46788 initial>]}
+2025-08-06 13:53:45.721 | 46788 | INFO | balsam.site.service.main:46] Starting service: TransferService
+2025-08-06 13:53:45.721 | 46788 | INFO | balsam.site.service.main:47] {'client': <balsam.client.requests_oauth.OAuthRequestsClient object at 0x7fece300c400>, 'service_period': 5, 'site_id': 708, 'data_path': PosixPath('/lus/flare/projects/LLM_for_DUNE/users/aditya/BALSAM/LLM_DUNEGPT/data'), 'transfer_locations': {'olcf_dtn': 'globus://ef1a9560-7ca1-11e5-992c-22000b96db58', 'cori_dtn': 'globus://9d6d99eb-6d04-11e5-ba46-22000b92c6ec', 'perlmutter_dtn': 'globus://6bdc7956-fc0f-4ad2-989c-7aa5ee643a79', 'theta_dtn': 'globus://08925f04-569f-11e7-bef8-22000b9a448b', 'aps_dtn': 'globus://1c85525e-8948-11e9-8e6a-029d279f7e24', 'als_dtn': 'globus://c7c11b22-e127-11e8-8c91-0a1d4c5c824a'}, 'max_concurrent_transfers': 5, 'transfer_interfaces': {'globus': <balsam.platform.transfer.globus_transfer.GlobusTransferInterface object at 0x7fece2f000d0>}, 'transfer_batch_size': 100, 'num_items_query_limit': 2000}
+2025-08-06 13:53:49.452 | 46797 | INFO | balsam.site.job_source:142] JobSource acquired 1 jobs:
+2025-08-06 13:53:50.750 | 46796 | INFO | balsam.site.status_updater:104] StatusUpdater bulk-updated 1 jobs
+2025-08-06 13:53:53.050 | 46797 | INFO | balsam.site.job_source:142] JobSource acquired 2 jobs:
+2025-08-06 13:53:54.269 | 46796 | INFO | balsam.site.status_updater:104] StatusUpdater bulk-updated 2 jobs
+2025-08-06 13:53:57.331 | 46795 | INFO | balsam.site.service.scheduler:152] batch job 31199: scheduler_id 7082703 no longer in queue statuses: finished
+2025-08-06 13:53:57.331 | 46795 | INFO | balsam.platform.scheduler.pbs_sched:324] _parse_logs issuing qstat: ['qstat', '-x', '-f', '-F', 'json', '7082703']
+2025-08-06 13:53:57.585 | 46795 | WARNING | balsam.platform.scheduler.pbs_sched:329] Batch Job 7082703 not found in PBS
+2025-08-06 13:54:45.722 | 46788 | INFO | balsam.site.service.main:59] 216h:56m remaining
+2025-08-06 13:55:45.723 | 46788 | INFO | balsam.site.service.main:59] 216h:55m remaining
+2025-08-06 13:56:45.723 | 46788 | INFO | balsam.site.service.main:59] 216h:54m remaining
+2025-08-06 13:57:45.723 | 46788 | INFO | balsam.site.service.main:59] 216h:53m remaining
+2025-08-06 13:58:45.723 | 46788 | INFO | balsam.site.service.main:59] 216h:52m remaining
+2025-08-06 13:59:45.724 | 46788 | INFO | balsam.site.service.main:59] 216h:51m remaining
+2025-08-06 14:00:45.724 | 46788 | INFO | balsam.site.service.main:59] 216h:50m remaining
+2025-08-06 14:01:45.724 | 46788 | INFO | balsam.site.service.main:59] 216h:49m remaining
+2025-08-06 14:02:45.724 | 46788 | INFO | balsam.site.service.main:59] 216h:48m remaining
+2025-08-06 14:03:45.725 | 46788 | INFO | balsam.site.service.main:59] 216h:47m remaining
+2025-08-06 14:04:45.725 | 46788 | INFO | balsam.site.service.main:59] 216h:46m remaining
+2025-08-06 14:05:45.725 | 46788 | INFO | balsam.site.service.main:59] 216h:45m remaining
+2025-08-06 14:06:45.725 | 46788 | INFO | balsam.site.service.main:59] 216h:44m remaining
+2025-08-06 14:07:45.726 | 46788 | INFO | balsam.site.service.main:59] 216h:43m remaining
+2025-08-06 14:08:45.726 | 46788 | INFO | balsam.site.service.main:59] 216h:42m remaining
+2025-08-06 14:09:45.726 | 46788 | INFO | balsam.site.service.main:59] 216h:41m remaining
+2025-08-06 14:10:45.726 | 46788 | INFO | balsam.site.service.main:59] 216h:40m remaining
+2025-08-06 14:11:45.727 | 46788 | INFO | balsam.site.service.main:59] 216h:39m remaining
+2025-08-06 14:12:45.727 | 46788 | INFO | balsam.site.service.main:59] 216h:38m remaining
+2025-08-06 14:13:45.727 | 46788 | INFO | balsam.site.service.main:59] 216h:37m remaining
+2025-08-06 14:14:45.727 | 46788 | INFO | balsam.site.service.main:59] 216h:36m remaining
+2025-08-06 14:15:45.727 | 46788 | INFO | balsam.site.service.main:59] 216h:35m remaining
+2025-08-06 14:16:45.727 | 46788 | INFO | balsam.site.service.main:59] 216h:34m remaining
+2025-08-06 14:17:45.728 | 46788 | INFO | balsam.site.service.main:59] 216h:33m remaining
+2025-08-06 14:18:45.728 | 46788 | INFO | balsam.site.service.main:59] 216h:32m remaining
+2025-08-06 14:19:45.728 | 46788 | INFO | balsam.site.service.main:59] 216h:31m remaining
+2025-08-06 14:20:45.728 | 46788 | INFO | balsam.site.service.main:59] 216h:30m remaining
+2025-08-06 14:21:45.728 | 46788 | INFO | balsam.site.service.main:59] 216h:29m remaining
+2025-08-06 14:22:45.729 | 46788 | INFO | balsam.site.service.main:59] 216h:28m remaining
+2025-08-06 14:23:45.729 | 46788 | INFO | balsam.site.service.main:59] 216h:27m remaining
+2025-08-06 14:24:45.729 | 46788 | INFO | balsam.site.service.main:59] 216h:26m remaining
+2025-08-06 14:25:45.729 | 46788 | INFO | balsam.site.service.main:59] 216h:25m remaining
+2025-08-06 14:26:45.730 | 46788 | INFO | balsam.site.service.main:59] 216h:24m remaining
+2025-08-06 14:27:45.730 | 46788 | INFO | balsam.site.service.main:59] 216h:23m remaining
+2025-08-06 14:28:45.730 | 46788 | INFO | balsam.site.service.main:59] 216h:22m remaining
+2025-08-06 14:29:45.730 | 46788 | INFO | balsam.site.service.main:59] 216h:21m remaining
+2025-08-06 14:30:45.731 | 46788 | INFO | balsam.site.service.main:59] 216h:20m remaining
+2025-08-06 14:31:45.731 | 46788 | INFO | balsam.site.service.main:59] 216h:19m remaining
+2025-08-06 14:32:45.731 | 46788 | INFO | balsam.site.service.main:59] 216h:18m remaining
+2025-08-06 14:33:45.732 | 46788 | INFO | balsam.site.service.main:59] 216h:17m remaining
+2025-08-06 14:34:45.732 | 46788 | INFO | balsam.site.service.main:59] 216h:16m remaining
+2025-08-06 14:35:45.732 | 46788 | INFO | balsam.site.service.main:59] 216h:15m remaining
+2025-08-06 14:36:45.732 | 46788 | INFO | balsam.site.service.main:59] 216h:14m remaining
+2025-08-06 14:37:45.733 | 46788 | INFO | balsam.site.service.main:59] 216h:13m remaining
+2025-08-06 14:38:45.733 | 46788 | INFO | balsam.site.service.main:59] 216h:12m remaining
+2025-08-06 14:39:45.733 | 46788 | INFO | balsam.site.service.main:59] 216h:11m remaining
+2025-08-06 14:40:45.733 | 46788 | INFO | balsam.site.service.main:59] 216h:10m remaining
+2025-08-06 14:41:45.733 | 46788 | INFO | balsam.site.service.main:59] 216h:09m remaining
+2025-08-06 14:42:45.734 | 46788 | INFO | balsam.site.service.main:59] 216h:08m remaining
+2025-08-06 14:43:45.734 | 46788 | INFO | balsam.site.service.main:59] 216h:07m remaining
+2025-08-06 14:44:45.734 | 46788 | INFO | balsam.site.service.main:59] 216h:06m remaining
+2025-08-06 14:45:45.734 | 46788 | INFO | balsam.site.service.main:59] 216h:05m remaining
+2025-08-06 14:46:45.735 | 46788 | INFO | balsam.site.service.main:59] 216h:04m remaining
+2025-08-06 14:47:45.735 | 46788 | INFO | balsam.site.service.main:59] 216h:03m remaining
+2025-08-06 14:48:45.735 | 46788 | INFO | balsam.site.service.main:59] 216h:02m remaining
+2025-08-06 14:49:45.735 | 46788 | INFO | balsam.site.service.main:59] 216h:01m remaining
+2025-08-06 14:50:45.735 | 46788 | INFO | balsam.site.service.main:59] 216h:00m remaining
+2025-08-06 14:51:45.736 | 46788 | INFO | balsam.site.service.main:59] 215h:59m remaining
+2025-08-06 14:52:45.736 | 46788 | INFO | balsam.site.service.main:59] 215h:58m remaining
+2025-08-06 14:53:45.736 | 46788 | INFO | balsam.site.service.main:59] 215h:57m remaining
+2025-08-06 14:54:45.737 | 46788 | INFO | balsam.site.service.main:59] 215h:56m remaining
+2025-08-06 14:55:45.737 | 46788 | INFO | balsam.site.service.main:59] 215h:55m remaining
+2025-08-06 14:56:45.737 | 46788 | INFO | balsam.site.service.main:59] 215h:54m remaining
+2025-08-06 14:57:45.737 | 46788 | INFO | balsam.site.service.main:59] 215h:53m remaining
+2025-08-06 14:58:45.738 | 46788 | INFO | balsam.site.service.main:59] 215h:52m remaining
+2025-08-06 14:59:45.738 | 46788 | INFO | balsam.site.service.main:59] 215h:51m remaining
+2025-08-06 15:00:45.738 | 46788 | INFO | balsam.site.service.main:59] 215h:50m remaining
+2025-08-06 15:01:45.738 | 46788 | INFO | balsam.site.service.main:59] 215h:49m remaining
+2025-08-06 15:02:45.739 | 46788 | INFO | balsam.site.service.main:59] 215h:48m remaining

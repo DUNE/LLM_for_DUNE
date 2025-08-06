@@ -1,0 +1,33 @@
+title: "Theta-KNL (ALCF)"
+compute_node: balsam.platform.compute_node.ThetaKNLNode
+mpi_app_launcher: balsam.platform.app_run.ThetaAprun
+local_app_launcher: balsam.platform.app_run.LocalAppRun
+mpirun_allows_node_packing: false # mpi_app_launcher supports multiple concurrent runs per node
+
+serial_mode_startup_params: 
+    cpu_affinity: none
+
+scheduler_class: balsam.platform.scheduler.CobaltScheduler
+
+allowed_queues:
+    debug-cache-quad:
+        max_nodes: 8
+        max_queued_jobs: 1
+        max_walltime: 60
+    debug-flat-quad:
+        max_nodes: 8
+        max_queued_jobs: 1
+        max_walltime: 60
+    default:
+        max_nodes: 4010
+        max_queued_jobs: 20
+        max_walltime: 1440
+
+allowed_projects:
+- datascience
+- WorkExpFacil
+
+optional_batch_job_params:
+    singularity_prime_cache: 'no'
+
+globus_endpoint_id: 08925f04-569f-11e7-bef8-22000b9a448b # The local Globus endpoint ID

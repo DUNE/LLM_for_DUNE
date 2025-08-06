@@ -1,0 +1,49 @@
+2025-07-28 17:54:58.634 | 104851 | INFO | balsam:114] Configured logging on aurora-uan-0011
+2025-07-28 17:54:58.635 | 104851 | INFO | balsam.site.service.main:38] Launching service for 428h:56m:08s
+2025-07-28 17:54:58.811 | 104851 | INFO | balsam.site.service.main:46] Starting service: SchedulerService
+2025-07-28 17:54:58.811 | 104851 | INFO | balsam.site.service.main:47] {'client': <balsam.client.requests_oauth.OAuthRequestsClient object at 0x7f82e44a5f00>, 'service_period': 10, 'site_id': 708, 'scheduler': <balsam.platform.scheduler.pbs_sched.PBSScheduler object at 0x7f82e436e9e0>, 'allowed_queues': {'debug': AllowedQueue(max_nodes=2, max_walltime=60, max_queued_jobs=100), 'prod': AllowedQueue(max_nodes=496, max_walltime=1440, max_queued_jobs=100), 'preemptable': AllowedQueue(max_nodes=10, max_walltime=4320, max_queued_jobs=20)}, 'allowed_projects': ['LLM_for_DUNE'], 'optional_batch_job_params': {'mig_count': '0'}, 'job_template': <balsam.site.script_template.ScriptTemplate object at 0x7f82e436d480>, 'submit_directory': PosixPath('/lus/flare/projects/LLM_for_DUNE/users/aditya/BALSAM/LLM_DUNEGPT/qsubmit'), 'username': 'aditya-singh', 'filter_tags': {}}
+2025-07-28 17:54:58.812 | 104851 | INFO | balsam.site.service.main:46] Starting service: ProcessingService
+2025-07-28 17:54:58.812 | 104851 | INFO | balsam.site.service.main:47] {'site_id': 708, 'job_source': <FixedDepthJobSource name='FixedDepthJobSource-2' parent=104851 initial>, 'status_updater': <BulkStatusUpdater name='BulkStatusUpdater-3' parent=104851 initial>, 'workers': [<Process name='Process-4' parent=104851 initial>]}
+2025-07-28 17:54:58.815 | 104851 | INFO | balsam.site.service.main:46] Starting service: TransferService
+2025-07-28 17:54:58.816 | 104851 | INFO | balsam.site.service.main:47] {'client': <balsam.client.requests_oauth.OAuthRequestsClient object at 0x7f82e44a5f00>, 'service_period': 5, 'site_id': 708, 'data_path': PosixPath('/lus/flare/projects/LLM_for_DUNE/users/aditya/BALSAM/LLM_DUNEGPT/data'), 'transfer_locations': {'olcf_dtn': 'globus://ef1a9560-7ca1-11e5-992c-22000b96db58', 'cori_dtn': 'globus://9d6d99eb-6d04-11e5-ba46-22000b92c6ec', 'perlmutter_dtn': 'globus://6bdc7956-fc0f-4ad2-989c-7aa5ee643a79', 'theta_dtn': 'globus://08925f04-569f-11e7-bef8-22000b9a448b', 'aps_dtn': 'globus://1c85525e-8948-11e9-8e6a-029d279f7e24', 'als_dtn': 'globus://c7c11b22-e127-11e8-8c91-0a1d4c5c824a'}, 'max_concurrent_transfers': 5, 'transfer_interfaces': {'globus': <balsam.platform.transfer.globus_transfer.GlobusTransferInterface object at 0x7f82e43cc0d0>}, 'transfer_batch_size': 100, 'num_items_query_limit': 2000}
+2025-07-28 17:55:58.817 | 104851 | INFO | balsam.site.service.main:59] 428h:55m remaining
+2025-07-28 17:56:58.817 | 104851 | INFO | balsam.site.service.main:59] 428h:54m remaining
+2025-07-28 17:57:58.817 | 104851 | INFO | balsam.site.service.main:59] 428h:53m remaining
+2025-07-28 17:58:15.569 | 104854 | INFO | balsam.site.service.scheduler:173] Job 31180 (sched_id 6843362) advanced to state running
+2025-07-28 17:58:58.818 | 104851 | INFO | balsam.site.service.main:59] 428h:52m remaining
+2025-07-28 17:59:58.818 | 104851 | INFO | balsam.site.service.main:59] 428h:51m remaining
+2025-07-28 18:00:57.305 | 104854 | INFO | balsam.site.service.scheduler:152] batch job 31180: scheduler_id 6843362 no longer in queue statuses: finished
+2025-07-28 18:00:57.306 | 104854 | INFO | balsam.platform.scheduler.pbs_sched:324] _parse_logs issuing qstat: ['qstat', '-x', '-f', '-F', 'json', '6843362']
+2025-07-28 18:00:58.818 | 104851 | INFO | balsam.site.service.main:59] 428h:50m remaining
+2025-07-28 18:01:58.818 | 104851 | INFO | balsam.site.service.main:59] 428h:49m remaining
+2025-07-28 18:02:58.818 | 104851 | INFO | balsam.site.service.main:59] 428h:48m remaining
+2025-07-28 18:03:58.819 | 104851 | INFO | balsam.site.service.main:59] 428h:47m remaining
+2025-07-28 18:04:58.819 | 104851 | INFO | balsam.site.service.main:59] 428h:46m remaining
+2025-07-28 18:05:58.819 | 104851 | INFO | balsam.site.service.main:59] 428h:45m remaining
+2025-07-28 18:06:58.819 | 104851 | INFO | balsam.site.service.main:59] 428h:44m remaining
+2025-07-28 18:07:58.820 | 104851 | INFO | balsam.site.service.main:59] 428h:43m remaining
+2025-07-28 18:08:58.820 | 104851 | INFO | balsam.site.service.main:59] 428h:42m remaining
+2025-07-28 18:09:58.820 | 104851 | INFO | balsam.site.service.main:59] 428h:41m remaining
+2025-07-28 18:10:58.820 | 104851 | INFO | balsam.site.service.main:59] 428h:40m remaining
+2025-07-28 18:11:58.820 | 104851 | INFO | balsam.site.service.main:59] 428h:39m remaining
+2025-07-28 18:12:58.820 | 104851 | INFO | balsam.site.service.main:59] 428h:38m remaining
+2025-07-28 18:13:58.821 | 104851 | INFO | balsam.site.service.main:59] 428h:37m remaining
+2025-07-28 18:14:58.821 | 104851 | INFO | balsam.site.service.main:59] 428h:36m remaining
+2025-07-28 18:15:58.821 | 104851 | INFO | balsam.site.service.main:59] 428h:35m remaining
+2025-07-28 18:16:58.822 | 104851 | INFO | balsam.site.service.main:59] 428h:34m remaining
+2025-07-28 18:17:58.822 | 104851 | INFO | balsam.site.service.main:59] 428h:33m remaining
+2025-07-28 18:18:58.822 | 104851 | INFO | balsam.site.service.main:59] 428h:32m remaining
+2025-07-28 18:19:58.822 | 104851 | INFO | balsam.site.service.main:59] 428h:31m remaining
+2025-07-28 18:20:16.821 | 104851 | INFO | balsam.site.service.main:63] Terminating services...
+2025-07-28 18:20:16.821 | 104851 | INFO | balsam.site.service.main:67] Waiting for service processes to join
+2025-07-28 18:20:16.821 | 104858 | INFO | balsam.site.service.service_base:24] Signal: TransferService Process cleaning up
+2025-07-28 18:20:16.821 | 104858 | INFO | balsam.site.service.service_base:26] TransferService Process exit
+2025-07-28 18:20:16.821 | 104856 | INFO | balsam.site.job_source:145] Signal: JobSource cancelling tick thread and deleting API Session
+2025-07-28 18:20:17.412 | 104857 | INFO | balsam.site.service.processing:166] Signal: ProcessingWorker exit
+2025-07-28 18:20:18.036 | 104854 | INFO | balsam.site.service.service_base:24] Signal: SchedulerService Process cleaning up
+2025-07-28 18:20:18.036 | 104854 | INFO | balsam.site.service.scheduler:191] SchedulerService exiting
+2025-07-28 18:20:18.036 | 104854 | INFO | balsam.site.service.service_base:26] SchedulerService Process exit
+2025-07-28 18:20:18.413 | 104855 | INFO | balsam.site.status_updater:50] Signal: break out of StatusUpdater main loop
+2025-07-28 18:20:18.414 | 104855 | INFO | balsam.site.status_updater:52] StatusUpdater thread finished.
+2025-07-28 18:20:21.257 | 104856 | INFO | balsam.site.job_source:148] JobSource exit graceful
+2025-07-28 18:20:21.260 | 104851 | INFO | balsam.site.service.main:71] Balsam service: exit main loop

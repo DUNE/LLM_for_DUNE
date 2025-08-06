@@ -1,0 +1,22 @@
+title: "MacOS/Linux (Local)"
+
+compute_node: balsam.platform.compute_node.DefaultNode
+mpi_app_launcher: balsam.platform.app_run.MPICHRun
+local_app_launcher: balsam.platform.app_run.LocalAppRun
+mpirun_allows_node_packing: true # mpi_app_launcher supports multiple concurrent runs per node
+serial_mode_startup_params: {} # Pass-through parameters to mpirun when starting the serial mode launcher
+
+scheduler_class: balsam.platform.scheduler.LocalProcessScheduler
+allowed_queues:
+    local:
+        max_nodes: 1
+        max_walltime: 1440
+        max_queued_jobs: 1000
+
+allowed_projects:
+- local
+
+optional_batch_job_params:
+    shout: 'no'
+
+globus_endpoint_id: null # The local Globus endpoint ID

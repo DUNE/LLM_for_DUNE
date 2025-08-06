@@ -1,0 +1,365 @@
+2025-08-06 02:42:18,273 - __main__ - INFO - Starting document indexing process
+2025-08-06 02:42:20,694 - src.indexing.faiss_manager - INFO - Using device: cpu
+2025-08-06 02:42:41,905 - src.indexing.faiss_manager - INFO - Loaded FAISS index with 2550 entries
+2025-08-06 02:42:41,905 - src.indexing.faiss_manager - INFO - Loaded metadata store with 2543 entries
+2025-08-06 02:42:41,905 - src.indexing.faiss_manager - INFO - Loaded doc_ids with 2550 entries
+2025-08-06 02:42:41,905 - src.core.document_processor - INFO - Starting document processing pipeline
+2025-08-06 02:42:41,905 - src.core.document_processor - INFO - Processing DocDB documents
+2025-08-06 02:42:41,905 - src.extractors.docdb_extractor - INFO - Extracting documents from DocDB (limit: 100)
+2025-08-06 02:42:41,908 - src.extractors.docdb_extractor - INFO - Skipping 701 already-indexed DocDB IDs
+2025-08-06 02:46:28,938 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20002 - DUNE Computing Overview for the DOE IPR July2020
+2025-08-06 02:46:31,972 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20002 - DUNE Computing Overview for the DOE IPR July2020
+2025-08-06 02:46:36,545 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20008 - 2020 CALCI Workshop/Scope Review Final Report
+2025-08-06 02:46:36,641 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20035 - LBNF-5 Magnet Installation Area Requirements
+2025-08-06 02:46:36,681 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20035 - LBNF-5 Magnet Installation Area Requirements
+2025-08-06 02:46:37,063 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20047 - Jan2019_PD-PDUNE_update_Macias
+2025-08-06 02:46:37,449 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20050 - Feb2019_PD-PDUNE_update_Macias
+2025-08-06 02:46:37,699 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20053 - MarchApril2019_PD-PDUNE_update_Macias
+2025-08-06 02:46:37,734 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20056 - Cosmic_telescope_summary-PD_PDUNE_Macias
+2025-08-06 02:46:38,685 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20060 - Measuring electron drift-velocity in ProtoDUNE-SP using anode-anode crossing cosmic ray muon tracks
+2025-08-06 02:46:40,167 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20069 - Interface specifications between flex cable and probe boards for APAs
+2025-08-06 02:46:40,551 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20072 - Physics impact of target and horn design updates
+2025-08-06 02:46:41,362 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20078 - The future of DUNE in 10 minutes.
+2025-08-06 02:47:43,907 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20081 - Pipe-in-a-Pipe-in-a-Pipe Feasibility Study - AECOM
+2025-08-06 02:48:20,055 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20081 - Pipe-in-a-Pipe-in-a-Pipe Feasibility Study - AECOM
+2025-08-06 02:48:40,724 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20081 - Pipe-in-a-Pipe-in-a-Pipe Feasibility Study - AECOM
+2025-08-06 02:48:43,423 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20081 - Pipe-in-a-Pipe-in-a-Pipe Feasibility Study - AECOM
+2025-08-06 02:49:48,609 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20081 - Pipe-in-a-Pipe-in-a-Pipe Feasibility Study - AECOM
+2025-08-06 02:50:24,526 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20081 - Pipe-in-a-Pipe-in-a-Pipe Feasibility Study - AECOM
+2025-08-06 02:50:44,955 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20081 - Pipe-in-a-Pipe-in-a-Pipe Feasibility Study - AECOM
+2025-08-06 02:50:48,939 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20081 - Pipe-in-a-Pipe-in-a-Pipe Feasibility Study - AECOM
+2025-08-06 02:50:51,624 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20081 - Pipe-in-a-Pipe-in-a-Pipe Feasibility Study - AECOM
+2025-08-06 02:50:51,837 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20084 - 2020 Energy Depositon in Horn A
+2025-08-06 02:50:52,269 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20084 - 2020 Energy Depositon in Horn A
+2025-08-06 02:50:52,584 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20087 - Proposal for approval of the electrical wire tension measurement technique for APAs
+2025-08-06 02:50:52,688 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20093 - LBNF Modules Preliminary Review Reference Documents & Links
+2025-08-06 02:50:52,873 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20093 - LBNF Modules Preliminary Review Reference Documents & Links
+2025-08-06 02:50:53,109 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20093 - LBNF Modules Preliminary Review Reference Documents & Links
+2025-08-06 02:50:53,282 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20093 - LBNF Modules Preliminary Review Reference Documents & Links
+2025-08-06 02:50:53,381 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20093 - LBNF Modules Preliminary Review Reference Documents & Links
+2025-08-06 02:50:53,565 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20093 - LBNF Modules Preliminary Review Reference Documents & Links
+2025-08-06 02:50:53,723 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20093 - LBNF Modules Preliminary Review Reference Documents & Links
+2025-08-06 02:50:53,806 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20093 - LBNF Modules Preliminary Review Reference Documents & Links
+2025-08-06 02:50:53,876 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20093 - LBNF Modules Preliminary Review Reference Documents & Links
+2025-08-06 02:50:53,932 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20093 - LBNF Modules Preliminary Review Reference Documents & Links
+2025-08-06 02:51:02,936 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20093 - LBNF Modules Preliminary Review Reference Documents & Links
+2025-08-06 02:51:18,393 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20093 - LBNF Modules Preliminary Review Reference Documents & Links
+2025-08-06 02:52:54,869 - src.extractors.docdb_extractor - INFO - Processed DocDB document: 20099 - The DUNE event processing framework
+2025-08-06 02:52:54,869 - src.extractors.docdb_extractor - INFO - Extracted 38 DocDB documents
+2025-08-06 02:52:54,872 - src.indexing.faiss_manager - INFO - Adding 36 new documents to index
+2025-08-06 02:53:33,343 - src.indexing.faiss_manager - INFO - Successfully added 36 documents to index
+2025-08-06 02:53:33,343 - src.core.document_processor - INFO - DocDB: 38 extracted, 36 added to index
+2025-08-06 02:53:33,343 - src.core.document_processor - INFO - Processing Indico documents
+2025-08-06 02:53:33,343 - src.extractors.indico_extractor - INFO - Extracting documents from Indico category 455 (limit: 100)
+2025-08-06 02:54:30,143 - src.extractors.indico_extractor - INFO - Processing event: Nucleon Decay and Atmospheric Neutrinos: Bi-weekly Meeting (10440)
+2025-08-06 02:54:33,220 - src.extractors.indico_extractor - INFO - Processed Indico document: 1788/2082/Neutron-antineutron_oscillation_in_DUNE.pdf - N-Nbar oscillations in MicroBoonE
+2025-08-06 02:54:33,678 - src.extractors.indico_extractor - INFO - Processed Indico document: 1789/2083/pdkwg_status_150928.pdf - Status and plans for N-decay WG
+2025-08-06 02:54:33,750 - src.extractors.indico_extractor - ERROR - Error processing attachment https://indico.fnal.gov/event/10440/contributions/2656/attachments/1791/2085/DUNEatm.pdf?access_token=DUNEnu: 403 Client Error: Forbidden for url: https://indico.fnal.gov/event/10440/contributions/2656/attachments/1791/2085/DUNEatm.pdf?access_token=DUNEnu
+2025-08-06 02:54:34,526 - src.extractors.indico_extractor - INFO - Processed Indico document: 1790/2084/atnu_09272015.pdf - Status and plans for the atmospherics WG
+2025-08-06 02:54:34,527 - src.extractors.indico_extractor - INFO - Processing event: FD Reconstruction Bi-Weekly (10441)
+2025-08-06 02:54:35,501 - src.extractors.indico_extractor - INFO - Processed Indico document: 1793/2087/FDSimReco.pdf - Overview and Plans for Simulation and Reconstruction
+2025-08-06 02:54:35,802 - src.extractors.indico_extractor - INFO - Processed Indico document: 1794/2088/DUNE_reco_first_meeting_wire-cell.pptx - Update on WireCell Reconstruction
+2025-08-06 02:54:36,590 - src.extractors.indico_extractor - INFO - Processed Indico document: 1795/2089/recofdstudies.pdf - Update on PMA/Shower Reconstruction
+2025-08-06 02:54:36,660 - src.extractors.indico_extractor - ERROR - Error processing attachment https://indico.fnal.gov/event/10441/contributions/2659/attachments/1792/2086/MUSUN_Generator_15_09_28.pdf?access_token=DUNEnu: 403 Client Error: Forbidden for url: https://indico.fnal.gov/event/10441/contributions/2659/attachments/1792/2086/MUSUN_Generator_15_09_28.pdf?access_token=DUNEnu
+2025-08-06 02:54:36,660 - src.extractors.indico_extractor - INFO - Processing event: LBL Bi-weekly Meeting (10442)
+2025-08-06 02:54:38,328 - src.extractors.indico_extractor - INFO - Processed Indico document: 1796/2090/etw_lbpwg_29sept2015.pdf - Long-baseline PWG Overview
+2025-08-06 02:54:38,330 - src.extractors.indico_extractor - INFO - Processing event: SNB and Low-Energy Neutrinos: Bi-Weekly Meeting (10443)
+2025-08-06 02:54:39,194 - src.extractors.indico_extractor - INFO - Processed Indico document: 1797/2091/SNB_lowE_DUNE_sept30.pdf - Status of SNB and low-energy neutrinos WG
+2025-08-06 02:54:39,609 - src.extractors.indico_extractor - INFO - Processed Indico document: 1798/2092/20150930_Svoboda.pdf - Update from FD Physics Performance group
+2025-08-06 02:54:39,610 - src.extractors.indico_extractor - INFO - Processing event: Near Detector Physics: Bi-Weekly Meeting (10444)
+2025-08-06 02:54:40,392 - src.extractors.indico_extractor - INFO - Processed Indico document: 1799/2093/Oct15-1-NDPhys-RevQeustions-SRM.pdf - Items raised at CD1 review
+2025-08-06 02:54:40,838 - src.extractors.indico_extractor - INFO - Processed Indico document: 1800/2094/dune-20151001-generator.pdf - Cross section systematic sketch priorities
+2025-08-06 02:54:40,838 - src.extractors.indico_extractor - INFO - Processing event: Cosmogenics: Bi-weeky Meeting (10509)
+2025-08-06 02:54:42,470 - src.extractors.indico_extractor - INFO - Processed Indico document: 2133/2515/DDwyer_CosmoWG_Organization_30Sep2015.pdf - Organizational Topics (WG charge, meeting schedule, etc.)
+2025-08-06 02:54:43,135 - src.extractors.indico_extractor - INFO - Processed Indico document: 2134/2516/cosmo-pdk-background-vk.pdf - Cosmogenic Backgrounds for Proton Decay
+2025-08-06 02:54:44,017 - src.extractors.indico_extractor - INFO - Processed Indico document: 2132/2514/MUSUN_Generator_15_09_28.pdf - A New Muon Generator - MUSUN
+2025-08-06 02:54:44,019 - src.extractors.indico_extractor - INFO - Processing event: FD Simulation and Reconstruction Bi-Weekly (10563)
+2025-08-06 02:54:44,677 - src.extractors.indico_extractor - INFO - Processed Indico document: 2386/2852/recotimeline.pdf - Timeline and news
+2025-08-06 02:54:45,092 - src.extractors.indico_extractor - INFO - Processed Indico document: 2384/2850/nueccstudies.pdf - Update on nue CC reconstruction
+2025-08-06 02:54:45,501 - src.extractors.indico_extractor - INFO - Processed Indico document: 2388/2855/emshower.pdf - A New Shower Reconstruction
+2025-08-06 02:54:46,140 - src.extractors.indico_extractor - INFO - Processed Indico document: 2387/2854/Overview_Signal_Processing.pdf - Overview of TPC signal processing
+2025-08-06 02:54:46,548 - src.extractors.indico_extractor - INFO - Processed Indico document: 2387/2853/Overview_Signal_Processing.pptx - Overview of TPC signal processing
+2025-08-06 02:54:47,913 - src.extractors.indico_extractor - INFO - Processed Indico document: 2385/2851/energyRes.pdf - Diffusion studies
+2025-08-06 02:54:48,366 - src.extractors.indico_extractor - INFO - Processed Indico document: 2383/2849/PID_35ton_Warwick.pdf - PID in 35 ton
+2025-08-06 02:54:48,367 - src.extractors.indico_extractor - INFO - Processing event: LBL Bi-weekly Meeting (10567)
+2025-08-06 02:54:48,440 - src.extractors.indico_extractor - ERROR - Error processing event 10567: 403 Client Error: Forbidden for url: https://indico.fnal.gov/event/10567/
+2025-08-06 02:54:48,440 - src.extractors.indico_extractor - INFO - Processing event: Nucleon Decay and Atmospheric Neutrinos: Bi-weekly meeting (10573)
+2025-08-06 02:54:49,026 - src.extractors.indico_extractor - INFO - Processed Indico document: 2450/2931/151012_AtmosWG.pdf - Discussion on WG tasks
+2025-08-06 02:54:50,532 - src.extractors.indico_extractor - INFO - Processed Indico document: 2449/2930/DUNEatm.pdf - Exploring the Earth with neutrinos
+2025-08-06 02:54:50,533 - src.extractors.indico_extractor - INFO - Processing event: DUNE Beyond the Standard Model Physics Group Meeting (10575)
+2025-08-06 02:54:56,669 - src.extractors.indico_extractor - INFO - Processed Indico document: 2455/2936/rlc_MiniBooNE_DUNE_BSM.pdf - A Light Mass Dark Matter Search with MiniBooNE
+2025-08-06 02:54:56,986 - src.extractors.indico_extractor - INFO - Processed Indico document: 2456/2937/dune_bsm_ju_151013.pdf - Discussion on Scope and Schedule
+2025-08-06 02:54:57,264 - src.extractors.indico_extractor - INFO - Processed Indico document: 2456/2938/scope-timeline.pdf - Discussion on Scope and Schedule
+2025-08-06 02:54:57,264 - src.extractors.indico_extractor - INFO - Processing event: Cosmogenics: Bi-weeky Meeting (10581)
+2025-08-06 02:55:01,092 - src.extractors.indico_extractor - INFO - Processed Indico document: 2465/2947/dune_li.pdf - Modeling of Muon Spallation
+2025-08-06 02:55:01,094 - src.extractors.indico_extractor - INFO - Processing event: SNB and Low-Energy Neutrinos: Bi-Weekly Meeting (10582)
+2025-08-06 02:55:01,707 - src.extractors.indico_extractor - INFO - Processed Indico document: 2468/2950/news-oct-14-2015.pdf - Intro/News
+2025-08-06 02:55:02,077 - src.extractors.indico_extractor - INFO - Processed Indico document: 2466/2948/dune_14_oct_15.pdf - Geant4 radio-purity simulation for SBND & DUNE
+2025-08-06 02:55:02,495 - src.extractors.indico_extractor - INFO - Processed Indico document: 2467/2949/snb_generator.pdf - SNB event generator
+2025-08-06 02:55:02,495 - src.extractors.indico_extractor - INFO - Processing event: Near Detector Physics: Bi-Weekly Meeting (10594)
+2025-08-06 02:55:08,858 - src.extractors.indico_extractor - INFO - Processed Indico document: 2532/3061/2015.10.15-costas-dune_nd-valor.pdf - VALOR for ND FD fitting
+2025-08-06 02:55:08,860 - src.extractors.indico_extractor - INFO - Processing event: FD Simulation and Reconstruction Bi-Weekly (10664)
+2025-08-06 02:55:11,281 - src.extractors.indico_extractor - INFO - Processed Indico document: 3219/3874/mcc5.pdf - Status of MCC5
+2025-08-06 02:55:11,357 - src.extractors.indico_extractor - ERROR - Error processing attachment https://indico.fnal.gov/event/10664/contributions/4656/attachments/3220/3875/adams_20151026_fdsimrec_larsigs.pdf?access_token=DUNEnu: 403 Client Error: Forbidden for url: https://indico.fnal.gov/event/10664/contributions/4656/attachments/3220/3875/adams_20151026_fdsimrec_larsigs.pdf?access_token=DUNEnu
+2025-08-06 02:55:12,272 - src.extractors.indico_extractor - INFO - Processed Indico document: 3220/3876/adams_20151026_fdsimrec_larsigs.pdf - Raw  and  deconvoluted  signal  shapes
+2025-08-06 02:55:13,479 - src.extractors.indico_extractor - INFO - Processed Indico document: 3221/3877/DUNE_FD_1.pdf - FD Reco Efficiency Studies
+2025-08-06 02:55:13,480 - src.extractors.indico_extractor - INFO - Processing event: LBL Bi-weekly Meeting (10669)
+2025-08-06 02:55:23,091 - src.extractors.indico_extractor - INFO - Processed Indico document: 3232/3888/LBLWG_Oct2015_Sorel.pdf - Planned publication: Neutrino oscillations at DUNE with improved energy reconstruction
+2025-08-06 02:55:23,093 - src.extractors.indico_extractor - INFO - Processing event: Nucleon Decay and Atmospheric Neutrinos: Bi-weekly meeting (10671)
+2025-08-06 02:55:23,625 - src.extractors.indico_extractor - INFO - Processed Indico document: 3237/3893/Proton_Decay_Working_Group_Intro.pdf - Intro and discussion of WG tasks
+2025-08-06 02:55:23,843 - src.extractors.indico_extractor - INFO - Processed Indico document: 3236/3892/dunepdk26oct15.pptx - Comprehensive list of nucleon decay modes
+2025-08-06 02:55:23,844 - src.extractors.indico_extractor - INFO - Processing event: Near Detector Physics: Bi-Weekly Meeting (10690)
+2025-08-06 02:55:27,481 - src.extractors.indico_extractor - INFO - Processed Indico document: 3322/3995/nd_flux_20151029.pdf - Flux constraint with FastMC
+2025-08-06 02:55:27,482 - src.extractors.indico_extractor - INFO - Processing event: SNB and Low-Energy Neutrinos: Bi-Weekly Meeting (10691)
+2025-08-06 02:55:28,273 - src.extractors.indico_extractor - INFO - Processed Indico document: 3324/3997/gardiner_dune_snb_10-28-2015.pdf - MARLEY update
+2025-08-06 02:55:28,591 - src.extractors.indico_extractor - INFO - Processed Indico document: 3323/3996/performance_meeting-oct-19-2015.pdf - FD performance group presentation
+2025-08-06 02:55:28,592 - src.extractors.indico_extractor - INFO - Processing event: DUNE Beyond the Standard Model Physics Group Meeting (10732)
+2025-08-06 02:55:35,835 - src.extractors.indico_extractor - INFO - Processed Indico document: 3618/4847/Sousa_DUNE_LBL_Steriles.pdf - Long-baseline sterile neutrino searches: The MINOS/MINOS+ and NOvA experiences
+2025-08-06 02:55:36,044 - src.extractors.indico_extractor - INFO - Processed Indico document: 3617/4845/dune_bsm_ju_151013.pdf - Discussion on Scope and Schedule
+2025-08-06 02:55:36,354 - src.extractors.indico_extractor - INFO - Processed Indico document: 3617/4846/scope-timeline.pdf - Discussion on Scope and Schedule
+2025-08-06 02:55:36,354 - src.extractors.indico_extractor - INFO - Processing event: LBL Bi-weekly Meeting (10800)
+2025-08-06 02:55:37,366 - src.extractors.indico_extractor - INFO - Processed Indico document: 3816/5076/etw_lbpwg_10nov2015.pdf - LBPWG News/Updates
+2025-08-06 02:55:37,668 - src.extractors.indico_extractor - INFO - Processed Indico document: 3817/5077/DUNE_sensitivity_scripts.pdf - Scripts for Sensitivity Calculations
+2025-08-06 02:55:37,669 - src.extractors.indico_extractor - INFO - Processing event: FD Simulation and Reconstruction Bi-Weekly (10805)
+2025-08-06 02:55:38,150 - src.extractors.indico_extractor - INFO - Processed Indico document: 3826/5086/mcc5.0.pdf - News
+2025-08-06 02:55:39,366 - src.extractors.indico_extractor - INFO - Processed Indico document: 3831/5091/PID_Warwick.pdf - PID in LArTPC
+2025-08-06 02:55:40,497 - src.extractors.indico_extractor - INFO - Processed Indico document: 3829/5089/DUNE_FD_2.pdf - Efficiency Update
+2025-08-06 02:55:42,422 - src.extractors.indico_extractor - INFO - Processed Indico document: 3827/5087/GSimpleFluxGeneration_091115_FDSim_DBrailsford.pdf - generation of gsimple flux
+2025-08-06 02:55:42,835 - src.extractors.indico_extractor - INFO - Processed Indico document: 3830/5090/emshower.pdf - Update on shower reconstruction
+2025-08-06 02:55:43,265 - src.extractors.indico_extractor - INFO - Processed Indico document: 3828/5088/Shower_recon_15_11_09.pdf - Benchmark of Shower Reconstruction
+2025-08-06 02:55:43,266 - src.extractors.indico_extractor - INFO - Processing event: Nucleon Decay and Atmospheric Neutrinos: Bi-weekly meeting (10809)
+2025-08-06 02:55:45,329 - src.extractors.indico_extractor - INFO - Processed Indico document: 3839/5100/costas-dune_atmos_pdk-2014_11_09.pdf - GENIE Tools for PDK and Atmos Nus
+2025-08-06 02:55:46,012 - src.extractors.indico_extractor - INFO - Processed Indico document: 3841/5102/DUNE_nnbar_simulation.pdf - Simulation of neutron-antineutron oscillation events with GENIE and LArSoft
+2025-08-06 02:55:46,255 - src.extractors.indico_extractor - INFO - Processed Indico document: 3840/5101/151109_AtmosWG_FDPG.pdf - Discussion of Detector Design Parameters
+2025-08-06 02:55:46,256 - src.extractors.indico_extractor - INFO - Processing event: SNB and Low-Energy Neutrinos: Bi-Weekly Meeting (10813)
+2025-08-06 02:55:46,931 - src.extractors.indico_extractor - INFO - Processed Indico document: 3874/5143/DUNEradiologicalsSims_SNB_11Nov2015_JR.pdf - Status of knowledge/sims on radiologicals from purity group
+2025-08-06 02:55:47,292 - src.extractors.indico_extractor - INFO - Processed Indico document: 3875/5145/DAQ_Update.pdf - DAQ update
+2025-08-06 02:55:47,752 - src.extractors.indico_extractor - INFO - Processed Indico document: 3873/5142/updates_ar39.pdf - Updates, Ar39
+2025-08-06 02:55:47,752 - src.extractors.indico_extractor - INFO - Processing event: Cosmogenics (10822)
+2025-08-06 02:55:49,421 - src.extractors.indico_extractor - INFO - Processed Indico document: 3884/5156/dune_cosmo.pdf - Muon generator for DUNE and first results on muons in DUNE
+2025-08-06 02:55:49,422 - src.extractors.indico_extractor - INFO - Processing event: Near Detector Physics: Bi-Weekly Meeting (10835)
+2025-08-06 02:55:51,783 - src.extractors.indico_extractor - INFO - Processed Indico document: 3923/5198/minerva_nu_e_scattering.pdf - Measurement of nu-e NC elastic in MINERvA
+2025-08-06 02:55:59,080 - src.extractors.indico_extractor - INFO - Processed Indico document: 3922/5197/GENIE_DUNENDPWG_12Nov2015.pdf - New GENIE release: model choices and systematics
+2025-08-06 02:55:59,083 - src.extractors.indico_extractor - INFO - Processing event: LBL Bi-weekly Meeting (10861)
+2025-08-06 02:56:00,094 - src.extractors.indico_extractor - INFO - Processed Indico document: 4019/5307/GENIE10_DUNE_LBPWG_Manly.pdf - GENIE Update & News from NuInt
+2025-08-06 02:56:00,696 - src.extractors.indico_extractor - INFO - Processed Indico document: 4019/5306/NUINT15_highlights_DUNE_LBPWG_Manly.pdf - GENIE Update & News from NuInt
+2025-08-06 02:56:00,774 - src.extractors.indico_extractor - ERROR - Error processing attachment https://indico.fnal.gov/event/10861/contributions/5608/attachments/4018/5305/highland_lbpwg_dune.pdf?access_token=DUNEnu: 403 Client Error: Forbidden for url: https://indico.fnal.gov/event/10861/contributions/5608/attachments/4018/5305/highland_lbpwg_dune.pdf?access_token=DUNEnu
+2025-08-06 02:56:00,775 - src.extractors.indico_extractor - INFO - Processing event: Lowe/SNB meeting (off-cycle) (10872)
+2025-08-06 02:56:01,036 - src.extractors.indico_extractor - INFO - Processing event: FD Simulation and Reconstruction Bi-Weekly (10882)
+2025-08-06 02:56:01,462 - src.extractors.indico_extractor - ERROR - Error processing attachment https://indico.fnal.gov/event/10882/contributions/5689/attachments/4066/5359/news.pdf?access_token=DUNEnu: 403 Client Error: Forbidden for url: https://indico.fnal.gov/event/10882/contributions/5689/attachments/4066/5359/news.pdf?access_token=DUNEnu
+2025-08-06 02:56:02,516 - src.extractors.indico_extractor - INFO - Processed Indico document: 4067/5360/highland_simreco_dune.pdf - HighLAND Analysis Framework
+2025-08-06 02:56:03,142 - src.extractors.indico_extractor - INFO - Processed Indico document: 4064/5357/PID_Warwick.pdf - Update on the Particle ID
+2025-08-06 02:56:03,574 - src.extractors.indico_extractor - INFO - Processed Indico document: 4065/5358/egamma_distance.pdf - Understanding the e/gamma separation
+2025-08-06 02:56:03,645 - src.extractors.indico_extractor - ERROR - Error processing attachment https://indico.fnal.gov/event/10882/contributions/5690/attachments/4069/5362/wirecell_li_20151123.pdf?access_token=DUNEnu: 403 Client Error: Forbidden for url: https://indico.fnal.gov/event/10882/contributions/5690/attachments/4069/5362/wirecell_li_20151123.pdf?access_token=DUNEnu
+2025-08-06 02:56:04,005 - src.extractors.indico_extractor - INFO - Processed Indico document: 4068/5361/showerupdate.pdf - Update on shower reconstruction
+2025-08-06 02:56:04,005 - src.extractors.indico_extractor - INFO - Processing event: Nucleon Decay and Atmospheric Neutrinos: Bi-weekly meeting (10887)
+2025-08-06 02:56:05,058 - src.extractors.indico_extractor - INFO - Processed Indico document: 4078/5372/151123_AtmosWG.pdf - Discussion of Detector Performance Requirements
+2025-08-06 02:56:05,271 - src.extractors.indico_extractor - INFO - Processed Indico document: 4077/5371/151123_atmosworkshop.pdf - A workshop on atmospherics and PDK
+2025-08-06 02:56:05,272 - src.extractors.indico_extractor - INFO - Processing event: DUNE Beyond the Standard Model Group Meeting (10894)
+2025-08-06 02:56:05,923 - src.extractors.indico_extractor - INFO - Processed Indico document: 4099/5395/Non_Standard_Neutrino_Interaction.pdf - Non-Standard Neutrino Interaction
+2025-08-06 02:56:06,248 - src.extractors.indico_extractor - INFO - Processed Indico document: 4098/5394/scope-timeline.pdf - BSM Group Organization
+2025-08-06 02:56:06,249 - src.extractors.indico_extractor - INFO - Processing event: Cosmogenics (10902)
+2025-08-06 02:56:08,359 - src.extractors.indico_extractor - INFO - Processed Indico document: 4163/5462/dune_cosmo.pdf - Muon events in DUNE (update with reconstruction)
+2025-08-06 02:56:08,360 - src.extractors.indico_extractor - INFO - Processing event: LBL Bi-weekly Meeting (11056)
+2025-08-06 02:56:08,963 - src.extractors.indico_extractor - INFO - Processed Indico document: 4370/5717/12.8.15_lblpwg_fmc_overview.pdf - Fast MC with GENIE update
+2025-08-06 02:56:09,528 - src.extractors.indico_extractor - INFO - Processed Indico document: 4371/5718/mcc5.0.pdf - MCC5.0
+2025-08-06 02:56:10,520 - src.extractors.indico_extractor - INFO - Processed Indico document: 4372/5719/etw_lbpwg_8dec2015.pdf - Assorted Updates
+2025-08-06 02:56:10,522 - src.extractors.indico_extractor - INFO - Processing event: FD Simulation and Reconstruction Bi-Weekly (11076)
+2025-08-06 02:56:11,168 - src.extractors.indico_extractor - INFO - Processed Indico document: 4413/5763/news.pdf - News
+2025-08-06 02:56:12,021 - src.extractors.indico_extractor - INFO - Processed Indico document: 4414/5764/nueccnunc.pdf - nue CC selection, nu NC rejection
+2025-08-06 02:56:14,976 - src.extractors.indico_extractor - INFO - Processed Indico document: 4416/5767/dune_cosmo.pdf - simulation and reconstruction or cosmic muons with the new MUSUN module
+2025-08-06 02:56:15,785 - src.extractors.indico_extractor - INFO - Processed Indico document: 4417/5768/LArReco_2015_12_07.pdf - Update on Pandora
+2025-08-06 02:56:15,787 - src.extractors.indico_extractor - INFO - Processing event: SNB and Low-Energy Neutrinos: Bi-Weekly Meeting (11096)
+2025-08-06 02:56:16,039 - src.extractors.indico_extractor - INFO - Processing event: Near Detector Physics: Bi-Weekly Meeting (11107)
+2025-08-06 02:56:23,513 - src.extractors.indico_extractor - INFO - Processed Indico document: 4506/5876/GENIE_DUNENDPWG_12Nov2015.pdf - GENIE updates and more
+2025-08-06 02:56:26,439 - src.extractors.indico_extractor - INFO - Processed Indico document: 4505/5875/t2kqe_ndpwg_10dec2015.pdf - The evolution of the NEUT generator on T2K: tuning and associated uncertainties for QE
+2025-08-06 02:56:26,441 - src.extractors.indico_extractor - INFO - Processing event: Nucleon Decay and Atmospheric Neutrinos: Bi-weekly meeting (11124)
+2025-08-06 02:56:27,554 - src.extractors.indico_extractor - INFO - Processed Indico document: 4546/5961/okumura-151220-dune_meeting.pdf - Atmospheric neutrinos in SuperKamiokande
+2025-08-06 02:56:28,807 - src.extractors.indico_extractor - INFO - Processed Indico document: 4547/5962/chris_dunendk_20151221.pdf - CC/NC kaon production in MINERvA and in GENIE 2.10
+2025-08-06 02:56:28,808 - src.extractors.indico_extractor - INFO - Processing event: DUNE Beyond the Standard Model Group Meeting (11137)
+2025-08-06 02:56:29,136 - src.extractors.indico_extractor - ERROR - Error processing attachment https://indico.fnal.gov/event/11137/contributions/6535/attachments/4593/6021/LEDDune121515.pdf?access_token=DUNEnu: 403 Client Error: Forbidden for url: https://indico.fnal.gov/event/11137/contributions/6535/attachments/4593/6021/LEDDune121515.pdf?access_token=DUNEnu
+2025-08-06 02:56:29,439 - src.extractors.indico_extractor - INFO - Processed Indico document: 4592/6020/bsm-group-config.pdf - BSM Group Organization
+2025-08-06 02:56:29,440 - src.extractors.indico_extractor - INFO - Processing event: Near Detector Physics: Bi-Weekly Meeting (11147)
+2025-08-06 02:56:29,514 - src.extractors.indico_extractor - ERROR - Error processing event 11147: 403 Client Error: Forbidden for url: https://indico.fnal.gov/event/11147/
+2025-08-06 02:56:29,514 - src.extractors.indico_extractor - INFO - Processing event: FD Simulation and Reconstruction Bi-Weekly (11154)
+2025-08-06 02:56:29,882 - src.extractors.indico_extractor - ERROR - Error processing attachment https://indico.fnal.gov/event/11154/contributions/6945/attachments/4638/6070/news20151221.pdf?access_token=DUNEnu: 403 Client Error: Forbidden for url: https://indico.fnal.gov/event/11154/contributions/6945/attachments/4638/6070/news20151221.pdf?access_token=DUNEnu
+2025-08-06 02:56:30,322 - src.extractors.indico_extractor - INFO - Processed Indico document: 4644/6076/NeutronSimulation_FDSimRecoMeeting_211215_DBrailsford.pdf - Neutron Propogation in Simulation
+2025-08-06 02:56:31,094 - src.extractors.indico_extractor - INFO - Processed Indico document: 4641/6073/nueccnuncupdate.pdf - nue selection, nc rejection, update
+2025-08-06 02:56:31,796 - src.extractors.indico_extractor - INFO - Processed Indico document: 4642/6074/pi0recon.pdf - Status of Pi0 reconstruction
+2025-08-06 02:56:32,980 - src.extractors.indico_extractor - INFO - Processed Indico document: 4637/6069/DUNE_FD_3.pdf - Status on Shower Reconstruction
+2025-08-06 02:56:33,351 - src.extractors.indico_extractor - INFO - Processed Indico document: 4639/6071/Wire-Cell-Single-Muon-Eff.pptx - single muon tracking efficiency with wire-cell
+2025-08-06 02:56:33,422 - src.extractors.indico_extractor - ERROR - Error processing attachment https://indico.fnal.gov/event/11154/contributions/6946/attachments/4640/6072/PDK_Knu_Santucci_2015Dec20.pdf?access_token=DUNEnu: 403 Client Error: Forbidden for url: https://indico.fnal.gov/event/11154/contributions/6946/attachments/4640/6072/PDK_Knu_Santucci_2015Dec20.pdf?access_token=DUNEnu
+2025-08-06 02:56:33,915 - src.extractors.indico_extractor - INFO - Processed Indico document: 4643/6075/wirecell_li_20151221.pdf - update on detector optimization study
+2025-08-06 02:56:33,915 - src.extractors.indico_extractor - INFO - Processing event: FD Simulation and Reconstruction Bi-Weekly (11197)
+2025-08-06 02:56:34,243 - src.extractors.indico_extractor - INFO - Processing event: LBL Bi-weekly Meeting (11199)
+2025-08-06 02:56:37,309 - src.extractors.indico_extractor - INFO - Processed Indico document: 4854/6349/nuesel.pdf - Nu_e/NC Separation
+2025-08-06 02:56:37,311 - src.extractors.indico_extractor - INFO - Processing event: LBL Bi-weekly Meeting (11307)
+2025-08-06 02:56:39,582 - src.extractors.indico_extractor - INFO - Processed Indico document: 5225/6832/YLZ_DUNE.pdf - Symmetries behind neutrino oscillations
+2025-08-06 02:56:39,583 - src.extractors.indico_extractor - INFO - Processing event: SNB/LE Physics Working Group Meeting (11309)
+2025-08-06 02:56:40,478 - src.extractors.indico_extractor - INFO - Processed Indico document: 5227/6834/012016_Littlejohn_RadioSource_DUNE.pdf - Low-Energy Calibration
+2025-08-06 02:56:40,950 - src.extractors.indico_extractor - INFO - Processed Indico document: 5228/6835/2016-01-20_DAQ-SIM-TF_intro_for_the_SNe_lowE_group.pdf - DAQ sim discussion
+2025-08-06 02:56:40,951 - src.extractors.indico_extractor - INFO - Processing event: FD Simulation and Reconstruction Bi-Weekly (11359)
+2025-08-06 02:56:41,555 - src.extractors.indico_extractor - INFO - Processed Indico document: 5340/6967/mcc6.0.pdf - Plan for MCC 6.0
+2025-08-06 02:56:42,767 - src.extractors.indico_extractor - INFO - Processed Indico document: 5336/6963/adams_dunefdsimreco_20160201_muperp.pdf - Deconvolution of perpendicular tracks in LarSoft
+2025-08-06 02:56:43,233 - src.extractors.indico_extractor - INFO - Processed Indico document: 5336/6962/adams_dunefdsimreco_20160201_muperp.pptx - Deconvolution of perpendicular tracks in LarSoft
+2025-08-06 02:56:43,788 - src.extractors.indico_extractor - INFO - Processed Indico document: 5337/6964/deconv-50l.pdf - Signal Processing with ICARUS 50-l data
+2025-08-06 02:56:44,501 - src.extractors.indico_extractor - INFO - Processed Indico document: 5335/6961/Perpendicular_APA.pptx - Induction plane signal in Perpendicular APA
+2025-08-06 02:56:44,853 - src.extractors.indico_extractor - INFO - Processed Indico document: 5338/6965/supernova_neutrino_generator_v2.pdf - Supernova Neutrino Generator
+2025-08-06 02:56:46,341 - src.extractors.indico_extractor - INFO - Processed Indico document: 5339/6966/DUNE_FD_5.pdf - Tracking Efficiency with Different Geometries
+2025-08-06 02:56:46,343 - src.extractors.indico_extractor - INFO - Processing event: Nucleon Decay, Atmospheric Neutrinos and Cosmogenics: Bi-weekly meeting (11387)
+2025-08-06 02:56:46,828 - src.extractors.indico_extractor - INFO - Processed Indico document: 5497/7165/Updated_Santucci_atmnu_Feb01.pdf - Generating atmospheric neutrino events in dunetpc
+2025-08-06 02:56:47,307 - src.extractors.indico_extractor - INFO - Processed Indico document: 5496/7164/dune_pdk.pdf - Update on the muon background simulations for proton decay
+2025-08-06 02:56:47,308 - src.extractors.indico_extractor - INFO - Processing event: DUNE Beyond the Standard Model Group Meeting (11407)
+2025-08-06 02:56:48,053 - src.extractors.indico_extractor - INFO - Processed Indico document: 5583/7259/meeting-160201-v2.pdf - NSI subgroup status: organization and plan for the near future
+2025-08-06 02:56:48,055 - src.extractors.indico_extractor - INFO - Processing event: DUNE Beyond the Standard Model Group Meeting (11408)
+2025-08-06 02:56:48,951 - src.extractors.indico_extractor - INFO - Processed Indico document: 5584/7260/dune-bsm-slac-ds-feb-16-2016.pdf - Current and Future Dark Sector and LDM Work @ SLAC
+2025-08-06 02:56:49,759 - src.extractors.indico_extractor - INFO - Processed Indico document: 5585/7261/talk_DUNE.pdf - Neutrino Trident Searches at DUNE
+2025-08-06 02:56:49,761 - src.extractors.indico_extractor - INFO - Processing event: DUNE Beyond the Standard Model Group Meeting (11410)
+2025-08-06 02:56:50,804 - src.extractors.indico_extractor - INFO - Processed Indico document: 5586/7262/DUNEBSM_Software_update_March15.pdf - Computing and Software Framework Updates
+2025-08-06 02:56:51,225 - src.extractors.indico_extractor - INFO - Processed Indico document: 5587/7263/meeting-160315-v2.pdf - Non-Standard Neutrino Interaction Group Activities
+2025-08-06 02:56:51,227 - src.extractors.indico_extractor - INFO - Processing event: DUNE Beyond the Standard Model Group Meeting (11411)
+2025-08-06 02:56:51,302 - src.extractors.indico_extractor - ERROR - Error processing event 11411: 403 Client Error: Forbidden for url: https://indico.fnal.gov/event/11411/
+2025-08-06 02:56:51,303 - src.extractors.indico_extractor - INFO - Processing event: DUNE Beyond the Standard Model Group Meeting (11412)
+2025-08-06 02:56:51,625 - src.extractors.indico_extractor - INFO - Processing event: DUNE Beyond the Standard Model Group Meeting (11413)
+2025-08-06 02:56:51,917 - src.extractors.indico_extractor - INFO - Processing event: DUNE Beyond the Standard Model Group Meeting (11414)
+2025-08-06 02:56:52,172 - src.extractors.indico_extractor - INFO - Processing event: DUNE Beyond the Standard Model Group Meeting (11415)
+2025-08-06 02:56:52,512 - src.extractors.indico_extractor - INFO - Processing event: DUNE Beyond the Standard Model Group Meeting (11416)
+2025-08-06 02:56:52,823 - src.extractors.indico_extractor - INFO - Processing event: DUNE Beyond the Standard Model Group Meeting (11417)
+2025-08-06 02:56:57,363 - src.extractors.indico_extractor - INFO - Processed Indico document: 5588/7264/Sousa_DUNE_LoE_Plots.pdf - DUNE L over E plots for a 3+1 sterile neutrino hypothesis
+2025-08-06 02:56:57,366 - src.extractors.indico_extractor - INFO - Processing event: DUNE Beyond the Standard Model Group Meeting (11418)
+2025-08-06 02:56:57,439 - src.extractors.indico_extractor - ERROR - Error processing event 11418: 403 Client Error: Forbidden for url: https://indico.fnal.gov/event/11418/
+2025-08-06 02:56:57,440 - src.extractors.indico_extractor - INFO - Processing event: DUNE Beyond the Standard Model Group Meeting (11419)
+2025-08-06 02:56:57,707 - src.extractors.indico_extractor - INFO - Processing event: DUNE Beyond the Standard Model Group Meeting (11420)
+2025-08-06 02:56:58,471 - src.extractors.indico_extractor - INFO - Processed Indico document: 5589/7265/DarkMatterUpdate.pdf - Dark Matter Search Update and Plans
+2025-08-06 02:56:58,473 - src.extractors.indico_extractor - INFO - Processing event: DUNE Beyond the Standard Model Group Meeting (11421)
+2025-08-06 02:56:58,796 - src.extractors.indico_extractor - INFO - Processing event: DUNE Beyond the Standard Model Group Meeting (11422)
+2025-08-06 02:56:59,067 - src.extractors.indico_extractor - INFO - Processing event: DUNE Beyond the Standard Model Group Meeting (11423)
+2025-08-06 02:56:59,356 - src.extractors.indico_extractor - INFO - Processing event: DUNE Beyond the Standard Model Group Meeting (11424)
+2025-08-06 02:56:59,625 - src.extractors.indico_extractor - INFO - Processing event: DUNE Beyond the Standard Model Group Meeting (11425)
+2025-08-06 02:57:25,862 - src.extractors.indico_extractor - INFO - Processed Indico document: 5590/7266/coloma-DM-dune.pdf - Dark Matter Beams at LBNF
+2025-08-06 02:57:25,865 - src.extractors.indico_extractor - INFO - Processing event: DUNE Beyond the Standard Model Group Meeting (11426)
+2025-08-06 02:57:26,288 - src.extractors.indico_extractor - ERROR - Error processing attachment https://indico.fnal.gov/event/11426/contributions/8344/attachments/5592/7268/Presentation.pptx?access_token=DUNEnu: 403 Client Error: Forbidden for url: https://indico.fnal.gov/event/11426/contributions/8344/attachments/5592/7268/Presentation.pptx?access_token=DUNEnu
+2025-08-06 02:57:26,359 - src.extractors.indico_extractor - ERROR - Error processing attachment https://indico.fnal.gov/event/11426/contributions/8345/attachments/5591/7267/seesawosc-DUNE.pdf?access_token=DUNEnu: 403 Client Error: Forbidden for url: https://indico.fnal.gov/event/11426/contributions/8345/attachments/5591/7267/seesawosc-DUNE.pdf?access_token=DUNEnu
+2025-08-06 02:57:26,360 - src.extractors.indico_extractor - INFO - Processing event: DUNE Beyond the Standard Model Group Meeting (11427)
+2025-08-06 02:57:26,443 - src.extractors.indico_extractor - ERROR - Error processing event 11427: 403 Client Error: Forbidden for url: https://indico.fnal.gov/event/11427/
+2025-08-06 02:57:26,443 - src.extractors.indico_extractor - INFO - Processing event: DUNE Beyond the Standard Model Group Meeting (11428)
+2025-08-06 02:57:26,514 - src.extractors.indico_extractor - ERROR - Error processing event 11428: 403 Client Error: Forbidden for url: https://indico.fnal.gov/event/11428/
+2025-08-06 02:57:26,515 - src.extractors.indico_extractor - INFO - Processing event: DUNE Beyond the Standard Model Group Meeting (11429)
+2025-08-06 02:57:27,121 - src.extractors.indico_extractor - INFO - Processed Indico document: 5596/7272/LED_DUNE.pdf - Incorporation of Large Extra Dimension simulation into the DUNE framework
+2025-08-06 02:57:28,204 - src.extractors.indico_extractor - INFO - Processed Indico document: 5595/7271/NeutrinoExpDUNEBSM.pdf - Neutrino Experiments for Dark Matter Detection
+2025-08-06 02:57:28,205 - src.extractors.indico_extractor - INFO - Processing event: DUNE Beyond the Standard Model Group Meeting (11430)
+2025-08-06 02:57:28,956 - src.extractors.indico_extractor - INFO - Processed Indico document: 5599/7276/ldm-status-n-timeline-122016.pdf - Searches for Light Dark Matter
+2025-08-06 02:57:29,255 - src.extractors.indico_extractor - INFO - Processed Indico document: 5599/7275/ldm-status-n-timeline-122016.pptx - Searches for Light Dark Matter
+2025-08-06 02:57:33,188 - src.extractors.indico_extractor - INFO - Processed Indico document: 5598/7274/Sousa_DUNE_BSM_Update_Dec20_16.pdf - Searches for Light Sterile Neutrinos and Large Extra-Dimensions
+2025-08-06 02:57:33,451 - src.extractors.indico_extractor - INFO - Processed Indico document: 5597/7273/nsi-update161220f.pdf - Searches for Non-Standard Neutrino Interactions
+2025-08-06 02:57:33,797 - src.extractors.indico_extractor - INFO - Processed Indico document: 5601/7278/update-strategy_122016.pdf - Searches for Heavy Neutral Leptons
+2025-08-06 02:57:34,152 - src.extractors.indico_extractor - INFO - Processed Indico document: 5600/7277/Software_update_20dec.pdf - Computing and Software
+2025-08-06 02:57:34,152 - src.extractors.indico_extractor - INFO - Processing event: SNB/LE Physics Working Group Meeting (11441)
+2025-08-06 02:57:34,966 - src.extractors.indico_extractor - INFO - Processed Indico document: 5669/7349/snb_event_generator_v2.pdf - SNB Event Generator
+2025-08-06 02:57:34,967 - src.extractors.indico_extractor - INFO - Processing event: FD Simulation and Reconstruction Bi-Weekly (11530)
+2025-08-06 02:57:35,036 - src.extractors.indico_extractor - ERROR - Error processing event 11530: 403 Client Error: Forbidden for url: https://indico.fnal.gov/event/11530/
+2025-08-06 02:57:35,036 - src.extractors.indico_extractor - INFO - Processing event: Nucleon Decay and Atmospheric Neutrinos: Bi-weekly meeting (11533)
+2025-08-06 02:57:36,020 - src.extractors.indico_extractor - INFO - Processed Indico document: 5863/7592/160215_ANW16summary.pdf - Summary of 1st Atmospheric Neutrino Workshop
+2025-08-06 02:57:37,486 - src.extractors.indico_extractor - INFO - Processed Indico document: 5862/7589/AtmosNuTalkFeb2016.pdf - Honda atmospheric flux calculation for Homestake
+2025-08-06 02:57:38,617 - src.extractors.indico_extractor - INFO - Processed Indico document: 5862/7590/AtmosNuTalkFeb2016.pdf - Honda atmospheric flux calculation for Homestake
+2025-08-06 02:57:38,686 - src.extractors.indico_extractor - ERROR - Error processing attachment https://indico.fnal.gov/event/11533/contributions/8769/attachments/5862/7591/AtmosNuTalkFeb2016.pdf?access_token=DUNEnu: 403 Client Error: Forbidden for url: https://indico.fnal.gov/event/11533/contributions/8769/attachments/5862/7591/AtmosNuTalkFeb2016.pdf?access_token=DUNEnu
+2025-08-06 02:57:38,687 - src.extractors.indico_extractor - INFO - Processing event: Near Detector Physics: Bi-Weekly Meeting (11561)
+2025-08-06 02:57:41,582 - src.extractors.indico_extractor - INFO - Processed Indico document: 5942/7683/1602_nelson_minerva_lownu.pdf - Low Nu results from MINERvA
+2025-08-06 02:57:41,584 - src.extractors.indico_extractor - INFO - Processing event: FD Simulation and Reconstruction Bi-Weekly (11611)
+2025-08-06 02:57:41,829 - src.extractors.indico_extractor - INFO - Processing event: LBL Bi-weekly Meeting (11612)
+2025-08-06 02:57:42,306 - src.extractors.indico_extractor - INFO - Processed Indico document: 6051/7799/etw_lblpwg_1mar2016.pdf - Summary of Ongoing Work
+2025-08-06 02:57:42,581 - src.extractors.indico_extractor - INFO - Processed Indico document: 6050/7798/nueupdates.pdf - Event Selection and Fitter Inputs Status
+2025-08-06 02:57:42,582 - src.extractors.indico_extractor - INFO - Processing event: Nucleon Decay and Atmospheric Neutrinos: Bi-weekly meeting (11617)
+2025-08-06 02:57:42,821 - src.extractors.indico_extractor - INFO - Processing event: Cosmic rays and cosmogenics WG meeting (11622)
+2025-08-06 02:57:44,250 - src.extractors.indico_extractor - INFO - Processed Indico document: 6075/7826/dune_cosmo.pdf - Update on muon background for proton decay search
+2025-08-06 02:57:44,256 - src.extractors.indico_extractor - ERROR - Error processing attachment https://indico.fnal.govhttp://arxiv.org/pdf/1602.07742.pdf?access_token=DUNEnu: HTTPSConnectionPool(host='indico.fnal.govhttp', port=443): Max retries exceeded with url: //arxiv.org/pdf/1602.07742.pdf?access_token=DUNEnu (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 500 Internal Server Error')))
+2025-08-06 02:57:44,256 - src.extractors.indico_extractor - INFO - Processing event: SNB/LE Physics Working Group Meeting (11633)
+2025-08-06 02:57:45,270 - src.extractors.indico_extractor - INFO - Processed Indico document: 6139/7897/snb_generator_updates.pdf - Updates
+2025-08-06 02:57:45,585 - src.extractors.indico_extractor - INFO - Processed Indico document: 6138/7896/SNGenie_Dune.pdf - NOvA SN event generator
+2025-08-06 02:57:45,586 - src.extractors.indico_extractor - INFO - Processing event: Near Detector Physics: Bi-Weekly Meeting (11635)
+2025-08-06 02:57:57,492 - src.extractors.indico_extractor - INFO - Processed Indico document: 6143/7901/LowNu-Flux-DUNE-ND-FD-2Mar16-v2.pdf - Low-nu flux and FD/ND prediction
+2025-08-06 02:57:57,495 - src.extractors.indico_extractor - INFO - Processing event: FD Simulation and Reconstruction Bi-Weekly (11682)
+2025-08-06 02:57:58,190 - src.extractors.indico_extractor - INFO - Processed Indico document: 6320/8121/news.pdf - News
+2025-08-06 02:57:58,603 - src.extractors.indico_extractor - INFO - Processed Indico document: 6319/8120/emshowerupdate.pdf - Update on Shower Reconstruction
+2025-08-06 02:57:58,604 - src.extractors.indico_extractor - INFO - Processing event: Nucleon Decay, Atmospheric Neutrinos and Cosmogenics: Bi-weekly meeting (11704)
+2025-08-06 02:57:59,120 - src.extractors.indico_extractor - INFO - Processed Indico document: 6363/8181/dunepdk13mar16.pptx - NDK systematic errors on nuclear efficiency
+2025-08-06 02:57:59,602 - src.extractors.indico_extractor - INFO - Processed Indico document: 6364/8183/parentage.pdf - Update on muon background for proton decay search
+2025-08-06 02:58:00,841 - src.extractors.indico_extractor - INFO - Processed Indico document: 6365/8185/dune_cosmo.pdf - Update on muon background for proton decay search
+2025-08-06 02:58:00,842 - src.extractors.indico_extractor - INFO - Processing event: Near Detector Physics: Bi-Weekly Meeting (11713)
+2025-08-06 02:58:01,795 - src.extractors.indico_extractor - INFO - Processed Indico document: 6384/8214/DUNEND-20160216-qerpa2p2h.pdf - Uncertainty model for QE-Dip-Delta region, applications to ND and oscillation mock data.
+2025-08-06 02:58:01,796 - src.extractors.indico_extractor - INFO - Processing event: LBL Bi-weekly Meeting (11716)
+2025-08-06 02:58:02,351 - src.extractors.indico_extractor - INFO - Processed Indico document: 6392/8222/NuMuSelection_29Mar2016.pdf - Nu_mu event selection
+2025-08-06 02:58:02,422 - src.extractors.indico_extractor - ERROR - Error processing attachment https://indico.fnal.gov/event/11716/contributions/9728/attachments/6390/8220/3_29_2016.pdf?access_token=DUNEnu: 403 Client Error: Forbidden for url: https://indico.fnal.gov/event/11716/contributions/9728/attachments/6390/8220/3_29_2016.pdf?access_token=DUNEnu
+2025-08-06 02:58:03,746 - src.extractors.indico_extractor - INFO - Processed Indico document: 6391/8221/2016_03_29_DetectorEffects.pdf - Systematic uncertainties from nuclear effect or missing energy
+2025-08-06 02:58:03,748 - src.extractors.indico_extractor - INFO - Processing event: FD Simulation and Reconstruction Bi-Weekly (11771)
+2025-08-06 02:58:04,097 - src.extractors.indico_extractor - ERROR - Error processing attachment https://indico.fnal.gov/event/11771/contributions/10012/attachments/6525/8375/mcc6.pdf?access_token=DUNEnu: 403 Client Error: Forbidden for url: https://indico.fnal.gov/event/11771/contributions/10012/attachments/6525/8375/mcc6.pdf?access_token=DUNEnu
+2025-08-06 02:58:04,585 - src.extractors.indico_extractor - INFO - Processed Indico document: 6526/8376/named_vertices_rsulej.pdf - Vertex collections and associations to tracks and pfparticles
+2025-08-06 02:58:04,656 - src.extractors.indico_extractor - ERROR - Error processing attachment https://indico.fnal.gov/event/11771/contributions/10013/attachments/6524/8374/shsupdate.pdf?access_token=DUNEnu: 403 Client Error: Forbidden for url: https://indico.fnal.gov/event/11771/contributions/10013/attachments/6524/8374/shsupdate.pdf?access_token=DUNEnu
+2025-08-06 02:58:04,657 - src.extractors.indico_extractor - INFO - Processing event: SNB/LE Physics Working Group Meeting (11780)
+2025-08-06 02:58:05,330 - src.extractors.indico_extractor - INFO - Processed Indico document: 6550/8405/snb_generator_updates_20160323.pdf - Updates
+2025-08-06 02:58:05,330 - src.extractors.indico_extractor - INFO - Processing event: DUNE Beyond the Standard Model Group Meeting (11814)
+2025-08-06 02:58:06,354 - src.extractors.indico_extractor - INFO - Processed Indico document: 6635/8630/DUNE_steriles.pdf - DUNE Sensitivities to Searches for Sterile Neutrinos
+2025-08-06 02:58:08,601 - src.extractors.indico_extractor - INFO - Processed Indico document: 6636/8631/DUNEmeeting_Cui.pdf - Boosted DM search at DUNE/LBNF
+2025-08-06 02:58:08,605 - src.extractors.indico_extractor - INFO - Processing event: Nucleon decay, Atmospheric neutrinos and Cosmogenics working groups - joint meeting (11816)
+2025-08-06 02:58:08,968 - src.extractors.indico_extractor - ERROR - Error processing attachment https://indico.fnal.gov/event/11816/contributions/10192/attachments/6639/8639/v5vsv4.pdf?access_token=DUNEnu: 403 Client Error: Forbidden for url: https://indico.fnal.gov/event/11816/contributions/10192/attachments/6639/8639/v5vsv4.pdf?access_token=DUNEnu
+2025-08-06 02:58:08,969 - src.extractors.indico_extractor - INFO - Processing event: Near Detector Physics: Bi-Weekly Meeting (11818)
+2025-08-06 02:58:09,829 - src.extractors.indico_extractor - INFO - Processed Indico document: 6643/8643/steve_d_valor_validation.pdf - Validation of the VALOR DUNE ND analysis for the 2nd pass-through
+2025-08-06 02:58:10,938 - src.extractors.indico_extractor - INFO - Processed Indico document: 6642/8642/VALOR_DUNE_ND_xsec_March_2016.pdf - Cross-section systematics / inputs for VALOR DUNE ND analysis
+2025-08-06 02:58:10,940 - src.extractors.indico_extractor - INFO - Processing event: SNB/LE Physics Working Group Meeting (11840)
+2025-08-06 02:58:11,644 - src.extractors.indico_extractor - INFO - Processed Indico document: 6714/8727/checking_sn_generator.pdf - Updates
+2025-08-06 02:58:11,645 - src.extractors.indico_extractor - INFO - Processing event: FD Simulation and Reconstruction Bi-Weekly (11884)
+2025-08-06 02:58:12,039 - src.extractors.indico_extractor - ERROR - Error processing attachment https://indico.fnal.gov/event/11884/contributions/10431/attachments/6834/8867/mcc6.pdf?access_token=DUNEnu: 403 Client Error: Forbidden for url: https://indico.fnal.gov/event/11884/contributions/10431/attachments/6834/8867/mcc6.pdf?access_token=DUNEnu
+2025-08-06 02:58:12,651 - src.extractors.indico_extractor - INFO - Processed Indico document: 6835/8868/MCCprotodune.pdf - Thoughts on protoDUNE MC production
+2025-08-06 02:58:12,729 - src.extractors.indico_extractor - ERROR - Error processing attachment https://indico.fnal.gov/event/11884/contributions/10432/attachments/6837/8871/showerupdate.pdf?access_token=DUNEnu: 403 Client Error: Forbidden for url: https://indico.fnal.gov/event/11884/contributions/10432/attachments/6837/8871/showerupdate.pdf?access_token=DUNEnu
+2025-08-06 02:58:13,143 - src.extractors.indico_extractor - INFO - Processed Indico document: 6836/8870/adams_dunefdsimreco_20160411_destsim.pdf - New DetSim Module
+2025-08-06 02:58:13,394 - src.extractors.indico_extractor - INFO - Processed Indico document: 6836/8869/adams_dunefdsimreco_20160411_destsim.pptx - New DetSim Module
+2025-08-06 02:58:52,464 - src.extractors.indico_extractor - INFO - Processed Indico document: 6833/8866/wirecell_li_20160314.pdf - Perpendicular APA gap study
+2025-08-06 02:58:52,466 - src.extractors.indico_extractor - INFO - Processing event: LBL Bi-weekly Meeting (11918)
+2025-08-06 02:58:52,740 - src.extractors.indico_extractor - INFO - Processing event: SNB/LE Physics Working Group Meeting (11919)
+2025-08-06 02:58:53,473 - src.extractors.indico_extractor - INFO - Processed Indico document: 7064/9123/argon-39_bg_dune_pds_sinev_v2.pdf - APS meeting practice talk
+2025-08-06 02:58:59,766 - src.extractors.indico_extractor - INFO - Processed Indico document: 7063/9122/aps2016_gardiner.pdf - APS meeting practice talk
+2025-08-06 02:58:59,768 - src.extractors.indico_extractor - INFO - Processing event: DUNE Beyond the Standard Model Group Meeting (11925)
+2025-08-06 02:59:01,053 - src.extractors.indico_extractor - INFO - Processed Indico document: 7073/9132/talk_DUNE.pdf - DUNE Sensitivities to Neutrino Tridents
+2025-08-06 02:59:01,367 - src.extractors.indico_extractor - INFO - Processed Indico document: 7072/9131/DUNE_BSM_Software_Update_April12.pdf - DUNE BSM Code Framework Update
+2025-08-06 02:59:01,368 - src.extractors.indico_extractor - INFO - Processing event: Near Detector Physics: Bi-Weekly Meeting (11940)
+2025-08-06 02:59:01,724 - src.extractors.indico_extractor - ERROR - Error processing attachment https://indico.fnal.gov/event/11940/contributions/10828/attachments/7107/9170/Z_Expansion_for_Dune.pdf?access_token=DUNEnu: 403 Client Error: Forbidden for url: https://indico.fnal.gov/event/11940/contributions/10828/attachments/7107/9170/Z_Expansion_for_Dune.pdf?access_token=DUNEnu
+2025-08-06 02:59:02,403 - src.extractors.indico_extractor - INFO - Processed Indico document: 7106/9169/Kabirnezhad_DUNE.pdf - Single Pion Production in neutrino-nucleon reaction
+2025-08-06 02:59:02,404 - src.extractors.indico_extractor - INFO - Processing event: FD Simulation and Reconstruction Bi-Weekly (11982)
+2025-08-06 02:59:03,356 - src.extractors.indico_extractor - INFO - Processed Indico document: 7218/9295/adams_dunefdsimreco_20160425_detsim.pdf - Moving production to the new detsim module
+2025-08-06 02:59:03,695 - src.extractors.indico_extractor - INFO - Processed Indico document: 7218/9294/adams_dunefdsimreco_20160425_detsim.pptx - Moving production to the new detsim module
+2025-08-06 02:59:04,209 - src.extractors.indico_extractor - INFO - Processed Indico document: 7219/9296/DUNE_Noise.pptx - Update on Signal Processing
+2025-08-06 02:59:04,210 - src.extractors.indico_extractor - INFO - Processing event: LBL Bi-weekly Meeting (12000)
+2025-08-06 02:59:05,374 - src.extractors.indico_extractor - INFO - Processed Indico document: 7675/9787/etw_lblpwg_arxiv_26april2016.pdf - Status of arXiv posting
+2025-08-06 02:59:06,208 - src.extractors.indico_extractor - INFO - Processed Indico document: 7677/9789/lbpwg_042616_1.pdf - LBNF Beam Alternative Designs
+2025-08-06 02:59:07,301 - src.extractors.indico_extractor - INFO - Processed Indico document: 7676/9788/Sanjib-DUNE-PWG-26th-March.pdf - Impact of Light Sterile Neutrino
+2025-08-06 02:59:07,303 - src.extractors.indico_extractor - INFO - Processing event: Nucleon Decay, Atmospheric Neutrinos and Cosmogenics: Bi-weekly meeting (12005)
+2025-08-06 02:59:08,467 - src.extractors.indico_extractor - INFO - Processed Indico document: 7688/9801/DUNE_FD_7.pdf - Tracking efficiency studies for NDK events
+2025-08-06 02:59:08,979 - src.extractors.indico_extractor - INFO - Processed Indico document: 7689/9802/azimuthal_dune.pdf - Measuring the azimuthal angle distribution of atmospheric neutrinos in DUNE
+2025-08-06 02:59:08,979 - src.extractors.indico_extractor - INFO - Processing event: SNB/LE Physics Working Group Meeting (12020)
+2025-08-06 02:59:09,989 - src.extractors.indico_extractor - INFO - Processed Indico document: 7722/9837/DUNEEarthScan1.pdf - Solar neutrino sensitivity
+2025-08-06 02:59:10,209 - src.extractors.indico_extractor - INFO - Processed Indico document: 7721/9836/snb_hackfest.pdf - Hack Days discussion
+2025-08-06 02:59:10,210 - src.extractors.indico_extractor - INFO - Processing event: Nucleon Decay, Atmospheric Neutrinos and Cosmogenics: Bi-weekly meeting (12096)
+2025-08-06 02:59:11,457 - src.extractors.indico_extractor - INFO - Processed Indico document: 8077/10232/morecosmo.pdf - Update on muon-induced backgrounds for PDK using Geant4.10.1
+2025-08-06 02:59:11,829 - src.extractors.indico_extractor - INFO - Processed Indico document: 8076/10231/RecoMusun_16_05_09.pdf - Reconstruction of cosmic ray muons
+2025-08-06 02:59:11,830 - src.extractors.indico_extractor - INFO - Processing event: SNB/LE Physics Working Group Meeting (12169)
+2025-08-06 02:59:12,194 - src.extractors.indico_extractor - ERROR - Error processing attachment https://indico.fnal.gov/event/12169/contributions/12690/attachments/8297/10520/DUNE_non-acc_ines.pdf?access_token=DUNEnu: 403 Client Error: Forbidden for url: https://indico.fnal.gov/event/12169/contributions/12690/attachments/8297/10520/DUNE_non-acc_ines.pdf?access_token=DUNEnu
+2025-08-06 02:59:12,434 - src.extractors.indico_extractor - INFO - Processed Indico document: 8296/10519/snble_may25_2016.pdf - Timeline for Supernova Hack Days
+2025-08-06 02:59:12,435 - src.extractors.indico_extractor - INFO - Processing event: Supernova Hack Days (12171)
+2025-08-06 02:59:12,787 - src.extractors.indico_extractor - INFO - Extracted 166 Indico documents
+2025-08-06 02:59:12,792 - src.indexing.faiss_manager - INFO - Adding 5 new documents to index
+2025-08-06 02:59:16,863 - src.indexing.faiss_manager - INFO - Successfully added 5 documents to index
+2025-08-06 02:59:16,863 - src.core.document_processor - INFO - Indico: 166 extracted, 5 added to index
+2025-08-06 02:59:16,863 - src.core.document_processor - INFO - Document processing completed. Total new documents added: 41
+
+==================================================
+INDEXING RESULTS
+==================================================
+DocDB documents processed: 38
+Indico documents processed: 166
+Total new documents added: 41
+
+Current index statistics:
+Total documents: 2591
+Total vectors: 2591
+Metadata entries: 2563
+2025-08-06 02:59:16,877 - __main__ - INFO - Document indexing completed successfully

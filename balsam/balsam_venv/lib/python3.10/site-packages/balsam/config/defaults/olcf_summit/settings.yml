@@ -1,0 +1,33 @@
+title: "Summit (OLCF)"
+
+compute_node: balsam.platform.compute_node.SummitNode
+mpi_app_launcher: balsam.platform.app_run.SummitJsrun
+local_app_launcher: balsam.platform.app_run.LocalAppRun
+mpirun_allows_node_packing: false
+serial_mode_startup_params: 
+    cpu_affinity: none
+
+scheduler_class: balsam.platform.scheduler.LsfScheduler
+allowed_queues:
+    batch:
+        max_nodes: 4608
+        max_queued_jobs: 100
+        max_walltime: 1440
+    batch-hm:
+        max_nodes: 54
+        max_queued_jobs: 100
+        max_walltime: 1440
+    debug:
+        max_nodes: 4608
+        max_queued_jobs: 1
+        max_walltime: 120
+        
+
+allowed_projects:
+- CSC388
+- CSC435
+
+optional_batch_job_params:
+    reservation: ""
+
+globus_endpoint_id: ef1a9560-7ca1-11e5-992c-22000b96db58 # The local Globus endpoint ID

@@ -1,0 +1,42 @@
+2025-07-30 15:00:57.289 | 19042 | INFO | balsam:114] Configured logging on x4417c1s0b0n0
+2025-07-30 15:00:57.289 | 19042 | INFO | balsam.site.launcher.mpi_mode:256] Launcher filtering for tags: {'job_start': '0'}
+2025-07-30 15:00:57.290 | 19042 | INFO | balsam.platform.compute_node.alcf_aurora_node:46] x4417c1s0b0n0.hsn.cm.aurora.alcf.anl.gov detected GPU IDs: ['0.0', '0.1', '1.0', '1.1', '2.0', '2.1', '3.0', '3.1', '4.0', '4.1', '5.0', '5.1']
+2025-07-30 15:00:57.290 | 19042 | INFO | balsam.platform.compute_node.alcf_aurora_node:46] x4418c4s4b0n0.hsn.cm.aurora.alcf.anl.gov detected GPU IDs: ['0.0', '0.1', '1.0', '1.1', '2.0', '2.1', '3.0', '3.1', '4.0', '4.1', '5.0', '5.1']
+2025-07-30 15:00:57.290 | 19042 | INFO | balsam.platform.compute_node.alcf_aurora_node:46] x4418c6s1b0n0.hsn.cm.aurora.alcf.anl.gov detected GPU IDs: ['0.0', '0.1', '1.0', '1.1', '2.0', '2.1', '3.0', '3.1', '4.0', '4.1', '5.0', '5.1']
+2025-07-30 15:00:57.290 | 19042 | INFO | balsam.platform.compute_node.alcf_aurora_node:46] x4418c7s7b0n0.hsn.cm.aurora.alcf.anl.gov detected GPU IDs: ['0.0', '0.1', '1.0', '1.1', '2.0', '2.1', '3.0', '3.1', '4.0', '4.1', '5.0', '5.1']
+2025-07-30 15:00:59.399 | 19042 | INFO | balsam.site.launcher.mpi_mode:120] Job Acquisition: 4 empty nodes; 4.0 aggregate free nodes; requested up to 990 jobs [node packing allowed: True]; Acquired 2 jobs.
+2025-07-30 15:00:59.401 | 19042 | INFO | balsam.platform.app_run.app_run:174] AuroraRun Popen: source /var/tmp/pbs.6871675.aurora-pbs-0001.hostmgmt.cm.aurora.alcf.anl.gov/tmp2ib08mwg && mpiexec -np 1 -ppn 1 --hosts x4417c1s0b0n0.hsn.cm.aurora.alcf.anl.gov --cpu-bind none -d 1 --envall /lus/flare/projects/LLM_for_DUNE/users/aditya/DUNEGPT_aurora//new_venv/bin/python cli.py python cli.py index --docdb-limit 150 --indico-limit 150
+2025-07-30 15:00:59.401 | 19042 | INFO | balsam.platform.app_run.app_run:178] AuroraRun envs: OMP_NUM_THREADS=1
+2025-07-30 15:00:59.413 | 19042 | INFO | balsam.platform.app_run.app_run:174] AuroraRun Popen: source /var/tmp/pbs.6871675.aurora-pbs-0001.hostmgmt.cm.aurora.alcf.anl.gov/tmpj44biry8 && mpiexec -np 1 -ppn 1 --hosts x4418c4s4b0n0.hsn.cm.aurora.alcf.anl.gov --cpu-bind none -d 1 --envall /lus/flare/projects/LLM_for_DUNE/users/aditya/DUNEGPT_aurora//new_venv/bin/python cli.py python cli.py index --docdb-limit 150 --indico-limit 150
+2025-07-30 15:00:59.413 | 19042 | INFO | balsam.platform.app_run.app_run:178] AuroraRun envs: OMP_NUM_THREADS=1
+2025-07-30 15:01:01.061 | 19046 | INFO | balsam.site.status_updater:104] StatusUpdater bulk-updated 2 jobs
+2025-07-30 15:01:16.055 | 19042 | INFO | balsam.site.launcher.mpi_mode:180] Run error:   File "/lus/flare/projects/LLM_for_DUNE/users/aditya/DUNEGPT_aurora/new_venv/lib/python3.10/site-packages/spacy/compat.py", line 4, in <module>
+    from thinc.util import copy_array
+  File "/lus/flare/projects/LLM_for_DUNE/users/aditya/DUNEGPT_aurora/new_venv/lib/python3.10/site-packages/thinc/__init__.py", line 5, in <module>
+    from .config import registry
+  File "/lus/flare/projects/LLM_for_DUNE/users/aditya/DUNEGPT_aurora/new_venv/lib/python3.10/site-packages/thinc/config.py", line 5, in <module>
+    from .types import Decorator
+  File "/lus/flare/projects/LLM_for_DUNE/users/aditya/DUNEGPT_aurora/new_venv/lib/python3.10/site-packages/thinc/types.py", line 24, in <module>
+    from pydantic import GetCoreSchemaHandler
+ImportError: cannot import name 'GetCoreSchemaHandler' from 'pydantic' (/lus/flare/projects/LLM_for_DUNE/users/aditya/DUNEGPT_aurora/new_venv/lib/python3.10/site-packages/pydantic/__init__.cpython-310-x86_64-linux-gnu.so)
+x4417c1s0b0n0.hsn.cm.aurora.alcf.anl.gov: rank 0 exited with code 1
+
+2025-07-30 15:01:16.059 | 19042 | INFO | balsam.site.launcher.mpi_mode:180] Run error:   File "/lus/flare/projects/LLM_for_DUNE/users/aditya/DUNEGPT_aurora/new_venv/lib/python3.10/site-packages/spacy/compat.py", line 4, in <module>
+    from thinc.util import copy_array
+  File "/lus/flare/projects/LLM_for_DUNE/users/aditya/DUNEGPT_aurora/new_venv/lib/python3.10/site-packages/thinc/__init__.py", line 5, in <module>
+    from .config import registry
+  File "/lus/flare/projects/LLM_for_DUNE/users/aditya/DUNEGPT_aurora/new_venv/lib/python3.10/site-packages/thinc/config.py", line 5, in <module>
+    from .types import Decorator
+  File "/lus/flare/projects/LLM_for_DUNE/users/aditya/DUNEGPT_aurora/new_venv/lib/python3.10/site-packages/thinc/types.py", line 24, in <module>
+    from pydantic import GetCoreSchemaHandler
+ImportError: cannot import name 'GetCoreSchemaHandler' from 'pydantic' (/lus/flare/projects/LLM_for_DUNE/users/aditya/DUNEGPT_aurora/new_venv/lib/python3.10/site-packages/pydantic/__init__.cpython-310-x86_64-linux-gnu.so)
+x4418c4s4b0n0.hsn.cm.aurora.alcf.anl.gov: rank 0 exited with code 1
+
+2025-07-30 15:01:17.177 | 19046 | INFO | balsam.site.status_updater:104] StatusUpdater bulk-updated 2 jobs
+2025-07-30 15:02:17.019 | 19042 | INFO | balsam.site.launcher.mpi_mode:74] Exceeded 60 sec TTL: shutting down because nothing to do
+2025-07-30 15:02:17.019 | 19042 | INFO | balsam.site.launcher.mpi_mode:227] Launcher starting shutdown sequence
+2025-07-30 15:02:17.019 | 19042 | INFO | balsam.site.job_source:212] Signal: JobSource cancelling tick thread and deleting API Session
+2025-07-30 15:02:20.577 | 19042 | INFO | balsam.site.job_source:214] JobSource exit graceful
+2025-07-30 15:02:20.577 | 19042 | INFO | balsam.site.launcher.mpi_mode:229] Timing out active runs
+2025-07-30 15:02:21.244 | 19046 | INFO | balsam.site.status_updater:50] Signal: break out of StatusUpdater main loop
+2025-07-30 15:02:21.244 | 19046 | INFO | balsam.site.status_updater:52] StatusUpdater thread finished.

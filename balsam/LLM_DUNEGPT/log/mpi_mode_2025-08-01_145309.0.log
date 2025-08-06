@@ -1,0 +1,27 @@
+2025-08-01 14:53:10.628 | 163910 | INFO | balsam:114] Configured logging on x4320c7s0b0n0
+2025-08-01 14:53:10.628 | 163910 | INFO | balsam.site.launcher.mpi_mode:256] Launcher filtering for tags: {'job_start': '0'}
+2025-08-01 14:53:10.628 | 163910 | INFO | balsam.platform.compute_node.alcf_aurora_node:46] x4320c7s0b0n0.hsn.cm.aurora.alcf.anl.gov detected GPU IDs: ['0.0', '0.1', '1.0', '1.1', '2.0', '2.1', '3.0', '3.1', '4.0', '4.1', '5.0', '5.1']
+2025-08-01 14:53:10.628 | 163910 | INFO | balsam.platform.compute_node.alcf_aurora_node:46] x4320c7s1b0n0.hsn.cm.aurora.alcf.anl.gov detected GPU IDs: ['0.0', '0.1', '1.0', '1.1', '2.0', '2.1', '3.0', '3.1', '4.0', '4.1', '5.0', '5.1']
+2025-08-01 14:53:10.628 | 163910 | INFO | balsam.platform.compute_node.alcf_aurora_node:46] x4320c7s2b0n0.hsn.cm.aurora.alcf.anl.gov detected GPU IDs: ['0.0', '0.1', '1.0', '1.1', '2.0', '2.1', '3.0', '3.1', '4.0', '4.1', '5.0', '5.1']
+2025-08-01 14:53:10.628 | 163910 | INFO | balsam.platform.compute_node.alcf_aurora_node:46] x4320c7s3b0n0.hsn.cm.aurora.alcf.anl.gov detected GPU IDs: ['0.0', '0.1', '1.0', '1.1', '2.0', '2.1', '3.0', '3.1', '4.0', '4.1', '5.0', '5.1']
+2025-08-01 14:53:10.628 | 163910 | INFO | balsam.platform.compute_node.alcf_aurora_node:46] x4320c7s4b0n0.hsn.cm.aurora.alcf.anl.gov detected GPU IDs: ['0.0', '0.1', '1.0', '1.1', '2.0', '2.1', '3.0', '3.1', '4.0', '4.1', '5.0', '5.1']
+2025-08-01 14:53:10.628 | 163910 | INFO | balsam.platform.compute_node.alcf_aurora_node:46] x4320c7s5b0n0.hsn.cm.aurora.alcf.anl.gov detected GPU IDs: ['0.0', '0.1', '1.0', '1.1', '2.0', '2.1', '3.0', '3.1', '4.0', '4.1', '5.0', '5.1']
+2025-08-01 14:53:10.628 | 163910 | INFO | balsam.platform.compute_node.alcf_aurora_node:46] x4320c7s6b0n0.hsn.cm.aurora.alcf.anl.gov detected GPU IDs: ['0.0', '0.1', '1.0', '1.1', '2.0', '2.1', '3.0', '3.1', '4.0', '4.1', '5.0', '5.1']
+2025-08-01 14:53:10.628 | 163910 | INFO | balsam.platform.compute_node.alcf_aurora_node:46] x4320c7s7b0n0.hsn.cm.aurora.alcf.anl.gov detected GPU IDs: ['0.0', '0.1', '1.0', '1.1', '2.0', '2.1', '3.0', '3.1', '4.0', '4.1', '5.0', '5.1']
+2025-08-01 14:53:12.082 | 163910 | INFO | balsam.site.launcher.mpi_mode:120] Job Acquisition: 8 empty nodes; 8.0 aggregate free nodes; requested up to 990 jobs [node packing allowed: True]; Acquired 4 jobs.
+2025-08-01 14:53:12.084 | 163910 | INFO | balsam.platform.app_run.app_run:174] AuroraRun Popen: source /var/tmp/pbs.6894484.aurora-pbs-0001.hostmgmt.cm.aurora.alcf.anl.gov/tmpg3h5vw20 && mpiexec -np 1 -ppn 1 --hosts x4320c7s0b0n0.hsn.cm.aurora.alcf.anl.gov --cpu-bind none -d 1 --envall /lus/flare/projects/LLM_for_DUNE/users/aditya/DUNEGPT_aurora//new_venv/bin/python cli.py index --docdb-limit 1000 --indico-limit 1000
+2025-08-01 14:53:12.084 | 163910 | INFO | balsam.platform.app_run.app_run:178] AuroraRun envs: OMP_NUM_THREADS=1
+2025-08-01 14:53:12.100 | 163910 | INFO | balsam.platform.app_run.app_run:174] AuroraRun Popen: source /var/tmp/pbs.6894484.aurora-pbs-0001.hostmgmt.cm.aurora.alcf.anl.gov/tmp5cprq0ne && mpiexec -np 1 -ppn 1 --hosts x4320c7s1b0n0.hsn.cm.aurora.alcf.anl.gov --cpu-bind none -d 1 --envall /lus/flare/projects/LLM_for_DUNE/users/aditya/DUNEGPT_aurora//new_venv/bin/python cli.py index --docdb-limit 1000 --indico-limit 1000
+2025-08-01 14:53:12.100 | 163910 | INFO | balsam.platform.app_run.app_run:178] AuroraRun envs: OMP_NUM_THREADS=1
+2025-08-01 14:53:12.110 | 163910 | INFO | balsam.platform.app_run.app_run:174] AuroraRun Popen: source /var/tmp/pbs.6894484.aurora-pbs-0001.hostmgmt.cm.aurora.alcf.anl.gov/tmpitmsgjn2 && mpiexec -np 1 -ppn 1 --hosts x4320c7s2b0n0.hsn.cm.aurora.alcf.anl.gov --cpu-bind none -d 1 --envall /lus/flare/projects/LLM_for_DUNE/users/aditya/DUNEGPT_aurora//new_venv/bin/python cli.py index --docdb-limit 1000 --indico-limit 1000
+2025-08-01 14:53:12.110 | 163910 | INFO | balsam.platform.app_run.app_run:178] AuroraRun envs: OMP_NUM_THREADS=1
+2025-08-01 14:53:12.119 | 163910 | INFO | balsam.platform.app_run.app_run:174] AuroraRun Popen: source /var/tmp/pbs.6894484.aurora-pbs-0001.hostmgmt.cm.aurora.alcf.anl.gov/tmpd1e615hg && mpiexec -np 1 -ppn 1 --hosts x4320c7s3b0n0.hsn.cm.aurora.alcf.anl.gov --cpu-bind none -d 1 --envall /lus/flare/projects/LLM_for_DUNE/users/aditya/DUNEGPT_aurora//new_venv/bin/python cli.py index --docdb-limit 1000 --indico-limit 1000
+2025-08-01 14:53:12.119 | 163910 | INFO | balsam.platform.app_run.app_run:178] AuroraRun envs: OMP_NUM_THREADS=1
+2025-08-01 14:53:13.322 | 163914 | INFO | balsam.site.status_updater:104] StatusUpdater bulk-updated 4 jobs
+2025-08-01 18:09:11.322 | 163910 | INFO | balsam.site.launcher.mpi_mode:227] Launcher starting shutdown sequence
+2025-08-01 18:09:11.322 | 163910 | INFO | balsam.site.job_source:212] Signal: JobSource cancelling tick thread and deleting API Session
+2025-08-01 18:09:14.114 | 163910 | INFO | balsam.site.job_source:214] JobSource exit graceful
+2025-08-01 18:09:14.114 | 163910 | INFO | balsam.site.launcher.mpi_mode:229] Timing out active runs
+2025-08-01 18:09:15.250 | 163914 | INFO | balsam.site.status_updater:104] StatusUpdater bulk-updated 4 jobs
+2025-08-01 18:09:15.250 | 163914 | INFO | balsam.site.status_updater:50] Signal: break out of StatusUpdater main loop
+2025-08-01 18:09:15.250 | 163914 | INFO | balsam.site.status_updater:52] StatusUpdater thread finished.
