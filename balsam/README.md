@@ -32,10 +32,17 @@ balsam/
 ## Quick Start
 
 ### Prerequisites
-
+- To use Balsam, users need an account on the Balsam server. Users can get an account by contacting the ALCF Help Desk. Once a user has an account, they can log in and make a new site. A Balsam site is a project space for your workflow. You will be prompted to select what machine (Aurora) you are working on when creating a new site
 - Python environment with Balsam installed (e.g., `balsam_env`)
 - A valid `embed_docdb_indico.py` script that creates and runs FAISS embedding jobs
-
+- Balsam installed using:
+```bash  
+  module load frameworks
+  python -m venv _env
+  source _env/bin/activate
+  pip install --upgrade pip
+  pip install --pre balsam
+```
 ---
 
 ##  Setup
@@ -49,6 +56,7 @@ source balsam_venv/bin/activate
 ### 2. Initialize the Balsam site (first time only), creates LLM_DUNEGPT folder
 
 ```bash
+balsam login
 balsam site init LLM_DUNEGPT
 ```
 
