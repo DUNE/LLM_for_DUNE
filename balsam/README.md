@@ -95,7 +95,7 @@ Before submitting jobs, register the app once (from /balsam/LLM_DUNEGPT/):
 ```bash
 python scripts/app/embed_docdb_indico.py
 ```
-
+In this python file you can edit the number of documents indexed in:  python cli.py index --docdb-limit n --indico-limit n 
 ---
 
 ## Run Jobs
