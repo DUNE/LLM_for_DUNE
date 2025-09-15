@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="static/styles.css">
+
+    <title>DUNE-GPT</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            max-width: 800px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            padding: 8px 16px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        #response {
+            margin-top: 30px;
+        }
+        a {
+            color: #0645AD;
+        }
+        .loader {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #555;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+             margin-top: 10px;
+        }
+        #dune-logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 120px;
+            height: auto;
+            z-index: 10;
+        }
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+    </style>
+</head>
+<body>
+    <h1>DUNE-GPT</h1>
+    
+    <!-- Authentication Status -->
+    {% if auth_enabled %}
+        <div style="margin-bottom: 20px; padding: 10px; background-color: #f0f8ff; border-radius: 5px;">
+            {% if user %}
+                <p>✅ <strong>Authenticated as:</strong> {{ user.email }}</p>
+                <a href="/logout" style="color: #dc3545; text-decoration: none;">🚪 Logout</a>
+            {% else %}
+                <p>🔐 <strong>Authentication Required</strong></p>
+                <a href="/login" style="color: #007bff; text-decoration: none;">🔑 Login with Fermilab</a>
+            {% endif %}
+        </div>
+    {% endif %}
+    
+    {% if not auth_enabled or user %}
+    <form method="POST" action="/ui" onsubmit="showSpinner()">
+        <label for="question">Ask a question:</label><br>
+        <input type="text" id="question" name="question" required value="{{ question or '' }}" placeholder="Ask me about DUNE documents"><br>
+        <button type="submit">Submit</button>
+        <div id="spinner" style="display:none; margin-top: 10px;">
+            <strong>Processing...</strong> <br>
+            <div class="loader"></div>
+        </div>
+    </form>
+    
+    <script>
+        function showSpinner() {
+            document.getElementById('spinner').style.display = 'block';
+        }
+    </script>
+
+    <div id="response">
+        {% if answer %}
+            <h2>Answer:</h2>
+            <pre>{{ answer }}</pre>
+
+            {% if reference %}
+                <h3>References:</h3>
+                <!-- Debug: Print the raw reference to check its structure -->
+                <!--<p><strong>Raw Reference:</strong> {{ reference }}</p> -->
+                <ul>
+                    {% for ref in reference %}
+                        {% if 'http' in ref %}
+                            <li><a href="{{ ref }}" target="_blank">{{ ref }}</a></li>
+                        {% else %}
+                            <li>{{ ref }}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endif %}
+    </div>
+    {% endif %}
+</body>
+<img src="static/images/DUNElogo_color.png"
+     alt="DUNE Logo" 
+     id="dune-logo" 
+     style="position: absolute; top: 20px; right: 20px; width: 200px; height: auto; z-index: 9999;">
+</html>
