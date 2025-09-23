@@ -1,0 +1,10 @@
+base_envs:
+  - name: 'embed_docdb_indico'
+    env:
+      OUTDIR_BASE: '/lus/flare/projects/LLM_for_DUNE/users/Rishika/DUNEGPT_polaris_cursor/data/faiss/new'
+      LOGDIR_BASE: '/lus/flare/projects/LLM_for_DUNE/users/Rishika/DUNEGPT_polaris_cursor/data/faiss/new/logs_new'
+      IN_NAME: ''
+      HOME_DIR: '/lus/flare/projects/LLM_for_DUNE/users/Rishika/DUNEGPT_polaris_cursor/'
+      USE_LOCAL_PRODUCT: '1'
+      OUT_NAME: 'embeddings'
+
