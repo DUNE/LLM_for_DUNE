@@ -20,7 +20,7 @@ class BaseExtractor(ABC):
         """Extract documents from the source"""
         pass
 
-
+    '''
     def _download_file(self, link, session, max_file_bytes) -> Optional[Tuple[bytes, Dict[str, str]]]:
         """Download a file with size check; returns (content, headers) or None if skipped/failure."""
 
@@ -56,13 +56,73 @@ class BaseExtractor(ABC):
                 content = resp.raw.read(max_file_bytes + 1)
                 if len(content) > max_file_bytes:
                     logger.info(f"Skipping file exceeding max size while streaming: {link}")
-                    return None, None
+                    return None, None                   
 
             return content, resp.headers
         except requests.RequestException as e:
             logger.warning(f"Error downloading {link}: {e}")
             return None, None
-        
+    '''
+
+    def _download_file(self, link, session, max_file_bytes) -> Optional[Tuple[bytes, Dict[str, str]]]:
+        """Download a file with size check; returns (content, headers) or None if skipped/failure."""
+        if not link:
+            logger.error(f"Invalid link: {link}")
+            return None, None
+        try:
+            assert not isinstance(session, str), type(session)
+
+            # First try HEAD to get size
+            try:
+                head = session.head(link, allow_redirects=True)
+                if head.status_code in (401, 403):
+                    logger.warning(f"Unauthorized to download (HEAD): {link}")
+                    raise requests.RequestException(f"HEAD returned {head.status_code}")
+                if head.status_code == 404:
+                    logger.info(f"File not found (404): {link}")
+                    return None, None
+                if head.status_code >= 400:
+                    raise requests.RequestException(f"HEAD returned {head.status_code}")
+            
+                size_hdr = head.headers.get("content-length", None)
+                size = int(size_hdr) if (size_hdr and size_hdr.isdigit()) else 0
+            except requests.RequestException:
+                logger.info(f"HEAD failed, falling back to GET for {link}")
+                size = 0  # Unknown size, proceed to GET
+
+            # GET request with browser User-Agent
+            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+            resp = session.get(link, headers=headers, stream=True)
+            if resp.status_code in (401, 403):
+                logger.warning(f"Unauthorized to download (GET): {link}")
+                return None, None
+            if resp.status_code == 404:
+                logger.info(f"File not found (404): {link}")
+                return None, None
+            if resp.status_code >= 400:
+                logger.warning(f"GET failed ({resp.status_code}) for {link}")
+                return None, None
+
+            # Use content-length if HEAD succeeded, else unknown
+            if size and size > max_file_bytes:
+                logger.info(f"Skipping large file ({size} bytes > {max_file_bytes}): {link}")
+                return None, None
+
+            # Read content (cap if size unknown)
+            if size and size <= max_file_bytes:
+                content = resp.content
+            else:
+                content = resp.raw.read(max_file_bytes + 1)
+                if len(content) > max_file_bytes:
+                    logger.info(f"Skipping file exceeding max size while streaming: {link}")
+                    return None, None
+
+            return content, resp.headers
+
+        except requests.RequestException as e:
+            logger.warning(f"Error downloading {link}: {e}")
+            return None, None
+    
     def get_raw_text(self, content_type, content):
         raw_text = ''
         if 'application/pdf' in content_type:
