@@ -55,7 +55,6 @@ python-docx
 openpyxl
 pytesseract 
 pillow
-tesseract
 
 playwright
 #playwright install chromium
