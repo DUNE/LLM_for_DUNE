@@ -60,6 +60,7 @@ A Retrieval-Augmented Generation (RAG) based LLM application for DUNE scientific
    ```bash
    pip install -r requirements.txt
    python -m spacy download en_core_web_sm
+   brew install tesseract
    ```
 
 4. **Index documents**
