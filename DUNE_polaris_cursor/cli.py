@@ -70,7 +70,7 @@ def cli():
 @click.option(
     '--data-path',
     type=str,
-    default='data',
+    default='data/faiss',
 )
 
 @click.option(
