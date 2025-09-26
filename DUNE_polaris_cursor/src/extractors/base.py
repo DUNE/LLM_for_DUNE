@@ -20,50 +20,20 @@ class BaseExtractor(ABC):
         """Extract documents from the source"""
         pass
 
-    '''
-    def _download_file(self, link, session, max_file_bytes) -> Optional[Tuple[bytes, Dict[str, str]]]:
-        """Download a file with size check; returns (content, headers) or None if skipped/failure."""
 
-        if not link:
-            logger.error(f"Invalid link: {link}")
-            return None, None
-        try:
-            assert not isinstance(session, str), type(session)
-            head = session.head(link, allow_redirects=True)
-            
-            assert head, f"For {link}, head is {head}"
-            if head.status_code in (401, 403):
-                logger.warning(f"Unauthorized to download: {link}")
-                return None, None
-            if head.status_code == 404:
-                logger.info(f"File not found (404): {link}")
-                return None, None
-            size_hdr = head.headers.get("content-length", None)
-            size = int(size_hdr) if (size_hdr and size_hdr.isdigit()) else 0
-            if size and size > max_file_bytes:
-                logger.info(f"Skipping large file ({size} bytes > {max_file_bytes}): {link}")
-                return None, None
-
-            resp = session.get(link, stream=True)
-            if not resp.ok:
-                logger.warning(f"GET failed ({resp.status_code}) for {link}")
-                return None, None
-
-            # If size unknown, cap read
-            if size and size <= max_file_bytes:
-                content = resp.content
-            else:
-                content = resp.raw.read(max_file_bytes + 1)
-                if len(content) > max_file_bytes:
-                    logger.info(f"Skipping file exceeding max size while streaming: {link}")
-                    return None, None                   
-
-            return content, resp.headers
-        except requests.RequestException as e:
-            logger.warning(f"Error downloading {link}: {e}")
-            return None, None
-    '''
-
+    def get_chunks(self, text, chunk_size):
+        if not text: return []
+        start = 0
+        end=chunk_size
+        if end >= len(text): 
+            return [' '.join(text)]
+        chunks = []
+        while end < len(text):
+            chunks.append(' '.join(text[start:end]))
+            start=end
+            end += chunk_size
+        return chunks
+    
     def _download_file(self, link, session, max_file_bytes) -> Optional[Tuple[bytes, Dict[str, str]]]:
         """Download a file with size check; returns (content, headers) or None if skipped/failure."""
         if not link:
@@ -122,7 +92,7 @@ class BaseExtractor(ABC):
         except requests.RequestException as e:
             logger.warning(f"Error downloading {link}: {e}")
             return None, None
-    
+        
     def get_raw_text(self, content_type, content):
         raw_text = ''
         if 'application/pdf' in content_type:
@@ -230,6 +200,8 @@ class BaseExtractor(ABC):
 
     def extract_text_from_image(self, image_content: bytes) -> str:
         """Extract text from images (JPEG/PNG) using OCR"""
+        return ''
+        #follow up have this be an llm call to interpret the image in the form of text
         from PIL import Image
         import pytesseract
         

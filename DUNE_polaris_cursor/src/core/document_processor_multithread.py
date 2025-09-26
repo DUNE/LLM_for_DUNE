@@ -64,7 +64,7 @@ class DocumentProcessor:
                                                                     max_missing=1000
                                                                 ):
                     
-                    logger.warning("Got 1 batch")
+
                     for rec in raw_records:
                         did = rec["document_id"]
 
@@ -88,7 +88,6 @@ class DocumentProcessor:
                         incoming_v = int(rec.get("docdb_version", "0") or "0")
                         if force or incoming_v > indexed_versions.get(did, 0) or modified_date_md > last_scraped_date_md or modified_date_ct > last_scraped_date_ct:
                             to_reindex.append(rec)
-                    logger.warning(f"GOTS {len(to_reindex)}")
                     log_to_db_docdb(to_reindex)
                     
                 
@@ -142,7 +141,6 @@ class DocumentProcessor:
                 for indico_records in self.indico_extractor.extract_documents(start=start_ind, limit=indico_limit):
                     logger.info(f"Indico records returns {len(indico_records)}")
                     existing_ids = set(self.faiss_manager.doc_ids)
-                    print(existing_ids)
                     indico_to_add[0] = [
                         doc for doc in indico_records
                         if doc["document_id"] not in existing_ids
@@ -151,7 +149,6 @@ class DocumentProcessor:
                     logger.info(
                         f"Indico: extracted {len(indico_to_add[0])} docs, "
                     )
-                    logger.warning(f"LOGGING INDICO TO FAISS")
 
                     log_to_db_indico(indico_to_add[0])
                     
