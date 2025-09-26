@@ -3,7 +3,7 @@ from mlflow.genai import scorer
 from mlflow.genai.scorers import Correctness, Guidelines
 
 from config import ( ARGO_API_USERNAME, ARGO_API_KEY, 
-    DEFAULT_TOP_K, STORE,
+    DEFAULT_TOP_K, STORE, QA_PATH
 )
 import logging
 import pandas as pd
@@ -43,8 +43,7 @@ def relevant_refs(outputs:str, expectations:str):
 @scorer
 def correctness(outputs: str, expectations: str = None) -> int:
     try:
-        
-        question = "How correct is the generated output from the expected output? Return a single value, 0 or 1 in the format of a json with the only permitted key being 'score'. Get the main points from the expected output and evaluate correctness on how closely aligned the generated out is to those points. If the generated output does not address those points, give a value of 0. If it does address these points, give it a value of 1." 
+        question="Using the expected output as the ground truth answer, determine if the generated output is correct .Return a float value between 0 and 1 in the format of a json with the only permitted key being 'score'. You will evaluate correctness like this: Get the main points from the expected output and the generated output. Then evaluate how closely aligned these points are. The words do not need to match exactly. Even if the generated output is phrased differently, as long as the general idea behind the generated output is the same as that behind the expected out, give the generated output a score close to 1. However, if the generated output does not address the same points or convey the same ideas as that of the expected output, then give a value close to 0."
         context = f"Generated output: {outputs}\nExpected out: {expectations}"
         resp = argo_client.chat_completion(question=question, context=context)
         clean_str = re.sub(r'^```json\s*|```$', '', resp, flags=re.MULTILINE).strip()
@@ -53,9 +52,6 @@ def correctness(outputs: str, expectations: str = None) -> int:
         # Return the "score" value as float
         
         results = float(data.get("score", 0))
-        print("generated" , outputs)
-        print("true", expectations)
-        print(results)
     except Exception as e:
         print(e)
         return e
@@ -73,8 +69,8 @@ def extract_https_url(text):
 class Evalutation():
     def __init__(self, port, experiment_name, data_path):
         if STORE == 'faiss':
-            self.faiss_manager = FAISSManager(data_path) 
-            #self.faiss_manager = ChromaManager(data_path)#FAISSManager(data_path)
+            #self.faiss_manager = FAISSManager(data_path) 
+            self.faiss_manager = ChromaManager(data_path)#FAISSManager(data_path)
         print(f"connecting to client")
         self.argo_client = ArgoAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
         print("Conntected to client")
@@ -85,7 +81,7 @@ class Evalutation():
         
     def create_validation_dataset(self):
         
-        qa=pd.read_csv("/home/newg2/Projects/LLM/DUNE/LLM_for_DUNE/qa.csv")
+        qa=pd.read_csv(QA_PATH)
         qas=[]
         for row in qa.iterrows():
             dictionary={}
@@ -100,12 +96,11 @@ class Evalutation():
     def create_refs_dataset(self):
     
 
-        refs_dataset=pd.read_csv("/home/newg2/Projects/LLM/DUNE/LLM_for_DUNE/qa.csv")
+        refs_dataset=pd.read_csv(QA_PATH)
         refs=[]
         for row in refs_dataset.iterrows():
             dictionary={}
             dictionary['inputs'] = {'question': row[1]['question']}
-            print(row[1]['question'], row[1]['link'])
             try:
                 link = re.sub(r'\s+', '', row[1]['link'])
                 link=extract_https_url(link)
@@ -188,7 +183,7 @@ results = val.evaluate(args.method)
 for key in results.metrics:
     if '/mean' in key:
         metric=key.split('/')[0]
-        DATA_FILE = f"{key.split('/')[0]}.json"
+        DATA_FILE = f"metrics/chroma/{key.split('/')[0]}.json"
 logger.info(f"Logging metrics to {DATA_FILE}")
 
 

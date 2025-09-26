@@ -39,7 +39,7 @@ class FAISSManager:
         # Load or initialize on‐disk data
      
         self.metadata_path = os.path.join(data_path, 'metadata_store.pkl')
-        print(self.metadata_path)
+
         self.metadata_store: Dict[str, Dict[str, Any]] = self._load_metadata()
         
         self.doc_ids_path = os.path.join(data_path, 'doc_ids.pkl')
@@ -102,33 +102,33 @@ class FAISSManager:
           - source, docdb_version, filename, content_type
         """
         # Filter out any IDs we've already stored
-        new_docs = [d for d in documents if 'cleaned_text' in d and (d["document_id"] not in self.metadata_store or self.metadata_store[d["document_id"]]['source'] != d['source']) ]
+        all_docs = [d for d in documents if d["document_id"] not in self.metadata_store or self.metadata_store[d["document_id"]]['source'] != d['source'] ]
+        new_docs = [d for d in all_docs if 'cleaned_text' in d ]
         if not new_docs:
             logger.info("All documents already indexed")
             return 0
 
-        logger.info(f"Adding {len(new_docs)} {new_docs[-1].keys()}new documents to index")
+        logger.info(f"Adding {len(new_docs)} new documents to FAISS")
 
         # 1) Embed the cleaned text
         texts = [d["cleaned_text"] for d in new_docs]
        
         embeddings = self.generate_embeddings(texts)
-        logger.info(f"Embedded {len(new_docs)} {len(embeddings)} new documents to index")
+        logger.info(f"Embedded {len(new_docs)} new docs to FAISS")
 
 
         # 2) Add to FAISS
         self.count+=1
         self.faiss_index.add(np.array(embeddings))
-        print(f"Added {len(np.array(embeddings))} embeddings")
+        print(f"Added {len(np.array(embeddings))} embeddings to FAISS")
 
         # 3) Update doc_ids
-        self.doc_ids.extend(d["document_id"] for d in new_docs)
+        self.doc_ids.extend(d["document_id"] for d in all_docs)
 
         # 4) Write out rich metadata for each
         u=set()
         try:
-            for d in new_docs:
-
+            for d in all_docs:
                 did = d["document_id"]
                 u.add(did)
                 if d.get("source", "") == 'docdb':
@@ -163,6 +163,7 @@ class FAISSManager:
         self.save_all()
         logger.info(f"Successfully added {len(new_docs)} documents to index")
         return len(new_docs)
+    
     def get_indico_ids(self) -> Dict[int, int]:
         """
         Return a map { doc_id: max_version_indexed } for all DocDB docs.
@@ -279,9 +280,9 @@ class FAISSManager:
 
     def get_stats(self) -> Dict[str, int]:
         return {
-            "total_documents": len(self.doc_ids),
-            "total_vectors": self.faiss_index.ntotal,
-            "metadata_entries": len(self.metadata_store),
+            "total_attachments": len(self.doc_ids),
+            "total_embeddings": self.faiss_index.ntotal,
+            "total_metadata_entries": len(self.metadata_store),
         }
 
     def cleanup(self):

@@ -344,6 +344,7 @@ class IndicoExtractor(BaseExtractor):
         - obj['materials'][i]['attachments'] -> list of attachment dicts
         - attachment entries can carry direct 'download_url' or a 'files' list
         """
+   
         attachments: List[Dict[str, Any]] = []
         # Direct attachments list
         if isinstance(obj.get("folders"), list):
@@ -545,25 +546,33 @@ class IndicoExtractor(BaseExtractor):
         
         return ', '.join(list(authors)) if authors else 'Unknown Author'
     
+    
+
+    
     def add_chunks_to_doc(self, event_id, chunk_size, raw_text, docs, doc, attachments_total):
-        start=0
-        end=chunk_size
-        if end >= len(raw_text):
+
+        chunks = self.get_chunks(raw_text, chunk_size)
+        for chunk in chunks:
             doc['document_id']= f"{event_id}_{attachments_total}"
-            doc['cleaned_text'] = ' '.join(raw_text)
+            doc['cleaned_text'] = chunk
             docs.append(doc)
 
             attachments_total += 1
-        while end < len(raw_text):
-            doc['document_id']= f"{event_id}_{attachments_total}"
-            doc['cleaned_text'] = ' '.join(raw_text[start:end])
-            start=end
-            end += chunk_size
-            docs.append(doc)
+            logger.info(f'event_id: {event_id} added: {event_id}_{attachments_total}')
 
-            attachments_total += 1
         return docs, attachments_total
     
+    def get_content_type(self, a):
+        link = a['link_url']
+
+        try:
+            print(link)
+            response,_ = self._download_file(link, self.session, self.max_file_bytes )
+            print(response)
+            return 
+        except:
+            logger.error(f"Couldn't access {link}, not storing this in DB")
+        return ''
     def get_attachments(self, event_id, details,attachments_total, chunk_size):
         docs=[]
         for a in self._collect_attachments(details):
@@ -571,7 +580,10 @@ class IndicoExtractor(BaseExtractor):
             
             download_url = a['download_url']
             content_type = a.get('content_type','')
-            if not content_type: continue
+            if not content_type: 
+                #content_type=self.get_content_type(a)
+                continue
+
             filename = a['filename']
             doc['event_url'] = download_url
             doc['filename'] = filename
@@ -583,17 +595,17 @@ class IndicoExtractor(BaseExtractor):
             content, _ = self._download_file(download_url, self.session, self.max_file_bytes )
             
             if content:
-                
                 raw_text = self.get_raw_text(content_type,content).split()
-
                 docs, attachments_total = self.add_chunks_to_doc(event_id, chunk_size, raw_text, docs, doc, attachments_total)
-               
+                
                 
             else:
 
                 doc['document_id']= f"{event_id}_{attachments_total}"
                 attachments_total += 1
                 docs.append(doc)
+                logger.warning(f"Didn't get content for {download_url}")
+   
 
         return docs, attachments_total
     def collect_subcategories(self):
@@ -637,7 +649,7 @@ class IndicoExtractor(BaseExtractor):
             start_date = event.get("startDate").get('date', "Unknown Date")
             start_time = event.get("startDate").get('time', "Unknown Time")
  
-            doc['document_id'] = event_id
+            
             doc['meeting_name'] = title #meeting name
             doc['conveners'] = author  #conveners
             doc['start_date'] = start_date
@@ -645,8 +657,8 @@ class IndicoExtractor(BaseExtractor):
             doc['location'] = event.get("location", '')
             doc['event_description']=event.get("description",'')
             doc["source"]= "indico"
-            doc['event_url']=event.get('url','')
-            dataset.append(doc)
+            #doc['event_url']=event.get('url','')
+            #dataset.append(doc)
    
 
             try:
@@ -660,17 +672,18 @@ class IndicoExtractor(BaseExtractor):
 
                 # Top-level attachments from export
                 top_attachments = details.get("attachments", []) if details else [] #for 10575 there are no attachments
-                
+            
+
                 for a in top_attachments:
                     doc={}
                     download_url = a.get('download_url','')
-                    
                     content, _ = self._download_file(download_url, self.session, self.max_file_bytes )
               
                     
                     if content:
                         raw_text = self.get_raw_text(a['content_type'],content).strip()
                         dataset, attachments_total = self.add_chunks_to_doc(event_id, chunk_size, raw_text, dataset, doc, attachments_total)
+                       
                         
                         
 
@@ -684,30 +697,34 @@ class IndicoExtractor(BaseExtractor):
                     #only put one, BASED ON EVALUATION
                     #TO DO START EVALUATION 
                     if docs: #only if theres an attachment store it
-                        for doc in docs:
-                            dataset.append(doc)
+                        for doc_ in docs:
+                            doc_.update(doc)
+                            dataset.append(doc_)
+                    
                     
                 else:
                     for  contrib in  contribs:
-                        doc={}
+                        doc_ = doc.copy()
                         c_title = contrib.get("title") or title
                         c_author = self._extract_speakers(contrib) or author #here gets the sub titles and sub authors
                     
-                        doc['presentation_title'] = c_title #presentation_title
-                        doc['speaker_name'] = c_author #speaker_name
-                        doc["source"]= "indico"
+                        doc_['presentation_title'] = c_title #presentation_title
+                        doc_['speaker_name'] = c_author #speaker_name
+                        doc_["source"]= "indico"
                         docs , attachments_total= self.get_attachments(event_id, contrib, attachments_total, chunk_size)
+                        
                         if docs:
                             for docs_ in docs:
-                                doc.update(docs_)
-                                dataset.append(doc)
+                                docs_.update(doc_)
+                                
+                                dataset.append(docs_)
                         else:
-                            doc['document_id'] = f"{event_id}_{attachments_total}" 
                             attachments_total += 1 
-                            dataset.append(doc)
-
+                            doc_['document_id'] = f"{event_id}_{attachments_total}" 
+                            
+                            dataset.append(doc_)
+                            print(f"updated dataset with {doc_['document_id']}")
                         
-
                 # Fallback to HTML scrape if export yielded nothing
                 if attachments_total == 0:
                     logger.warning("Failback to HTML")
@@ -751,6 +768,5 @@ class IndicoExtractor(BaseExtractor):
                 logger.error(f"Error processing event {event_id}: {e}") #22667
 
         logger.info(f"Extracted {len(dataset)} Indico documents")
-        
         yield dataset
 

@@ -1,6 +1,7 @@
 from collections import defaultdict
 import os
 import pickle
+from chATLAS_Embed.EmbeddingModels import SentenceTransformerEmbedding
 import numpy as np
 import torch
 from typing import List, Dict, Any, Tuple
@@ -40,7 +41,10 @@ class ChromaManager:
         # Setup device & model
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         logger.info(f"Using device: {self.device}")
-        self.model = SentenceTransformer(EMBEDDING_MODEL, device=self.device)
+        #self.model = SentenceTransformer(EMBEDDING_MODEL, device=self.device)
+        self.model = SentenceTransformerEmbedding(
+            model_name="sentence-transformers/all-MiniLM-L6-v2"
+        )
         logger.info(f"Loaded sentence transformer {EMBEDDING_MODEL}")
         
         self.indico_ids = defaultdict()
@@ -63,11 +67,15 @@ class ChromaManager:
             if md.get('source') == 'indico':
                 self.indico_ids[id]=True
             elif md.get('source') == 'docdb':
-                self.docdb_versions[id] = md['docdb_version']
-                self.docdb_content_modified[id]  = md['content_last_modified_date']
-                self.docdb_metadata_modified[id] = md['metadata_last_modified_date']
+                try:
+                    self.docdb_versions[id] = md['docdb_version']
+                    self.docdb_content_modified[id]  = md['content_last_modified_date']
+                    self.docdb_metadata_modified[id] = md['metadata_last_modified_date']
+                except:
+                    continue
             self.doc_ids.add(id)
         print(len(self.doc_ids))
+
     def _configure_threading(self):
         os.environ["OMP_NUM_THREADS"] = "1"
         os.environ["MKL_NUM_THREADS"] = "1"
@@ -86,6 +94,9 @@ class ChromaManager:
         for i in ids:
             if documents[ids_to_idx_map[i]].get('cleaned_text', None):
                 up_ids.append(i)
+            else:
+                logger.error(f"Cannot add {i} because didn't extract text from it")
+
         for id_ in up_ids:
             md = {}
             doc_idx = ids_to_idx_map[id_]
@@ -98,7 +109,6 @@ class ChromaManager:
             metadatas.append(md)
         if not up_ids: return    
         if mode == 'update':
-            print("Update 1")
             self.chroma_collection.update(
                 ids = up_ids,
                 documents = doc_texts,
@@ -106,7 +116,6 @@ class ChromaManager:
             )
             
         elif mode == 'add':
-            print(f"Adding {up_ids}")
             self.chroma_collection.add(
                 ids = up_ids,
                 documents = doc_texts,
@@ -117,9 +126,8 @@ class ChromaManager:
             logger.error(f"Invalid argument mode={mode}. Must be 'add' or 'update")
             raise ValueError
          
-        logger.info(f"Added len(ids) to Chrome")
-        self.chroma_client.persist()
-        return len(ids)
+        logger.info(f"Added {len(up_ids)} to Chroma")
+        return len(up_ids)
         
 
     def  update_indico_docdb_record(self, documents):
@@ -139,10 +147,10 @@ class ChromaManager:
             logger.error(f"Error in updating list of doc_ids with Indico/DocDB: {e}")
 
     def add_documents(self, documents: List[Dict[str, Any]]) -> int:
-    
+        
         #which index each doc id is at in documents
         map_ids_to_idx = {d['document_id']:idx for idx,d in enumerate(documents)}
-
+        
         self.update_indico_docdb_record(documents)
         
         #all ids to add/update
@@ -155,6 +163,7 @@ class ChromaManager:
 
         #add new ids to chroma
         ids_to_add = ids - self.doc_ids 
+      
         if ids_to_add:
             self.add_to_chroma(documents= documents, ids= ids_to_add, ids_to_idx_map=map_ids_to_idx, mode='add')
         self.doc_ids.update(ids_to_add)
@@ -189,10 +198,9 @@ class ChromaManager:
         """
             Finds the docID_number associated with the retrieved text, then goes back to the docID to find header info
         """
-        query_emb = self.generate_embeddings([query])
+        #query_emb = self.generate_embeddings([query])
         results = self.chroma_collection.query(query_texts=[query],  n_results=top_k)
         snippets, refs = [], []
-        print(results['metadatas'][0], type(results['metadatas'][0]))
         for md in results['metadatas'][0]:
             link  = md.get("event_url", "")
             title = md.get("meeting_name", "")
@@ -200,7 +208,7 @@ class ChromaManager:
                 refs.append(link)
         for docs in results['documents'][0]:
             snippets.append(docs)
-
+        print(refs)
         #might be able to zip these for oops together. 
         #check if results are returned as connected idices 
         #ie if metadata idx1 is assoc w dcyments idx 1
@@ -215,8 +223,8 @@ class ChromaManager:
     def get_stats(self) -> Dict[str, int]:
         return {
             "total_documents": len(self.doc_ids),
-            "total_vectors": self.chroma_ntotal,
-            "metadata_entries": self.chroma_collection.count(),
+            "total_attachments_with_attachment_content": self.chroma_ntotal,
+            "total_embeddings": self.chroma_collection.count(),
         }
 
     def cleanup(self):

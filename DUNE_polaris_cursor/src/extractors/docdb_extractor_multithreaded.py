@@ -500,7 +500,7 @@ class DocDBExtractor(BaseExtractor):
             if limit_pages == -1:
                 return (consecutive_missing < max_missing)
             return (
-                docid < limit_pages + start
+                docid <= limit_pages + start
                 and consecutive_missing < max_missing
             )
 
@@ -538,6 +538,7 @@ class DocDBExtractor(BaseExtractor):
                         continue
 
                     # otherwise it's truly a page with attachments → queue it
+                    logger.info(f"Logging {page_url} to store")
                     existing_pages.append(page_url)
                   
                     consecutive_seen_indexed = 0
@@ -559,8 +560,8 @@ class DocDBExtractor(BaseExtractor):
         logger.info(f"Found {len(existing_pages)} DocDB pages with attachments to process")
         return existing_pages
 
-   
-
+    
+    
     def extract_documents(
         self,
         start: int=0,
@@ -607,84 +608,73 @@ class DocDBExtractor(BaseExtractor):
                     all_metadata.extend(metadata)
                 except Exception as e:
                     logger.error(f"Error processing page {page_url}: {e}")
-
+        logger.info(f"{len(all_links)} were extracted: {all_links}")
         # Download files (parallel)
         documents: List[Dict[str, Any]] = []
-        existing_ids=collections.defaultdict(lambda: start)
+        root_data: List[Dict[str, Any]]= []
+        existing_ids=collections.defaultdict(int)
         with ThreadPoolExecutor(max_workers=self.max_workers_files) as pool:
             futures = {pool.submit(self._download_file, link, self.session, self.max_file_bytes): (link, metadata) for link, metadata in zip(all_links, all_metadata)}
+            logger.info(f"Downloaded {len(futures)} links")
             for fut in as_completed(futures):
                 link, metadata = futures[fut]
+                
                 try:
                     result = fut.result()
                     if not result:
+                        logger.error(f"Couldn't fetch content from {link}")
                         continue
                     content, headers = result
                    
                     ct = self._detect_type(link, headers)
                     qs = parse_qs(urlparse(link).query)
                     doc_id = qs.get("docid", ["unknown"])[0]
-                    existing_ids[doc_id]+=1
 
                     raw_text = self.get_raw_text(content_type=ct, content=content)
+                    cleaned_text_list = raw_text.split()
+                    chunks = self.get_chunks(cleaned_text_list, chunk_size=chunk_size)
+                    logger.info(f"Found {len(chunks)} chunks for {link}")
+                    for chunk in chunks:
+                        root_id = doc_id
+                        
+                        child_id = int(existing_ids.get(doc_id,'0_0').split("_")[-1])
+                        
+                        documents.append({
+                            'document_id': f"{root_id}_{child_id+1}",
+                            'cleaned_text': chunk,
+                            'content_type': ct,
+                            'metadata': metadata,
+                        })
+                        existing_ids[doc_id] = f"{root_id}_{child_id+1}"
+                        logger.info(f"Added chunk from {link} to documents")
                 
-                    cleaned_text = raw_text if raw_text else '' #self.clean_text(raw_text) if raw_text else ""
-                    cleaned_text_list = cleaned_text.split()
-                  
-                    start=0
-                    end=chunk_size
-                    if end >= len(cleaned_text_list):
-                        documents.append({
-                            'doc_id': f"{doc_id}_{existing_ids.get(doc_id,-1)+1}",
-                            'cleaned_text': cleaned_text,
-                            'content_type': ct,
-                            'metadata': metadata
-                        })
-                        existing_ids[doc_id]+=1
-                        assert len(set(documents[-1]['cleaned_text'])) != 1
-                    while end < len(cleaned_text_list):
-                        documents.append({
-                            'doc_id': f"{doc_id}_{existing_ids.get(doc_id,-1)+1}",
-                            'cleaned_text': ' '.join(cleaned_text_list[start:end]),
-                            'content_type': ct,
-                            'metadata': metadata
-                        })
-                        assert len(set(documents[-1]['cleaned_text'])) != 1
-                        start=end
-                        end+=chunk_size
-                        existing_ids[doc_id]+=1
-                    
+                    logger.info(f"Finished extracting from {link}")
                 except Exception as e:
                     logger.error(f"Error downloading document {link}: {e}")
 
         # Process content to text
         dataset: List[Dict[str, Any]] = []
-
+        
         for ct, doc in enumerate(documents):
-
-            if limit != -1 and ct >= start+limit:
-                break
-
+            
             try:
-                raw_text = ""
                 content_type = doc['content_type']
                 metadata = doc['metadata']
                 cleaned_text = doc['cleaned_text']
 
                 
-                logger.info(f"foc is = {doc['doc_id']}")
+                logger.info(f"doc is = {doc['document_id']}")
                 
 
                 # Always include a record; raw_text may be empty if unsupported
                 
                 # give each vector a unique "document_id" – e.g. include filename
-                unique_id = f"docdb_{doc['doc_id']}_{metadata.get('filename','')}"
-
+                unique_id = f"docdb_{doc['document_id']}_{metadata.get('filename','0')}"
+                print(doc.keys())
                 #PUT IN DOCUMENTATION THAT THESE ARE THE FIELDS
                 dataset.append({
-                    'document_id': doc['doc_id'],
+                    'document_id': doc['document_id'],
                     'vector_id': unique_id,
-                    
                     'cleaned_text': cleaned_text,
                     'event_url': metadata['url'],
                     'title': metadata['title'],
@@ -703,28 +693,28 @@ class DocDBExtractor(BaseExtractor):
                     #HWHEN UPDATING THE VERISONS ALSO MAKE SURE YOU UPDATE THE ABSTRACT IF THE META DATA IS CHANGED
                     'filename': metadata.get('filename', ''),
                     'content_type': content_type,
-
                 })
+
                 if raw_text:
-                    logger.info(f"Processed DocDB event: {doc['doc_id']} -  Title: {metadata['title']}")
+                    logger.info(f"Processed DocDB event: {doc['document_id']} -  Title: {metadata['title']}")
                 else:
-                    logger.info(f"Added metadata-only (no text) for DocDB {doc['doc_id']} - {metadata['title']}")
+                    logger.info(f"Added metadata-only (no text) for DocDB {doc['document_id']} - {metadata['title']}")
 
                 # Log attachment details: doc_id, filename, version, title, URL
                 fname = metadata.get('filename', '<no filename>')
                 version = metadata.get('docdb_version', '<no version>')
                 url = metadata.get('url', '')
 
-                if raw_text:
+                if cleaned_text:
                     logger.info(
-                        f"Processed attachment: doc={doc['doc_id']} "
+                        f"Processed attachment: doc={doc['document_id']} "
                         f"file={fname} version={version} "
                         f"title=\"{metadata['title']}\"\n"
                         #f"    URL={url}"
                     )
                 else:
                     logger.info(
-                        f"Skipped text-extraction (metadata-only): doc={doc['doc_id']} "
+                        f"Skipped text-extraction (metadata-only): doc={doc['document_id']} "
                         f"file={fname} version={version} "
                         f"title=\"{metadata['title']}\"\n"
                         f"    URL={url}"
@@ -736,7 +726,7 @@ class DocDBExtractor(BaseExtractor):
 
 
             except Exception as e:
-                logger.error(f"Error processing document {doc.get('doc_id','unknown')}: {e}")
+                logger.error(f"Error processing document {doc.get('document_id','unknown')}: {e}")
 
-        logger.info(f"Extracted {len(dataset)} DocDB events")
+        logger.info(f"Extracted {len(dataset)} DocDB attachments")
         yield dataset

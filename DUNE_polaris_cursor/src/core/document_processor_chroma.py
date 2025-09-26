@@ -64,31 +64,6 @@ class DocumentProcessor:
                                                                     max_missing=1000
                                                                 ):
                     
-                    logger.warning("Got 1 batch")
-                    '''for rec in raw_records:
-                        did = rec["document_id"]
-
-                        last_modified_md = rec['metadata_last_modified_date']
-                        if not metadata_modif_dates.get(did,None):
-                            modified_date_md = datetime.min
-                        else:
-                            metadata_modif_date = metadata_modif_dates[did]
-                            modified_date_md = datetime.strptime(metadata_modif_date, '%Y-%m-%d') 
-                        last_scraped_date_md = datetime.strptime(last_modified_md, '%Y-%m-%d') 
-
-                        last_modified_ct= rec['content_last_modified_date']
-                        if not content_modif_dates.get(did,None):
-                            modified_date_ct =datetime.min
-                        else:
-                            content_modified_date = content_modif_dates[did]
-                            modified_date_ct = datetime.strptime(content_modified_date, '%Y-%m-%d') 
-                        last_scraped_date_ct = datetime.strptime(last_modified_ct, '%Y-%m-%d') 
-
-                
-                        incoming_v = int(rec.get("docdb_version", "0") or "0")
-                        if force or incoming_v > indexed_versions.get(did, 0) or modified_date_md > last_scraped_date_md or modified_date_ct > last_scraped_date_ct:
-                            to_reindex.append(rec)'''
-                    logger.warning(f"GOTS {len(raw_records)}")
                     log_to_db_docdb(raw_records)
                     
                 
@@ -99,19 +74,6 @@ class DocumentProcessor:
         def log_to_db_docdb(to_reindex):
             try:
                 with log_lock:
-                    # 4) Prune old versions & rebuild only if there are updates
-                    '''if to_reindex:
-                        logger.info(f"Found {len(to_reindex)} new/updated DocDB docs; pruning & rebuilding…")
-                        for rec in to_reindex:
-                            did_str = rec["document_id"]
-
-                        
-                            self.faiss_manager.metadata_store.pop(did_str, None)
-                            if did_str in self.faiss_manager.doc_ids:
-                                self.faiss_manager.doc_ids.remove(did_str)
-                        self.faiss_manager._save_metadata()
-                        self.faiss_manager._save_doc_ids()
-                        self.faiss_manager.rebuild_index()'''
                     
                     logger.info(f"to_reindex is {len(to_reindex)}")
                     # 5) Add the new/updated docs
@@ -141,16 +103,7 @@ class DocumentProcessor:
 
                 for indico_records in self.indico_extractor.extract_documents(start=start_ind, limit=indico_limit):
                     logger.info(f"Indico records returns {len(indico_records)}")
-                    '''existing_ids = set(self.faiss_manager.doc_ids)
-                    indico_to_add[0] = [
-                        doc for doc in indico_records
-                        if doc["document_id"] not in existing_ids
-                    ]
-                    
-                    logger.info(
-                        f"Indico: extracted {len(indico_to_add[0])} docs, "
-                    )'''
-                    logger.warning(f"LOGGING INDICO TO FAISS")
+                   
 
                     log_to_db_indico(indico_records)
                     
@@ -174,17 +127,14 @@ class DocumentProcessor:
             
         docdb_thread = threading.Thread(target=docdb_extraction, args=('docdb',))
         indico_thread = threading.Thread(target=indico_extraction, args=('indico',))
-        #faiss_logger  = threading.Thread(target=log_documents, args=(0.05,))
 
         log_lock = threading.Lock()
         docdb_thread.start()
         indico_thread.start()
-        #faiss_logger.start()
 
         # Wait for everything to finish
         docdb_thread.join()
         indico_thread.join()
-        #faiss_logger.join() 
 
 
         # Final summary & return
