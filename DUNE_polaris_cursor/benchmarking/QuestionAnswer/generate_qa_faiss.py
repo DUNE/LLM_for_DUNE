@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 load_dotenv()
 from pathlib import Path
 
-from src.indexing.chroma_manager import ChromaManager
+
 USERNAME = os.getenv('ARGO_API_USERNAME', 'aleena')
 API_KEY = os.getenv('ARGO_API_KEY', 'XXX')
 QUESTION = f'''You are given a dictionary with link:text pairs. Your job is to use the each text to generate a question from that respective text. Then give the answer to that question from the text. The question should be answerable by reading the text.  The link should be the link associated with the text you used to generate that question Return your answer very strictly in this format: **Question:** <your question> **Answer:*** <the answer> **Link:** <link>.  DO NOT put anything else within the ** **. All 3 of these components MUST be present and must be valid. Generate 10 questions '''
@@ -170,10 +170,10 @@ if __name__=='__main__':
     # Parse arguments
     args = parser.parse_args()
 
-    import collections
+
     from collections import defaultdict
     if args.datastore == 'chroma':
-        chroma = ChromaManager(args.data_path)
+        chroma = ChromaManager(path)
         texts=collections.defaultdict()
         metadata_store = chroma.chroma_collection.get(include=['metadatas', 'documents'])
     elif args.datastore == 'faiss':
@@ -182,25 +182,20 @@ if __name__=='__main__':
     
     texts=defaultdict()
 
-    if args.datastore == 'chroma':
-        for text, did in zip(metadata_store['documents'], metadata_store['metadatas']):
-            url = did['event_url']
-            texts[url] =  text
-    else:
-        for did in doc_ids:
-            did = metadata_store[did]
+
+    for did in doc_ids:
+        did = metadata_store[did]
+        try:
+            link = did['download_url']
+        except:
+            link  = did.get('url')
+            if not link:
+                link = did.get('event_url')
+        if link: 
             try:
-                link = did['download_url']
+                texts[link] = did['cleaned_text']
             except:
-                link  = did.get('url')
-                if not link:
-                    link = did.get('event_url')
-            if link:
-                try:
-                    texts[link] = did['cleaned_text']
-                except:
-                    continue
-        
+                continue
 
 
     qa_pairs = defaultdict(list)
@@ -235,4 +230,4 @@ if __name__=='__main__':
         start = end
     
     import pandas as pd
-    pd.DataFrame(qa_pairs).to_csv(os.path.join(args.save_dir, "QA_4.csv"))
+    pd.DataFrame(qa_pairs).to_csv(os.path.join(args.save_dir, "QA_3.csv"))

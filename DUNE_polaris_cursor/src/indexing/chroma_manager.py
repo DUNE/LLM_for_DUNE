@@ -1,11 +1,12 @@
 from collections import defaultdict
 import os
 import pickle
-from chATLAS_Embed.EmbeddingModels import SentenceTransformerEmbedding
+
 import numpy as np
 import torch
 from typing import List, Dict, Any, Tuple
 from sentence_transformers import SentenceTransformer
+from src.embedder.embedding_wrappers import ChatlasEmbedder, OriginalEmbedder
 
 from config import (
     EMBEDDING_MODEL,
@@ -29,7 +30,19 @@ class ChromaManager:
         self.chroma_client = chromadb.PersistentClient(path=data, settings=Settings())
         print("Collections available:", self.chroma_client.list_collections())
 
-        self.chroma_collection = self.chroma_client.get_or_create_collection(name=CHROMA_DB_NAME)
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        logger.info(f"Using device: {self.device}")
+
+        self.model = OriginalEmbedder(EMBEDDING_MODEL)
+        logger.info("Creating collection")
+        try:    
+            self.chroma_collection = self.chroma_client.get_or_create_collection(
+                name=CHROMA_DB_NAME,
+                embedding_function=self.model
+            )
+        except Exception as e:
+            logger.error(f"Error intiiateing chroma {e}")
+        
         self.chroma_ntotal = self.chroma_collection.count()
 
 
@@ -39,12 +52,8 @@ class ChromaManager:
             logger.info(f"Retrieving existing DB named {CHROMA_DB_NAME}")
         
         # Setup device & model
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        logger.info(f"Using device: {self.device}")
-        #self.model = SentenceTransformer(EMBEDDING_MODEL, device=self.device)
-        self.model = SentenceTransformerEmbedding(
-            model_name="sentence-transformers/all-MiniLM-L6-v2"
-        )
+       
+        
         logger.info(f"Loaded sentence transformer {EMBEDDING_MODEL}")
         
         self.indico_ids = defaultdict()
@@ -52,8 +61,9 @@ class ChromaManager:
         self.docdb_content_modified = defaultdict()
         self.docdb_metadata_modified = defaultdict()
         self.doc_ids=set()
+        self.events_ids=set()
         self.fetch_ddb_ind_data()
-
+        self.num_events=len(self.events_ids)
 
 
         # Ensure directories exist
@@ -74,7 +84,10 @@ class ChromaManager:
                 except:
                     continue
             self.doc_ids.add(id)
-        print(len(self.doc_ids))
+       
+            event_id = id.split("_")[0]
+            self.events_ids.add(event_id)
+        
 
     def _configure_threading(self):
         os.environ["OMP_NUM_THREADS"] = "1"
@@ -107,7 +120,13 @@ class ChromaManager:
                 if k not in ['cleaned_text', 'raw_text', 'document_id']:
                     md[k] = v
             metadatas.append(md)
-        if not up_ids: return    
+
+        length = 0
+        for d in doc_texts:
+            length += len(d)
+        logger.info(f'Storing document of length {length} in chunks of 2000')
+
+        if not up_ids: return    0
         if mode == 'update':
             self.chroma_collection.update(
                 ids = up_ids,
@@ -146,8 +165,8 @@ class ChromaManager:
         except Exception as e:
             logger.error(f"Error in updating list of doc_ids with Indico/DocDB: {e}")
 
-    def add_documents(self, documents: List[Dict[str, Any]]) -> int:
-        
+    def add_documents(self, documents: List[Dict[str, Any]], num_events: int) -> int:
+        self.num_events+=num_events
         #which index each doc id is at in documents
         map_ids_to_idx = {d['document_id']:idx for idx,d in enumerate(documents)}
         
@@ -158,17 +177,17 @@ class ChromaManager:
 
         #update existing ids in chroma
         ids_to_update = list(self.doc_ids.intersection(ids))
-        self.add_to_chroma(documents = documents, ids = ids_to_update, ids_to_idx_map =  map_ids_to_idx, mode = 'update')
+        added = self.add_to_chroma(documents = documents, ids = ids_to_update, ids_to_idx_map =  map_ids_to_idx, mode = 'update')
         
 
         #add new ids to chroma
         ids_to_add = ids - self.doc_ids 
       
         if ids_to_add:
-            self.add_to_chroma(documents= documents, ids= ids_to_add, ids_to_idx_map=map_ids_to_idx, mode='add')
+            added += self.add_to_chroma(documents= documents, ids= ids_to_add, ids_to_idx_map=map_ids_to_idx, mode='add')
         self.doc_ids.update(ids_to_add)
 
-        return len(ids_to_add)
+        return added
     def get_indico_ids(self) -> Dict[int, int]:
         """
         Return a map { doc_id: max_version_indexed } for all DocDB docs.
@@ -198,7 +217,6 @@ class ChromaManager:
         """
             Finds the docID_number associated with the retrieved text, then goes back to the docID to find header info
         """
-        #query_emb = self.generate_embeddings([query])
         results = self.chroma_collection.query(query_texts=[query],  n_results=top_k)
         snippets, refs = [], []
         for md in results['metadatas'][0]:
@@ -208,12 +226,10 @@ class ChromaManager:
                 refs.append(link)
         for docs in results['documents'][0]:
             snippets.append(docs)
-        print(refs)
         #might be able to zip these for oops together. 
         #check if results are returned as connected idices 
         #ie if metadata idx1 is assoc w dcyments idx 1
 
-        
         return snippets, refs
 
     def save_all(self):
@@ -222,9 +238,9 @@ class ChromaManager:
 
     def get_stats(self) -> Dict[str, int]:
         return {
-            "total_documents": len(self.doc_ids),
-            "total_attachments_with_attachment_content": self.chroma_ntotal,
+            "total_documents": self.num_events,
             "total_embeddings": self.chroma_collection.count(),
+            "total_number_attachments_in_metadata": self.chroma_ntotal,
         }
 
     def cleanup(self):

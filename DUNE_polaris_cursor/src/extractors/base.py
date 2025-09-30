@@ -13,6 +13,7 @@ class BaseExtractor(ABC):
     """Base class for document extractors"""
 
     def __init__(self):
+        super().__init__()
         self.nlp = spacy.load("en_core_web_sm")
 
     @abstractmethod
@@ -25,6 +26,7 @@ class BaseExtractor(ABC):
         if not text: return []
         start = 0
         end=chunk_size
+        logger.info(f"Chunk size is {chunk_size} and num words are {len(text)}")
         if end >= len(text): 
             return [' '.join(text)]
         chunks = []

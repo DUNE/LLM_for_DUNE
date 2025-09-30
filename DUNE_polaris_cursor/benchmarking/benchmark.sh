@@ -1,30 +1,15 @@
 #!/bin/bash
 
-chunk_size="2000 4000 7000000"  #0.36 0.48 0.59 0.67 0.73 0.79, 0.83 0.86 0.89 0.91 0.93 0.94 0.95"
-data_path=test_store_CHROMA_chatlas/Chroma
-docdb_limit=100
-indico_limit=100
+chunk_size="8000"  #0.36 0.48 0.59 0.67 0.73 0.79, 0.83 0.86 0.89 0.91 0.93 0.94 0.95"
+data_path=CHROMA/Chroma
+docdb_limit=1
+indico_limit=1
 log_file=benchmarking/benchmark_log.txt
+
+
 for cs in ${chunk_size}
 do
 	echo "Running extraction with chunk size ${cs} and storing in ${data_path}" >> ${log_file}
 	
-	#python3.11 cli.py index --docdb-limit ${docdb_limit} --indico-limit ${indico_limit} --data-path "${data_path}_${cs}" --chunk-size ${cs}
-	echo "Extracted ${docdb_limit} from docdb and ${indico_limit} from indico. Stored extractions in ${data_path}" >> ${log_file}
-	echo ${cs}
-	#for i in {1..1}; do/home/newg2/Projects/LLM/DUNE/LLM_for_DUNE/metrics/chroma/ChatlasEmb
-	save="metrics"/"chroma"/"Chatlas"/"QA_2/correctness_${cs}_100_1"
-		
-	if [ ! -d "$save" ]; then
-		mkdir -p "$save"
-	fi
-	python3.11 -m benchmarking.evaluation --port 9 --experiment_name test --method correctness --data_path "${data_path}_${cs}" --savedir $save
-	echo "Ran correctness metric to ${save}" >> ${log_file}
-	save="metrics"/"chroma"/"Chatlas"/"QA_2/relevant_refs_${cs}_100_1"
-	if [ ! -d "$save" ]; then
-        	mkdir -p "$save"
-	fi
-	python3.11 -m benchmarking.evaluation --port 9 --experiment_name test --method references --data_path "${data_path}_${cs}" --savedir $save
-	echo "Ran reference match metric" >> ${log_file}
+	python3.11 cli.py index --docdb-limit ${docdb_limit} --indico-limit ${indico_limit} --data-path "${data_path}_${cs}" --chunk-size ${cs}
 done
-

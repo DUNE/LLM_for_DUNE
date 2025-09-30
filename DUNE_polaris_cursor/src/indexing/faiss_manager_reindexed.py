@@ -13,9 +13,7 @@ from config import (
     create_directories,
 )
 from src.utils.logger import get_logger
-
 logger = get_logger(__name__)
-
 
 class FAISSManager:
     """Manager for FAISS index operations"""
@@ -23,7 +21,7 @@ class FAISSManager:
     def __init__(self, data_path):
         # Prevent thread‐related segfaults
         self._configure_threading()
-        self.count=0
+       
         # Setup device & model
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         logger.info(f"Using device: {self.device}")
@@ -31,7 +29,7 @@ class FAISSManager:
         logger.info(f"Loaded sentence transformer {EMBEDDING_MODEL}")
         
         self.metadata_store=defaultdict( dict)
-
+        self.num_events = 0
 
         # Ensure directories exist
         create_directories(data_path)
@@ -89,9 +87,11 @@ class FAISSManager:
         faiss.write_index(self.faiss_index, str(self.faiss_index_path))
 
     def generate_embeddings(self, texts: List[str]) -> np.ndarray:
+        return np.array(self.model(texts)).astype(np.float32) 
         return self.model.encode(texts, convert_to_numpy=True).astype(np.float32)
 
-    def add_documents(self, documents: List[Dict[str, Any]]) -> int:
+    def add_documents(self, documents: List[Dict[str, Any]], num_events: int) -> int:
+        self.num_events += num_events
         """
         Add new documents to the index.
         Expects each `doc` to have these top-level fields:
@@ -118,17 +118,19 @@ class FAISSManager:
 
 
         # 2) Add to FAISS
-        self.count+=1
+        print(np.array(embeddings).dtype, embeddings.shape)
+        print(self.faiss_index.d)
+
         self.faiss_index.add(np.array(embeddings))
         print(f"Added {len(np.array(embeddings))} embeddings to FAISS")
 
         # 3) Update doc_ids
-        self.doc_ids.extend(d["document_id"] for d in all_docs)
+        self.doc_ids.extend(d["document_id"] for d in new_docs)
 
         # 4) Write out rich metadata for each
         u=set()
         try:
-            for d in all_docs:
+            for d in new_docs:
                 did = d["document_id"]
                 u.add(did)
                 if d.get("source", "") == 'docdb':
@@ -246,7 +248,7 @@ class FAISSManager:
         """
         query_emb = self.generate_embeddings([query])
         distances, indices = self.faiss_index.search(query_emb, top_k)
-        #print(distances)
+        logger.info(distances)
         snippets, refs = [], []
         for idx in indices[0]:
             if idx < len(self.doc_ids):
@@ -254,9 +256,10 @@ class FAISSManager:
                 did_root = did_of_txt.split("_")[0]
                 md_root = self.metadata_store.get(did_root, {})
                 md_text = self.metadata_store.get(did_of_txt, {})
+                #logger.warning(md_text)
                 raw   = md_text.get("cleaned_text", "")
                 if md_text.get('source','') == 'docdb':
-                    link = md_text.get('event_url', '')
+                    link = md_text.get('url', '')
                     title = md_text.get('title','')
                 else:
                     event_link = md_root.get('event_url', '')
@@ -269,7 +272,8 @@ class FAISSManager:
                     for l in link.split("  "):
                         
                         refs.append(l)
-        #print("Links : ", refs)
+
+        #logger.warning(f"Links : {refs}")
         return snippets, refs
 
     def save_all(self):
@@ -280,9 +284,9 @@ class FAISSManager:
 
     def get_stats(self) -> Dict[str, int]:
         return {
-            "total_attachments": len(self.doc_ids),
+            "total_documents": self.num_events,
             "total_embeddings": self.faiss_index.ntotal,
-            "total_metadata_entries": len(self.metadata_store),
+            "total_number_attachments_in_metadata": len(self.metadata_store),
         }
 
     def cleanup(self):

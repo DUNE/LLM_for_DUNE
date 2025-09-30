@@ -18,7 +18,9 @@ class DocumentProcessor:
 
     def __init__(self, data, chunk_size):
         self.chunk_size=chunk_size
+        logger.info("Initiated chroma")
         self.faiss_manager = chroma.ChromaManager(data) #FAISSManager()
+       
  
         self.docdb_extractor = DocDBExtractor(self.faiss_manager)
         self.indico_extractor = IndicoExtractor(self.faiss_manager)
@@ -35,7 +37,7 @@ class DocumentProcessor:
         results = {
             "docdb_processed": 0,
             "indico_processed": 0,
-            "total_added": 0
+            "total_embeddings_added": 0
         }
 
         #
@@ -48,8 +50,6 @@ class DocumentProcessor:
 
                 # 1) What versions (and thus IDs) do we already have?
                 indexed_versions = self.faiss_manager.get_docdb_versions()
-                content_modif_dates = self.faiss_manager.get_content_modification_dates()
-                metadata_modif_dates = self.faiss_manager.get_metadata_modification_dates()
                 #indexed_ids: Set[int] = set(indexed_versions.keys())
                 indexed_ids: Set[int] = { int(did) for did in indexed_versions.keys() }
 
@@ -57,29 +57,30 @@ class DocumentProcessor:
 
                 # 3) Optionally filter by version bump or force‐flag
                 
-                for raw_records in self.docdb_extractor.extract_documents(start=start_ddb, limit=docdb_limit,
+                for docs_processed, raw_records in self.docdb_extractor.extract_documents(start=start_ddb, limit=docdb_limit,
                                                                     indexed_doc_ids=indexed_ids,
                                                                     mode="incremental",
                                                                     stop_after_seen=100,
-                                                                    max_missing=1000
+                                                                    max_missing=1000,
+                                                                    chunk_size=self.chunk_size
                                                                 ):
                     
-                    log_to_db_docdb(raw_records)
+                    log_to_db_docdb(raw_records, num=docs_processed)
                     
                 
             except Exception as e:
                 logger.error(f"Error in extracting documents from dune docdb {e}"  )
             return to_reindex
         
-        def log_to_db_docdb(to_reindex):
+        def log_to_db_docdb(to_reindex, num):
             try:
                 with log_lock:
                     
                     logger.info(f"to_reindex is {len(to_reindex)}")
                     # 5) Add the new/updated docs
-                    added = self.faiss_manager.add_documents(to_reindex)
-                    results["docdb_processed"] = len(to_reindex)
-                    results["total_added"] += added
+                    added = self.faiss_manager.add_documents(to_reindex, num)
+                    results["docdb_processed"] += num
+                    results["total_embeddings_added"] += added
 
 
                     logger.info(
@@ -101,11 +102,11 @@ class DocumentProcessor:
                 
                 logger.info("Processing Indico documents")
 
-                for indico_records in self.indico_extractor.extract_documents(start=start_ind, limit=indico_limit):
-                    logger.info(f"Indico records returns {len(indico_records)}")
+                for num_events, indico_records in self.indico_extractor.extract_documents(start=start_ind, limit=indico_limit, chunk_size=self.chunk_size):
+                    logger.info(f"Indico records returns {len(indico_records)} from {num_events} events")
                    
 
-                    log_to_db_indico(indico_records)
+                    log_to_db_indico(indico_records,num_events)
                     
 
 
@@ -114,13 +115,13 @@ class DocumentProcessor:
             except Exception as e:
                 logger.error(f"Error processing Indico documents: {e}")
 
-        def log_to_db_indico(docs):
+        def log_to_db_indico(docs,num_events):
             with log_lock:
-                added = self.faiss_manager.add_documents(docs)
+                added = self.faiss_manager.add_documents(docs,num_events)
                         
-                results["indico_processed"] = len(docs)
+                results["indico_processed"] += num_events
                 
-                results["total_added"] += added
+                results["total_embeddings_added"] += added
                 
                 logger.info(f"Added Indico to FAISS: added {added} new vectors to index")
                 return added
@@ -138,7 +139,7 @@ class DocumentProcessor:
 
 
         # Final summary & return
-        logger.info(f"Document processing completed. Total new docs added: {results['total_added']}")
+        logger.info(f"Document processing completed. Total new docs added: {results['total_embeddings_added']}")
 
 
         return results

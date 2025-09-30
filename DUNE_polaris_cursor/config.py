@@ -37,6 +37,8 @@ CHUNK_SIZE = int(os.getenv("CHUNK_SIZE",4000))
 
 STORE = os.getenv("VECTOR_STORE", 'faiss')
 # FAISS Configuration
+CHROMA_PATH=os.getenv('DB_PATH',None)
+print(f"Got path as {CHROMA_PATH}")
 FAISS_DIR = BASE_DIR / "data" / "faiss"
 FAISS_INDEX_PATH = FAISS_DIR / "faiss_index.index"
 METADATA_PATH = FAISS_DIR / "metadata_store.pkl"

@@ -1,5 +1,5 @@
-1# indico_extractor.py
-
+# indico_extractor.py
+from abc import ABC, abstractmethod
 import time
 import os
 import json
@@ -19,6 +19,7 @@ except Exception:
     HAS_CLOUDSCRAPER = False
 
 from .base import BaseExtractor
+from .session import Session
 from config import (
     INDICO_BASE_URL,
     INDICO_CATEGORY_ID,
@@ -39,8 +40,7 @@ DEFAULT_UA = (
 DEFAULT_COOKIES_PATH = os.path.expanduser("~/.indico_cookies.json")
 
 
-
-class IndicoExtractor(BaseExtractor):
+class IndicoExtractor(BaseExtractor, Session):
     """
     Indico extractor resilient to Cloudflare + SSO:
     - Uses export API with Personal Access Token (Bearer).
@@ -49,10 +49,13 @@ class IndicoExtractor(BaseExtractor):
     - Avoids scraping HTML.
     """
 
-    def __init__(self,faiss):
-        super().__init__()
+    def __init__(self, faiss=None):
+        
         self.base_url = INDICO_BASE_URL.rstrip("/")
         self.category_id = INDICO_CATEGORY_ID
+        
+        self.max_file_bytes =  50 * 1024 * 1024
+        self.faiss=faiss
         self.api_token = INDICO_API_TOKEN or os.getenv("INDICO_API_TOKEN")
         self.cookies_file = (INDICO_COOKIES_FILE
                              or os.getenv("INDICO_COOKIES_FILE")
@@ -60,17 +63,19 @@ class IndicoExtractor(BaseExtractor):
         self.use_browser_login = bool(
             INDICO_USE_BROWSER_LOGIN or os.getenv("INDICO_USE_BROWSER_LOGIN")
         )
-        self.max_file_bytes =  50 * 1024 * 1024
-        self.faiss=faiss
-        self.session = self._build_session()
+        self.base_url = INDICO_BASE_URL.rstrip("/")
+        self.category_id = INDICO_CATEGORY_ID
+        
         self._auth_initialized = False
+        self._load_cookies()
+       
         self.total_fetched =0
         # Load any previously captured cookies (e.g., via Playwright)
-        self._load_cookies()
+        
         self.start_time = time.time()
+        super().__init__()
 
     # ------------------------ Session and Auth ------------------------
-
     def _build_session(self) -> requests.Session:
         s = requests.Session()
 
@@ -98,168 +103,7 @@ class IndicoExtractor(BaseExtractor):
             s.headers.update({"Authorization": f"Bearer {self.api_token}"})
 
         return s
-
-    def _load_cookies(self) -> None:
-        try:
-            if os.path.exists(self.cookies_file):
-                with open(self.cookies_file, "r") as f:
-                    cookies = json.load(f)
-
-                ua = None
-                for c in cookies:
-                    self.session.cookies.set(
-                        c["name"], c["value"],
-                        domain=c.get("domain"),
-                        path=c.get("path", "/")
-                    )
-                    if not ua and c.get("user_agent"):
-                        ua = c["user_agent"]
-                if ua:
-                    self.session.headers["User-Agent"] = ua
-                logger.info(f"Loaded cookies from {self.cookies_file}")
-        except Exception as e:
-            logger.warning(f"Failed to load cookies: {e}")
-
-    def _save_cookies(self) -> None:
-        try:
-            cookies = []
-            for c in self.session.cookies:
-                cookies.append({
-                    "name": c.name,
-                    "value": c.value,
-                    "domain": c.domain,
-                    "path": c.path,
-                    "user_agent": self.session.headers.get("User-Agent", DEFAULT_UA),
-                })
-            with open(self.cookies_file, "w") as f:
-                json.dump(cookies, f)
-            logger.info(f"Saved cookies to {self.cookies_file}")
-        except Exception as e:
-            logger.warning(f"Failed to save cookies: {e}")
-
-    def _is_cloudflare_challenge(self, resp: requests.Response) -> bool:
-        try:
-            text = resp.text.lower()
-        except Exception:
-            text = ""
-        if resp.status_code in (403, 503):
-            if "just a moment" in text:
-                return True
-            if "cf-ray" in {k.lower() for k in resp.headers.keys()}:
-                return True
-            if "cf-mitigated" in {k.lower() for k in resp.headers.keys()}:
-                return True
-            if any("cloudflare" in str(v).lower() for v in resp.headers.values()):
-                return True
-        return False
-
-    def _upgrade_to_cloudscraper(self) -> bool:
-        if not HAS_CLOUDSCRAPER:
-            return False
-        try:
-            cs = cloudscraper.create_scraper(
-                browser={"browser": "chrome", "platform": "windows", "mobile": False}
-            )
-            cs.headers.update(self.session.headers)
-            for c in self.session.cookies:
-                cs.cookies.set(c.name, c.value, domain=c.domain, path=c.path)
-            if self.api_token:
-                cs.headers.update({"Authorization": f"Bearer {self.api_token}"})
-            self.session = cs
-            logger.info("Switched to cloudscraper session.")
-            return True
-        except Exception as e:
-            logger.warning(f"cloudscraper init failed: {e}")
-            return False
-
-    def _browser_cookie_bootstrap(self) -> bool:
-        """
-        Use Playwright to load the site in a real browser, pass Cloudflare and optionally SSO,
-        then copy cookies and UA into the requests session.
-        Requires:
-          pip install playwright
-          playwright install chromium
-        """
-        try:
-            from playwright.sync_api import sync_playwright
-        except Exception:
-            logger.error("Playwright not available. Install with: pip install playwright && playwright install chromium")
-            return False
-
-        try:
-            with sync_playwright() as pw:
-                browser = pw.chromium.launch(headless=True)  # headful helps with MFA/SSO/CF
-                ctx = browser.new_context()
-                page = ctx.new_page()
-                logger.warning(f"In cookies 189, page={page}")
-
-                # Load base to satisfy Cloudflare; wait a bit for challenge completion
-                page.goto(self.base_url, wait_until="domcontentloaded")
-                page.wait_for_timeout(6000)
-
-                # Optionally visit export endpoint to ensure cookies apply there too
-                page.goto(f"{self.base_url}/export/categ/{self.category_id}.json", wait_until="domcontentloaded")
-                page.wait_for_timeout(3000)
-
-                # If SSO login is required for some content, user can navigate to /login and complete it
-                # page.goto(f"{self.base_url}/login", wait_until="domcontentloaded")
-
-                cookies = ctx.cookies()
-                ua = page.evaluate("() => navigator.userAgent") or DEFAULT_UA
-
-                self.session.headers["User-Agent"] = ua
-                self.session.cookies.clear()
-                for c in cookies:
-                    self.session.cookies.set(c["name"], c["value"], domain=c.get("domain"), path=c.get("path", "/"))
-
-                browser.close()
-                logger.info("Captured browser cookies and user agent.")
-                self._save_cookies()
-                return True
-        except Exception as e:
-            logger.error(f"Browser bootstrap failed: {e}")
-            return False
-
-    def _ensure_access(self) -> None:
-        if self._auth_initialized:
-            return
-
-        test_url = f"{self.base_url}/categ/{self.category_id}"
-        r = self.session.get(test_url, timeout=30)
-        logger.error(f"esure access {r}")
-
-        if r.status_code == 200:
-            self._auth_initialized = True
-            logger.info("Access OK (API token/cookies).")
-            return
-
-        if self._is_cloudflare_challenge(r):
-            logger.warning("Cloudflare challenge detected on export API.")
-            # Trpython3 cli.py index --docdb-limit  cloudscraper first
-            if self._upgrade_to_cloudscraper():
-                r = self.session.get(test_url, timeout=30)
-                if r.status_code == 200:
-                    self._auth_initialized = True
-                    logger.info("Access OK via cloudscraper.")
-                    return
-
-        # Try browser cookie bootstrap
-        if self.use_browser_login and self._browser_cookie_bootstrap():
-            r = self.session.get(test_url, timeout=30)
-            if r.status_code == 200:
-                self._auth_initialized = True
-                logger.info("Access OK via browser cookies.")
-                return
-
-        # Final failure
-        snippet = (r.text or "")[:300].replace("\n", " ")
-        logger.error(f"Cannot access {test_url} (status {r.status_code}). Snippet: {snippet}")
-        raise RuntimeError(
-            "Blocked by Cloudflare/SSO. Set INDICO_API_TOKEN and either "
-            "install cloudscraper or enable INDICO_USE_BROWSER_LOGIN to capture cookies."
-        )
-
-
+    
     def _fetch_category_events(self, categ_id:int, limit: int, start:int) -> List[Dict[str, Any]]:
         """
         Fetch recent events in the category via the export API.
@@ -268,7 +112,7 @@ class IndicoExtractor(BaseExtractor):
         url = f"{self.base_url}/export/categ/{categ_id}.json"
         #url = 'https://indico.fnal.gov/event/10575/'
         params = {
-            "limit": max(1, limit),
+            "limit": max(-1, limit),
             # You can also add time filters if needed:
             # "from": "today-365", "to": "today"
         }
@@ -283,6 +127,8 @@ class IndicoExtractor(BaseExtractor):
         r.raise_for_status()
         data = r.json()
         self.total_fetched += min(len(data.get("results",[])), limit)
+        if limit == -1:
+            return data.get("results", [])
         return data.get("results", [])[start:start+limit]
 
     def _fetch_event_details(self, event_id: int) -> Dict[str, Any]:
@@ -552,13 +398,13 @@ class IndicoExtractor(BaseExtractor):
     def add_chunks_to_doc(self, event_id, chunk_size, raw_text, docs, doc, attachments_total):
 
         chunks = self.get_chunks(raw_text, chunk_size)
-        for chunk in chunks:
+        for i,chunk in enumerate(chunks):
             doc['document_id']= f"{event_id}_{attachments_total}"
             doc['cleaned_text'] = chunk
             docs.append(doc)
 
             attachments_total += 1
-            logger.info(f'event_id: {event_id} added: {event_id}_{attachments_total}')
+            logger.info(f'event_id: {event_id} added: {event_id}_{attachments_total}, {i}th chunk of {len(chunks)}')
 
         return docs, attachments_total
     
@@ -581,7 +427,7 @@ class IndicoExtractor(BaseExtractor):
             download_url = a['download_url']
             content_type = a.get('content_type','')
             if not content_type: 
-                #content_type=self.get_content_type(a)
+                #content_type=self.get_content_type(a) #potential special cases of content_type not existing in download but it being a valid link
                 continue
 
             filename = a['filename']
@@ -590,9 +436,8 @@ class IndicoExtractor(BaseExtractor):
             doc['abstract'] = 'none'
             doc["source"]= "indico"
             
-            #if there is an abstract store that 
             
-            content, _ = self._download_file(download_url, self.session, self.max_file_bytes )
+            content, _ = self._download_file(download_url, self.session, self.max_file_bytes)
             
             if content:
                 raw_text = self.get_raw_text(content_type,content).split()
@@ -622,6 +467,7 @@ class IndicoExtractor(BaseExtractor):
         logger.info(f"Extracting documents from Indico category {self.category_id} (limit: {limit})")
         self._ensure_access()
 
+
         events=[]
         subcategs=self.collect_subcategories()
         for categ_id in subcategs:
@@ -629,11 +475,9 @@ class IndicoExtractor(BaseExtractor):
         
 
         dataset: List[Dict[str, Any]] = []
-
+        event_counts=set()
         current_versions=self.faiss.get_indico_ids()
         for ct, event in enumerate(events):
-            if ct > start + limit:
-                return dataset
             doc = {}
             event_id = event.get("id")
         
@@ -657,16 +501,14 @@ class IndicoExtractor(BaseExtractor):
             doc['location'] = event.get("location", '')
             doc['event_description']=event.get("description",'')
             doc["source"]= "indico"
-            #doc['event_url']=event.get('url','')
-            #dataset.append(doc)
    
 
             try:
                 logger.info(f"Processing event: {title} ({event_id})")
                 
                 details = self._fetch_event_details(event_id)
+                
   
-                #logger.error("GOT DETAILS FROM WEBPAGE AS {details}")
                 attachments_total = 0
                 
 
@@ -723,10 +565,10 @@ class IndicoExtractor(BaseExtractor):
                             doc_['document_id'] = f"{event_id}_{attachments_total}" 
                             
                             dataset.append(doc_)
-                            print(f"updated dataset with {doc_['document_id']}")
-                        
+                
                 # Fallback to HTML scrape if export yielded nothing
                 if attachments_total == 0:
+
                     logger.warning("Failback to HTML")
                     html_atts = self._scrape_event_attachments_html(event_id)
                     for a in html_atts:
@@ -750,15 +592,19 @@ class IndicoExtractor(BaseExtractor):
                                 
 
                                 dataset, attachments_total = self.add_chunks_to_doc(doc_id, chunk_size, raw_text, dataset, {}, attachments_total)
-                        
+                            event_counts.add(event_id)
                                 
-                                
+                              
                         except Exception as e:
+                            
                             logger.error(f"HTML fallback: error processing {a['url']}: {e}")
+                else:
+                    event_counts.add(event_id)
+
 
                 logger.info(f"Event {event_id}: collected {attachments_total} attachments")
                 if time.time() - self.start_time % 1800 == 0 and ct > 0:
-                    yield dataset
+                    yield len(event_counts), dataset
                     dataset.clear()
 
                 #if enumerate get to 50: yield dataset then reset dataset 
@@ -768,5 +614,5 @@ class IndicoExtractor(BaseExtractor):
                 logger.error(f"Error processing event {event_id}: {e}") #22667
 
         logger.info(f"Extracted {len(dataset)} Indico documents")
-        yield dataset
+        yield len(event_counts), dataset
 

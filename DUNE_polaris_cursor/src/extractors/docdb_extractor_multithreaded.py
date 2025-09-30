@@ -18,6 +18,7 @@ from src.extractors.indico_extractor import DEFAULT_COOKIES_PATH, DEFAULT_UA, HA
 from urllib3.util.retry import Retry
 
 from .base import BaseExtractor
+from .session import Session
 from config import DUNE_DOCDB_USERNAME, DUNE_DOCDB_PASSWORD, DOCDB_BASE_URL, INDICO_COOKIES_FILE
 from src.utils.logger import get_logger
 
@@ -42,7 +43,7 @@ def parse_date(date_str: str) -> str:
     return "Unknown Date"
 
 
-class DocDBExtractor(BaseExtractor):
+class DocDBExtractor(BaseExtractor, Session):
     """Extractor for DUNE DocDB documents (latest-first, backfill + weekly incrementals).
     - Downloads files (in memory), size-capped, and extracts text.
     - Uses ShowDocument (latest revision) pages only.
@@ -50,7 +51,7 @@ class DocDBExtractor(BaseExtractor):
 
     def __init__(
         self,
-        faiss,
+        faiss= None,
         max_retries: int = 5,
         timeout_sec: int = 20,
         max_pool: int = 20,
@@ -58,7 +59,7 @@ class DocDBExtractor(BaseExtractor):
         max_workers_pages: int = 6,
         max_workers_files: int = 4,
     ):
-        super().__init__()
+        
         self.username = DUNE_DOCDB_USERNAME
         self.password = DUNE_DOCDB_PASSWORD
         if not self.username or not self.password:
@@ -67,7 +68,7 @@ class DocDBExtractor(BaseExtractor):
 
         # Example base: "https://docs.dunescience.org/cgi-bin/ShowDocument?docid="
         self.base_url = DOCDB_BASE_URL.rstrip("?&")
-        self.session = self._build_session(max_retries, timeout_sec, max_pool)
+        self.session = self._build_session()
         self.max_file_bytes = max_file_bytes
         self.max_workers_pages = max_workers_pages
         self.max_workers_files = max_workers_files
@@ -85,179 +86,27 @@ class DocDBExtractor(BaseExtractor):
         except requests.RequestException as e:
             logger.warning(f"Could not perform initial DocDB auth check: {e}")
 
+        super().__init__()
 
-
-    def _build_session(self, max_retries: int, timeout: int, max_pool: int) -> requests.Session:
+    def _build_session(self) -> requests.Session:
         s = requests.Session()
         s.auth = HTTPBasicAuth(self.username, self.password)
         s.headers.update({"User-Agent": "DUNE-DocDB-Extractor/1.2 (+python-requests)"})
         retries = Retry(
-            total=max_retries,
+            total=5,
             backoff_factor=0.5,
             status_forcelist=[429, 500, 502, 503, 504],
             allowed_methods=["HEAD", "GET", "OPTIONS"],
             raise_on_status=False,
         )
-        adapter = HTTPAdapter(max_retries=retries, pool_connections=max_pool, pool_maxsize=max_pool)
+        adapter = HTTPAdapter(max_retries=retries, pool_connections=10, pool_maxsize=20)
         s.mount("https://", adapter)
         s.mount("http://", adapter)
-        s.request = functools.partial(s.request, timeout=timeout)  # default timeout
+        s.request = functools.partial(s.request, timeout=10)  # default timeout
         return s
 
-    def _load_cookies(self) -> None:
-        try:
-            if os.path.exists(self.cookies_file):
-                with open(self.cookies_file, "r") as f:
-                    cookies = json.load(f)
 
-                ua = None
-                for c in cookies:
-                    self.session.cookies.set(
-                        c["name"], c["value"],
-                        domain=c.get("domain"),
-                        path=c.get("path", "/")
-                    )
-                    if not ua and c.get("user_agent"):
-                        ua = c["user_agent"]
-                if ua:
-                    self.session.headers["User-Agent"] = ua
-                logger.info(f"Loaded cookies from {self.cookies_file}")
-        except Exception as e:
-            logger.warning(f"Failed to load cookies: {e}")
 
-    def _save_cookies(self) -> None:
-        try:
-            cookies = []
-            for c in self.session.cookies:
-                cookies.append({
-                    "name": c.name,
-                    "value": c.value,
-                    "domain": c.domain,
-                    "path": c.path,
-                    "user_agent": self.session.headers.get("User-Agent", DEFAULT_UA),
-                })
-            with open(self.cookies_file, "w") as f:
-                json.dump(cookies, f)
-            logger.info(f"Saved cookies to {self.cookies_file}")
-        except Exception as e:
-            logger.warning(f"Failed to save cookies: {e}")
-
-    def _is_cloudflare_challenge(self, resp: requests.Response) -> bool:
-        try:
-            text = resp.text.lower()
-        except Exception:
-            text = ""
-        if resp.status_code in (403, 503):
-            if "just a moment" in text:
-                return True
-            if "cf-ray" in {k.lower() for k in resp.headers.keys()}:
-                return True
-            if "cf-mitigated" in {k.lower() for k in resp.headers.keys()}:
-                return True
-            if any("cloudflare" in str(v).lower() for v in resp.headers.values()):
-                return True
-        return False
-
-    def _upgrade_to_cloudscraper(self) -> bool:
-        if not HAS_CLOUDSCRAPER:
-            return False
-        try:
-            cs = cloudscraper.create_scraper(
-                browser={"browser": "chrome", "platform": "windows", "mobile": False}
-            )
-            cs.headers.update(self.session.headers)
-            for c in self.session.cookies:
-                cs.cookies.set(c.name, c.value, domain=c.domain, path=c.path)
-            if self.api_token:
-                cs.headers.update({"Authorization": f"Bearer {self.api_token}"})
-            self.session = cs
-            logger.info("Switched to cloudscraper session.")
-            return True
-        except Exception as e:
-            logger.warning(f"cloudscraper init failed: {e}")
-            return False
-
-    def _browser_cookie_bootstrap(self) -> bool:
-        """
-        Use Playwright to load the site in a real browser, pass Cloudflare and optionally SSO,
-        then copy cookies and UA into the requests session.
-        Requires:
-          pip install playwright
-          playwright install chromium
-        """
-        try:
-            from playwright.sync_api import sync_playwright
-        except Exception:
-            logger.error("Playwright not available. Install with: pip install playwright && playwright install chromium")
-            return False
-
-        try:
-            with sync_playwright() as pw:
-                browser = pw.chromium.launch(headless=False)  # headful helps with MFA/SSO/CF
-                ctx = browser.new_context()
-                page = ctx.new_page()
-                logger.warning(f"In cookies 189, page={page}")
-
-                # Load base to satisfy Cloudflare; wait a bit for challenge completion
-                page.goto(self.base_url, wait_until="domcontentloaded")
-                page.wait_for_timeout(6000)
-                # If SSO login is required for some content, user can navigate to /login and complete it
-                page.goto(f"{self.base_url}/login", wait_until="domcontentloaded")
-
-                cookies = ctx.cookies()
-                ua = page.evaluate("() => navigator.userAgent") or DEFAULT_UA
-
-                self.session.headers["User-Agent"] = ua
-                self.session.cookies.clear()
-                for c in cookies:
-                    self.session.cookies.set(c["name"], c["value"], domain=c.get("domain"), path=c.get("path", "/"))
-
-                browser.close()
-                logger.info("Captured browser cookies and user agent.")
-                self._save_cookies()
-                return True
-        except Exception as e:
-            logger.error(f"Browser bootstrap failed: {e}")
-            return False
-
-    def _ensure_access(self) -> None:
-        if self._auth_initialized:
-            return
-
-        test_url = f"{self.base_url}"
-        r = self.session.get(test_url, timeout=30)
-        logger.error(f"esure access {r}")
-
-        if r.status_code == 200:
-            self._auth_initialized = True
-            logger.info("Access OK (API token/cookies).")
-            return
-
-        if self._is_cloudflare_challenge(r):
-            logger.warning("Cloudflare challenge detected on export API.")
-            # Try cloudscraper first
-            if self._upgrade_to_cloudscraper():
-                r = self.session.get(test_url, timeout=30)
-                if r.status_code == 200:
-                    self._auth_initialized = True
-                    logger.info("Access OK via cloudscraper.")
-                    return
-
-        # Try browser cookie bootstrap
-        if self.use_browser_login and self._browser_cookie_bootstrap():
-            r = self.session.get(test_url, timeout=30)
-            if r.status_code == 200:
-                self._auth_initialized = True
-                logger.info("Access OK via browser cookies.")
-                return
-
-        # Final failure
-        snippet = (r.text or "")[:300].replace("\n", " ")
-        logger.error(f"Cannot access {test_url} (status {r.status_code}). Snippet: {snippet}")
-        raise RuntimeError(
-            "Blocked by Cloudflare/SSO. Set INDICO_API_TOKEN and either "
-            "install cloudscraper or enable INDICO_USE_BROWSER_LOGIN to capture cookies."
-        )
 
     def _detect_type(self, url: str, headers: dict) -> str:
         ct = headers.get("content-type", "").split(";")[0].strip().lower()
@@ -506,6 +355,7 @@ class DocDBExtractor(BaseExtractor):
 
         while should_continue():
             status = self.check_document_page(docid)
+            logger.warning(f"Status for {docid} = {status}")
             
 
             if status == "exists":
@@ -527,6 +377,7 @@ class DocDBExtractor(BaseExtractor):
                 else:
                     # **INLINE ATTACHMENT CHECK**
                     page_url = f"{self.base_url}{docid}"
+                    
                     resp = self.session.get(page_url)
                     
                     # if there is no RetrieveFile link on that page, treat as "missing"
@@ -571,54 +422,50 @@ class DocDBExtractor(BaseExtractor):
         stop_after_seen: int = 100,
         max_missing: int = 1000,
         latest_hint: Optional[int] = None,  # NEW: optional manual starting hint (e.g., 34626)
-        chunk_size:int=7000000000000
+        chunk_size:int=None,
     ) -> List[Dict[str, Any]]:
         logger.info(f"Extracting events from DocDB (mode: {mode}, limit: {limit}, latest_hint={latest_hint})")
-        #self._ensure_access()
-        '''indexed_versions: Dict[int,int] = {}
-        for rec in self.faiss.metadata_store.values():
-            try:
-                did = int(rec['doc_id'])
-                
-                v   = int(rec.get('docdb_version', '0'))
-            except (KeyError, ValueError):
-                continue
-            indexed_versions[did] = max(indexed_versions.get(did, 0), v)
-        '''
         pages = self._enumerate_pages_latest_first(
             start=start,
             limit_pages=limit,
             indexed_doc_ids=indexed_doc_ids,
-            #indexed_doc_versions=indexed_versions,
             stop_after_seen=stop_after_seen,
             max_missing=max_missing,
             mode=mode,
         )
 
+        documents_processed = collections.defaultdict(list)
         # Extract links and metadata from pages (parallel)
         all_links: List[str] = []
         all_metadata: List[Dict[str, Any]] = []
         with ThreadPoolExecutor(max_workers=self.max_workers_pages) as pool:
             future_to_page = {pool.submit(self.extract_document_links_and_metadata, page_url): page_url for page_url in pages}
+            
             for fut in as_completed(future_to_page):
+                
                 page_url = future_to_page[fut]
+                
                 try:
                     links, metadata = fut.result()
+
                     all_links.extend(links)
                     all_metadata.extend(metadata)
+                    documents_processed[page_url].extend(links)
                 except Exception as e:
                     logger.error(f"Error processing page {page_url}: {e}")
-        logger.info(f"{len(all_links)} were extracted: {all_links}")
+                
+                
+
+        logger.info(f"{len(all_links)} were extracted: from {len(documents_processed)} websites")
         # Download files (parallel)
         documents: List[Dict[str, Any]] = []
-        root_data: List[Dict[str, Any]]= []
         existing_ids=collections.defaultdict(int)
         with ThreadPoolExecutor(max_workers=self.max_workers_files) as pool:
             futures = {pool.submit(self._download_file, link, self.session, self.max_file_bytes): (link, metadata) for link, metadata in zip(all_links, all_metadata)}
             logger.info(f"Downloaded {len(futures)} links")
             for fut in as_completed(futures):
                 link, metadata = futures[fut]
-                
+            
                 try:
                     result = fut.result()
                     if not result:
@@ -635,6 +482,7 @@ class DocDBExtractor(BaseExtractor):
                     chunks = self.get_chunks(cleaned_text_list, chunk_size=chunk_size)
                     logger.info(f"Found {len(chunks)} chunks for {link}")
                     for chunk in chunks:
+                        
                         root_id = doc_id
                         
                         child_id = int(existing_ids.get(doc_id,'0_0').split("_")[-1])
@@ -666,11 +514,10 @@ class DocDBExtractor(BaseExtractor):
                 logger.info(f"doc is = {doc['document_id']}")
                 
 
-                # Always include a record; raw_text may be empty if unsupported
                 
                 # give each vector a unique "document_id" – e.g. include filename
                 unique_id = f"docdb_{doc['document_id']}_{metadata.get('filename','0')}"
-                print(doc.keys())
+               
                 #PUT IN DOCUMENTATION THAT THESE ARE THE FIELDS
                 dataset.append({
                     'document_id': doc['document_id'],
@@ -686,11 +533,9 @@ class DocDBExtractor(BaseExtractor):
                     'abstract': metadata['abstract'],
                     'topic': metadata['topic'],
                     'keywords': metadata['keywords'],
-                    #STORE KEYWORDS
                     'created_date': metadata['created_date'],
                     'source': metadata['source'],
                     'docdb_version': metadata.get('docdb_version', ''),
-                    #HWHEN UPDATING THE VERISONS ALSO MAKE SURE YOU UPDATE THE ABSTRACT IF THE META DATA IS CHANGED
                     'filename': metadata.get('filename', ''),
                     'content_type': content_type,
                 })
@@ -710,7 +555,6 @@ class DocDBExtractor(BaseExtractor):
                         f"Processed attachment: doc={doc['document_id']} "
                         f"file={fname} version={version} "
                         f"title=\"{metadata['title']}\"\n"
-                        #f"    URL={url}"
                     )
                 else:
                     logger.info(
@@ -729,4 +573,6 @@ class DocDBExtractor(BaseExtractor):
                 logger.error(f"Error processing document {doc.get('document_id','unknown')}: {e}")
 
         logger.info(f"Extracted {len(dataset)} DocDB attachments")
-        yield dataset
+
+        
+        yield len(existing_ids), dataset

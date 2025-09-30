@@ -15,12 +15,16 @@ load_dotenv()
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
 
-from config import validate_config, create_directories, DOC_LIMIT_DOCDB, DOC_LIMIT_INDICO
-from src.core.document_processor_multithread import DocumentProcessor
-#from src.core.document_processor import DocumentProcessor
-#from src.core.document_processor_chroma import DocumentProcessor
-from src.indexing.faiss_manager_reindexed import FAISSManager
-from src.indexing.chroma_manager import ChromaManager
+from config import STORE, validate_config, create_directories, DOC_LIMIT_DOCDB, DOC_LIMIT_INDICO
+if STORE == 'faiss':
+    from src.core.document_processor_multithread import DocumentProcessor
+    from src.indexing.faiss_manager_reindexed import FAISSManager
+elif STORE == 'chroma':
+    from src.core.document_processor_chroma import DocumentProcessor
+    from src.indexing.chroma_manager import ChromaManager
+else:
+    raise Exception(f"Invalid Store. Must be FAISS or CHROMA. Got {store}")
+
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -70,7 +74,7 @@ def cli():
 @click.option(
     '--data-path',
     type=str,
-    default='data/faiss',
+    default='data',
 )
 
 @click.option(
@@ -84,6 +88,7 @@ def index(docdb_limit, indico_limit, start_idx_ddb, start_idx_ind, docdb_latest_
     start=time.time()
     try:
         logger.info("Starting document indexing process")
+        logger.info(f"chunk size is {chunk_size}")
 
         # Validate configuration
         validate_config()
@@ -105,17 +110,17 @@ def index(docdb_limit, indico_limit, start_idx_ddb, start_idx_ind, docdb_latest_
         click.echo(f"\n{'='*50}")
         click.echo("INDEXING RESULTS")
         click.echo(f"{'='*50}")
-        click.echo(f"DocDB documents processed: {results['docdb_processed']}")
-        click.echo(f"Indico documents processed: {results['indico_processed']}")
-        click.echo(f"Total new documents added: {results['total_added']}")
+        click.echo(f"DocDB Events processed: {results['docdb_processed']}")
+        click.echo(f"Indico Events processed: {results['indico_processed']}")
+        click.echo(f"Total new events added: {results['indico_processed'] + results['docdb_processed']}")
+        click.echo(f"Total new embeddings added: {results['total_embeddings_added']}")
 
         # Show index stats
         stats = processor.get_index_stats()
         click.echo(f"\nCurrent index statistics:")
-        click.echo(f"Total documents: {stats['total_documents']}")
-        click.echo(f"Total vectors: {stats['total_vectors']}")
-        click.echo(f"Metadata entries: {stats['metadata_entries']}")
-
+        click.echo(f"Total Events: {stats['total_documents']}")
+        click.echo(f"Total Embeddings: {stats['total_embeddings']}")
+        click.echo(f"Total Number of Attachments in Metadata: {stats['total_number_attachments_in_metadata']}")
         # Cleanup
         processor.cleanup()
         end=time.time()

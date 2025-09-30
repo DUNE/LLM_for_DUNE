@@ -35,7 +35,7 @@ class DocumentProcessor:
         results = {
             "docdb_processed": 0,
             "indico_processed": 0,
-            "total_added": 0
+            "total_embeddings_added": 0
         }
 
         #
@@ -57,11 +57,12 @@ class DocumentProcessor:
 
                 # 3) Optionally filter by version bump or force‐flag
                 
-                for raw_records in self.docdb_extractor.extract_documents(start=start_ddb, limit=docdb_limit,
+                for docs_processed, raw_records in self.docdb_extractor.extract_documents(start=start_ddb, limit=docdb_limit,
                                                                     indexed_doc_ids=indexed_ids,
                                                                     mode="incremental",
                                                                     stop_after_seen=100,
-                                                                    max_missing=1000
+                                                                    max_missing=1000,
+                                                                    chunk_size=self.chunk_size
                                                                 ):
                     
 
@@ -88,14 +89,14 @@ class DocumentProcessor:
                         incoming_v = int(rec.get("docdb_version", "0") or "0")
                         if force or incoming_v > indexed_versions.get(did, 0) or modified_date_md > last_scraped_date_md or modified_date_ct > last_scraped_date_ct:
                             to_reindex.append(rec)
-                    log_to_db_docdb(to_reindex)
+                    log_to_db_docdb(to_reindex,docs_processed)
                     
                 
             except Exception as e:
                 logger.error(f"Error in extracting documents from dune docdb {e}"  )
             return to_reindex
         
-        def log_to_db_docdb(to_reindex):
+        def log_to_db_docdb(to_reindex,num):
             try:
                 with log_lock:
                     # 4) Prune old versions & rebuild only if there are updates
@@ -114,9 +115,9 @@ class DocumentProcessor:
                     
                     logger.info(f"to_reindex is {len(to_reindex)}")
                     # 5) Add the new/updated docs
-                    added = self.faiss_manager.add_documents(to_reindex)
-                    results["docdb_processed"] = len(to_reindex)
-                    results["total_added"] += added
+                    added = self.faiss_manager.add_documents(to_reindex, num)
+                    results["docdb_processed"] += num
+                    results["total_embeddings_added"] += added
 
 
                     logger.info(
@@ -138,7 +139,7 @@ class DocumentProcessor:
                 
                 logger.info("Processing Indico documents")
 
-                for indico_records in self.indico_extractor.extract_documents(start=start_ind, limit=indico_limit):
+                for num_events, indico_records in self.indico_extractor.extract_documents(start=start_ind, limit=indico_limit, chunk_size=self.chunk_size):
                     logger.info(f"Indico records returns {len(indico_records)}")
                     existing_ids = set(self.faiss_manager.doc_ids)
                     indico_to_add[0] = [
@@ -150,7 +151,7 @@ class DocumentProcessor:
                         f"Indico: extracted {len(indico_to_add[0])} docs, "
                     )
 
-                    log_to_db_indico(indico_to_add[0])
+                    log_to_db_indico(indico_to_add[0], num_events)
                     
 
 
@@ -159,13 +160,13 @@ class DocumentProcessor:
             except Exception as e:
                 logger.error(f"Error processing Indico documents: {e}")
 
-        def log_to_db_indico(docs):
+        def log_to_db_indico(docs, num_events):
             with log_lock:
-                added = self.faiss_manager.add_documents(docs)
+                added = self.faiss_manager.add_documents(docs,num_events)
                         
-                results["indico_processed"] = len(docs)
+                results["indico_processed"] += num_events
                 
-                results["total_added"] += added
+                results["total_embeddings_added"] += added
                 
                 logger.info(f"Added Indico to FAISS: added {added} new vectors to index")
                 return added
@@ -186,7 +187,7 @@ class DocumentProcessor:
 
 
         # Final summary & return
-        logger.info(f"Document processing completed. Total new docs added: {results['total_added']}")
+        logger.info(f"Document processing completed. Total new docs added: {results['total_embeddings_added']}")
 
 
         return results

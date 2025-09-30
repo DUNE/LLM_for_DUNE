@@ -21,23 +21,66 @@ import json
 import os
 from find_port import find_port
 argo_client= ArgoAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
-
+from src.extractors.indico_extractor_multithreaded import IndicoExtractor
+from src.extractors.docdb_extractor_multithreaded import DocDBExtractor
 
 def normalize(s):
     # Remove all whitespace characters like \n, \t, spaces, etc.
     return re.sub(r'\s+', '', s)
 
 
+indico_session=IndicoExtractor()
+docdb_session=DocDBExtractor()
+docdb_session._build_session()
 @scorer
 def relevant_refs(outputs:str, expectations:str):
-    all_refs=outputs.split(',')
-    print(f" expectation {expectations}")
-
+    logger.error(outputs)
+    question = outputs.split("\ ")[1]
+    all_refs=outputs.split("\ ")
+    all_refs=all_refs[-1].split(',')
     expect = normalize(expectations['expected_response'])
+    results=0
+    assert len(all_refs)>0
     if expect in all_refs:
+        print("found")
         return 1
-    print(f"extracted: {all_refs}\ndesired: {expect}")
-    return 0
+    else:
+        prompt = f'Read the content in this document. Determine if it provides an answer to the question: {question}, if so, return a float value closer to 1 in the format of a json with the only permitted key being "score". If the content in the file is not related to the question at all or loosely relates to the question, give a score close to 0'
+        #look at the questoin, open the references and check if they relate to the quesiton
+        for link in all_refs:
+            if not link: continue
+            #logger.error(link)
+            raw_text=''
+            if 'docs.dune' in link:
+                content, headers = docdb_session._download_file(link, docdb_session.session, docdb_session.max_file_bytes)
+                if content:
+                    req=docdb_session.session.get(link)
+                    raw_text = docdb_session.get_raw_text(req.headers.get("Content-Type"),content)
+                else:
+                    logger.error(f"Error downloading {link}")
+            else:
+                indico_session._ensure_access()
+                content, headers = indico_session._download_file(link, indico_session.session, docdb_session.max_file_bytes)
+                if content:
+                    req=indico_session.session.get(link)
+                    raw_text = indico_session.get_raw_text(req.headers.get("Content-Type"), content)
+            document_text=raw_text
+            if not document_text:
+                results += 0
+                continue
+            resp=argo_client.chat_completion(question=prompt, context=document_text)
+            print(resp)
+            clean_str = re.sub(r'^```json\s*|```$', '', resp, flags=re.MULTILINE).strip()
+            # Parse JSON
+            data = json.loads(clean_str)
+            # Return the "score" value as float
+            
+            results += float(data.get("score", 0))
+    length = 0
+    for i in all_refs:
+        if i:
+            length += 1
+    return results / length
 
 
 @scorer
@@ -68,9 +111,9 @@ def extract_https_url(text):
 
 class Evalutation():
     def __init__(self, port, experiment_name, data_path):
-        if STORE == 'faiss':
-            #self.faiss_manager = FAISSManager(data_path) 
-            self.faiss_manager = ChromaManager(data_path)#FAISSManager(data_path)
+
+        self.faiss_manager = FAISSManager(data_path) 
+        #self.faiss_manager = ChromaManager(data_path)#FAISSManager(data_path)
         print(f"connecting to client")
         self.argo_client = ArgoAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
         print("Conntected to client")
@@ -121,7 +164,7 @@ class Evalutation():
     
     def llm_references(self,question):
         context_snippets, references = self.faiss_manager.search(question, top_k=DEFAULT_TOP_K)
-        return ','.join(references)
+        return f"question \ {question} \ {','.join(references)}"
 
     #@mlflow.trace
     def evaluate(self,method):
@@ -183,7 +226,7 @@ results = val.evaluate(args.method)
 for key in results.metrics:
     if '/mean' in key:
         metric=key.split('/')[0]
-        DATA_FILE = f"metrics/chroma/{key.split('/')[0]}.json"
+        DATA_FILE = f"{args.savedir}/{key.split('/')[0]}.json"
 logger.info(f"Logging metrics to {DATA_FILE}")
 
 
@@ -206,7 +249,7 @@ with open(DATA_FILE, "w") as f:
     json.dump(data, f)
 
 
-save_results_file = f"{args.savedir}/{args.data_path.split('/')[-1]}_{metric}_evaluation_results.csv"
+save_results_file = f"{args.savedir}/{metric}_evaluation_results.csv"
 logger.info(f"Saved results to {save_results_file}")
 results.result_df.to_csv(save_results_file, index=False)
 

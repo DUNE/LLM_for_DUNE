@@ -14,11 +14,18 @@ from typing import Optional, Dict, Any
 from config import (
     HOST, PORT, DEBUG, ARGO_API_USERNAME, ARGO_API_KEY, 
     DEFAULT_TOP_K, ENABLE_AUTHENTICATION, FERMILAB_REDIRECT_URI, 
-    validate_config, create_directories
+    STORE, validate_config, create_directories, CHROMA_PATH, FERMILAB_SESSION_SECRET
 )
-from config import FERMILAB_SESSION_SECRET
-from src.indexing.faiss_manager_reindexed import FAISSManager
-from src.indexing.chroma_manager import ChromaManager 
+
+
+if STORE == 'faiss':
+    from src.indexing.faiss_manager_reindexed import FAISSManager
+    db_manager: Optional[FAISSManager] = None
+elif STORE == 'chroma':
+    from src.indexing.chroma_manager import ChromaManager 
+    db_manager: Optional[ChromaManager] = None
+else:
+    raise Exception(f"DUNE-GPT requires Faiss or Chroma. Got {STORE}")
 from src.api.argo_client import ArgoAPIClient
 from src.auth.fermilab_auth import fermilab_auth
 from src.utils.logger import get_logger
@@ -26,38 +33,43 @@ from src.utils.logger import get_logger
 logger = get_logger(__name__)
 
 # Global variables
-faiss_manager: Optional[FAISSManager] = None
 argo_client: Optional[ArgoAPIClient] = None
-
+print(STORE, CHROMA_PATH)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage application lifecycle"""
-    global faiss_manager, argo_client
-    path = 'discard_2000'
+    global db_manager, argo_client
+    
     # Startup
     logger.info("Starting DUNE-GPT application")
     
     # Validate configuration
     validate_config()
-    create_directories(path)
+    create_directories(CHROMA_PATH)
     
     # Initialize components
-    faiss_manager = ChromaManager(path)
+    if STORE == 'faiss':
+        db_manager = FAISSManager(CHROMA_PATH)
+    elif STORE == 'chroma':
+        db_manager = ChromaManager(CHROMA_PATH)
+    else:
+        raise Exception(f"Requires Faiss or Chroma. Got {STORE}")
+    
     argo_client = ArgoAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
     
     # Check if index is empty
-    stats = faiss_manager.get_stats()
+    stats = db_manager.get_stats()
     if stats["total_documents"] == 0:
-        logger.warning("FAISS index is empty. Run the indexing process first.")
+        logger.warning("Vector store index is empty. Run the indexing process first.")
     else:
-        logger.info(f"FAISS index loaded with {stats['total_documents']} documents")
+        logger.info(f"Vector store index loaded with {stats['total_documents']} documents")
     
     yield
     
     # Shutdown
     logger.info("Shutting down DUNE-GPT application")
-    if faiss_manager:
-        faiss_manager.cleanup()
+    if db_manager:
+        db_manager.cleanup()
 
 # Create FastAPI app
 app = FastAPI(
@@ -146,7 +158,7 @@ async def form_post(request: Request, question: str = Form(...), user: Optional[
         logger.info(f"Question received from {user.get('email', 'anonymous') if user else 'anonymous'}: {question}")
         
         # Search FAISS index
-        context_snippets, references = faiss_manager.search(question, top_k=DEFAULT_TOP_K)
+        context_snippets, references = db_manager.search(question, top_k=DEFAULT_TOP_K)
         context = "\n\n".join(context_snippets)
         
         assert references, "no refs"
@@ -182,7 +194,7 @@ async def api_search(q: str, top_k: int = DEFAULT_TOP_K):
             raise HTTPException(status_code=400, detail="Question cannot be empty")
         
         # Search FAISS index
-        context_snippets, references = faiss_manager.search(q, top_k=top_k)
+        context_snippets, references = db_manager.search(q, top_k=top_k)
         context = "\n\n".join(context_snippets)
         
         # Get answer from Argo API
@@ -203,12 +215,12 @@ async def api_search(q: str, top_k: int = DEFAULT_TOP_K):
 async def health_check():
     """Health check endpoint"""
     try:
-        stats = faiss_manager.get_stats()
+        stats = db_manager.get_stats()
         argo_healthy = argo_client.health_check()
         
         return {
             "status": "healthy" if argo_healthy else "degraded",
-            "faiss_index": stats,
+            "db_index": stats,
             "argo_api": "available" if argo_healthy else "unavailable"
         }
     
@@ -223,7 +235,7 @@ async def health_check():
 async def get_stats():
     """Get application statistics"""
     try:
-        return faiss_manager.get_stats()
+        return db_manager.get_stats()
     except Exception as e:
         logger.error(f"Stats error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
