@@ -400,7 +400,7 @@ class IndicoExtractor(BaseExtractor, Session):
         chunks = self.get_chunks(raw_text, chunk_size)
         for i,chunk in enumerate(chunks):
             doc['document_id']= f"{event_id}_{attachments_total}"
-            doc['cleaned_text'] = chunk
+            doc['cleaned_text'] = chunk.page_content
             docs.append(doc)
 
             attachments_total += 1

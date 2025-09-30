@@ -120,13 +120,15 @@ class ChromaManager:
                 if k not in ['cleaned_text', 'raw_text', 'document_id']:
                     md[k] = v
             metadatas.append(md)
+        
 
         length = 0
         for d in doc_texts:
             length += len(d)
-        logger.info(f'Storing document of length {length} in chunks of 2000')
+        logger.info(f'Storing document of length {length} in chunks')
 
-        if up_ids is None: return    0
+        if length == 0: return  0
+   
         if mode == 'update':
             self.chroma_collection.update(
                 ids = up_ids,
@@ -169,7 +171,7 @@ class ChromaManager:
         self.num_events+=num_events
         #which index each doc id is at in documents
         map_ids_to_idx = {d['document_id']:idx for idx,d in enumerate(documents)}
-        logger.info("updating record ddb")
+    
         self.update_indico_docdb_record(documents)
         
         #all ids to add/update
@@ -177,13 +179,14 @@ class ChromaManager:
 
         #update existing ids in chroma
         ids_to_update = list(self.doc_ids.intersection(ids))
-        logger.info("adding crhroma ")
+        
+
         added = self.add_to_chroma(documents = documents, ids = ids_to_update, ids_to_idx_map =  map_ids_to_idx, mode = 'update')
-        logger.info("added crhroma ")
+
 
         #add new ids to chroma
         ids_to_add = ids - self.doc_ids 
-        logger.info("found crhroma ")
+    
         if ids_to_add:
             added += self.add_to_chroma(documents= documents, ids= ids_to_add, ids_to_idx_map=map_ids_to_idx, mode='add')
         self.doc_ids.update(ids_to_add)
@@ -256,4 +259,3 @@ class ChromaManager:
         self.docdb_metadata_modified = None
 
         self.doc_ids = None
-

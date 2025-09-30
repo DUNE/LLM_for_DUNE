@@ -293,4 +293,3 @@ class FAISSManager:
         self.model = None
         self.metadata_store = None
         self.doc_ids = None
-

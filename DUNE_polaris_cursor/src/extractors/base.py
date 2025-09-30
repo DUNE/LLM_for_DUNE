@@ -21,8 +21,8 @@ class BaseExtractor(ABC):
         """Extract documents from the source"""
         pass
 
-
-    def get_chunks(self, text, chunk_size):
+    #old don't use
+    def get_text_chunks(self, text, chunk_size):
         if not text: return []
         start = 0
         end=chunk_size
@@ -34,6 +34,24 @@ class BaseExtractor(ABC):
             chunks.append(' '.join(text[start:end]))
             start=end
             end += chunk_size
+        return chunks
+    
+    def get_chunks(self, text, chunk_size):
+        from langchain_experimental.text_splitter import SemanticChunker
+        from langchain.embeddings import HuggingFaceEmbeddings
+        from langchain.schema import Document
+
+        embedding = HuggingFaceEmbeddings(
+            model_name="sentence-transformers/all-MiniLM-L6-v2",
+            model_kwargs={"device": "cpu"}  # or "cuda"
+        )
+        text_splitter = SemanticChunker(embedding)
+        text = Document(page_content=' '.join(text))
+        try:
+            chunks = text_splitter.split_documents([text])
+            print(len(chunks))
+        except Exception as e:
+            logger.error(f"Error in splitting {e}")
         return chunks
     
     def _download_file(self, link, session, max_file_bytes) -> Optional[Tuple[bytes, Dict[str, str]]]:
@@ -100,6 +118,7 @@ class BaseExtractor(ABC):
         if 'application/pdf' in content_type:
             logger.warning("Getting from pdf")
             raw_text = self.extract_text_from_pdf(content)
+            print(len(raw_text))
             
         elif ('presentationml.presentation' in content_type
                 or 'application/vnd.ms-powerpoint' in content_type):

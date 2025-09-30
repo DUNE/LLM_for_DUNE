@@ -1,3 +1,4 @@
+
 from datetime import datetime
 import time
 import threading
@@ -6,7 +7,7 @@ import os
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 from src.extractors.docdb_extractor_multithreaded import DocDBExtractor
 from src.extractors.indico_extractor_multithreaded import IndicoExtractor
-from src.indexing.faiss_manager_reindexed import FAISSManager
+
 from config import DOC_LIMIT_DOCDB, DOC_LIMIT_INDICO
 from src.utils.logger import get_logger
 import src.indexing.chroma_manager as chroma
@@ -19,11 +20,11 @@ class DocumentProcessor:
     def __init__(self, data, chunk_size):
         self.chunk_size=chunk_size
         logger.info("Initiated chroma")
-        self.faiss_manager = chroma.ChromaManager(data) #FAISSManager()
+        self.chroma_manager = chroma.ChromaManager(data) 
        
  
-        self.docdb_extractor = DocDBExtractor(self.faiss_manager)
-        self.indico_extractor = IndicoExtractor(self.faiss_manager)
+        self.docdb_extractor = DocDBExtractor(self.chroma_manager)
+        self.indico_extractor = IndicoExtractor(self.chroma_manager)
 
     def process_all_documents(
         self,
@@ -49,7 +50,7 @@ class DocumentProcessor:
                 logger.info("Processing DocDB documents")
 
                 # 1) What versions (and thus IDs) do we already have?
-                indexed_versions = self.faiss_manager.get_docdb_versions()
+                indexed_versions = self.chroma_manager.get_docdb_versions()
                 #indexed_ids: Set[int] = set(indexed_versions.keys())
                 indexed_ids: Set[int] = { int(did) for did in indexed_versions.keys() }
 
@@ -78,13 +79,13 @@ class DocumentProcessor:
                     
                     logger.info(f"to_reindex is {len(to_reindex)}")
                     # 5) Add the new/updated docs
-                    added = self.faiss_manager.add_documents(to_reindex, num)
+                    added = self.chroma_manager.add_documents(to_reindex, num)
                     results["docdb_processed"] += num
                     results["total_embeddings_added"] += added
 
 
                     logger.info(
-                        f"Added DocDB to FAISS: reindexed {len(to_reindex)}, added {added} vectors"
+                        f"Added DocDB to Chroma: reindexed {len(to_reindex)}, added {added} vectors"
                     )
 
                             
@@ -117,13 +118,13 @@ class DocumentProcessor:
 
         def log_to_db_indico(docs,num_events):
             with log_lock:
-                added = self.faiss_manager.add_documents(docs,num_events)
+                added = self.chroma_manager.add_documents(docs,num_events)
                         
                 results["indico_processed"] += num_events
                 
                 results["total_embeddings_added"] += added
                 
-                logger.info(f"Added Indico to FAISS: added {added} new vectors to index")
+                logger.info(f"Added Indico to Chroma: added {added} new vectors to index")
                 return added
             
         docdb_thread = threading.Thread(target=docdb_extraction, args=('docdb',))
@@ -146,8 +147,8 @@ class DocumentProcessor:
 
     def get_index_stats(self) -> Dict[str, int]:
         """Get current index statistics"""
-        return self.faiss_manager.get_stats()
+        return self.chroma_manager.get_stats()
 
     def cleanup(self):
         """Cleanup resources"""
-        self.faiss_manager.cleanup()
+        self.chroma_manager.cleanup()
