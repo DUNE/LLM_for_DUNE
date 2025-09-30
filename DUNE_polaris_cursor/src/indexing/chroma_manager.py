@@ -126,7 +126,7 @@ class ChromaManager:
             length += len(d)
         logger.info(f'Storing document of length {length} in chunks of 2000')
 
-        if up_ids is not None: return    0
+        if up_ids is None: return    0
         if mode == 'update':
             self.chroma_collection.update(
                 ids = up_ids,
