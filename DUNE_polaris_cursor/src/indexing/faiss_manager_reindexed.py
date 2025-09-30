@@ -87,7 +87,6 @@ class FAISSManager:
         faiss.write_index(self.faiss_index, str(self.faiss_index_path))
 
     def generate_embeddings(self, texts: List[str]) -> np.ndarray:
-        return np.array(self.model(texts)).astype(np.float32) 
         return self.model.encode(texts, convert_to_numpy=True).astype(np.float32)
 
     def add_documents(self, documents: List[Dict[str, Any]], num_events: int) -> int:
@@ -118,8 +117,6 @@ class FAISSManager:
 
 
         # 2) Add to FAISS
-        print(np.array(embeddings).dtype, embeddings.shape)
-        print(self.faiss_index.d)
 
         self.faiss_index.add(np.array(embeddings))
         print(f"Added {len(np.array(embeddings))} embeddings to FAISS")
@@ -296,3 +293,4 @@ class FAISSManager:
         self.model = None
         self.metadata_store = None
         self.doc_ids = None
+
