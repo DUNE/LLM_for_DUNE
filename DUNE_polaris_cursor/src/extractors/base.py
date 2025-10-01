@@ -22,7 +22,7 @@ class BaseExtractor(ABC):
         pass
 
     #old don't use
-    def get_text_chunks(self, text, chunk_size):
+    def get_chunks(self, text, chunk_size):
         if not text: return []
         start = 0
         end=chunk_size
@@ -36,7 +36,7 @@ class BaseExtractor(ABC):
             end += chunk_size
         return chunks
     
-    def get_chunks(self, text, chunk_size):
+    def section_get_chunks(self, text, chunk_size):
         from langchain_experimental.text_splitter import SemanticChunker
         from langchain.embeddings import HuggingFaceEmbeddings
         from langchain.schema import Document

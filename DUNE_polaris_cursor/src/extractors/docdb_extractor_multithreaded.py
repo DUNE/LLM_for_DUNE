@@ -489,7 +489,7 @@ class DocDBExtractor(BaseExtractor, Session):
                         
                         documents.append({
                             'document_id': f"{root_id}_{child_id+1}",
-                            'cleaned_text': chunk.page_content,
+                            'cleaned_text': chunk,
                             'content_type': ct,
                             'metadata': metadata,
                         })
