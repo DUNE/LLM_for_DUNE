@@ -15,7 +15,8 @@ torchvision
 huggingface_hub>=0.14.1:
 torchaudio
 transformers>=4.21.0
-spacy>=3.4.0
+#spacy>=3.4.0
+spacy==3.7.5
 
 # Vector Database
 faiss-cpu>=1.7.4  # Use faiss-gpu if GPU available
