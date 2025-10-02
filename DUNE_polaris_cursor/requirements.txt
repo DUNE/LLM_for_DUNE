@@ -59,3 +59,5 @@ pillow
 playwright
 #playwright install chromium
 cloudscraper
+
+chATLAS_Embed
