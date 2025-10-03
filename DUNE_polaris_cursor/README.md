@@ -58,19 +58,19 @@ A Retrieval-Augmented Generation (RAG) based LLM application for DUNE scientific
 
 3. **Install dependencies**
    ```bash
-   pip install -r requirements.txt
-   python -m spacy download en_core_web_sm
+   pip3 install -r requirements.txt
+   python3 -m spacy download en_core_web_sm
    brew install tesseract
    ```
 
 4. **Index documents**
    ```bash
-   python cli.py index --docdb-limit 50 --indico-limit 50
+   python3 cli.py index --docdb-limit 10 --indico-limit 10
    ```
 
 5. **Start the server**
    ```bash
-   python cli.py serve
+   python3 cli.py serve
    ```
 
 Visit `http://localhost:8000` to access the web interface.
