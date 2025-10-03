@@ -2,22 +2,18 @@
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
 jinja2==3.1.2
-python-multipart==0.0.6
-python-dotenv
+python-multipart
 
 # HTTP Client
-httpx==0.25.2
-requests==2.31.0
+requests>=2.32.3
 
 # Machine Learning & NLP
-sentence-transformers==2.2.2
+sentence-transformers>=3.0.0
 torch>=2.0.0
 torchvision
-huggingface_hub>=0.14.1:
 torchaudio
-transformers>=4.21.0
-#spacy>=3.4.0
-spacy==3.7.5
+transformers>=4.30.0
+spacy>=3.7.0
 
 # Vector Database
 faiss-cpu>=1.7.4  # Use faiss-gpu if GPU available
@@ -26,10 +22,11 @@ faiss-cpu>=1.7.4  # Use faiss-gpu if GPU available
 pdfplumber==0.9.0
 python-pptx==0.6.21
 beautifulsoup4==4.12.2
-
-# Data Processing
-numpy>=1.24.0
-pandas>=2.0.0
+pytesseract
+pillow
+pdf2image
+python-docx
+openpyxl
 
 # CLI
 click==8.1.7
@@ -43,23 +40,22 @@ python-dotenv==1.0.0
 # Utilities
 pathlib2>=2.3.7
 typing-extensions>=4.5.0
+itsdangerous
 
 # Development (optional)
 pytest>=7.4.0
 pytest-asyncio>=0.21.0
 black>=23.0.0
 flake8>=6.0.0
-pydantic<2
+pydantic>=2.9.0,<3
 
-itsdangerous
+# Web Automation
+playwright==1.46.0
+pyee==11.1.0
+cloudscraper>=1.2.70
 
-python-docx
-openpyxl
-pytesseract 
-pillow
-
-playwright
-#playwright install chromium
-cloudscraper
-
+# Embeddings
 chATLAS_Embed
+
+# Vector DB / Chroma
+chromadb>=0.3.29
