@@ -60,7 +60,27 @@ A Retrieval-Augmented Generation (RAG) based LLM application for DUNE scientific
    ```bash
    pip3 install -r requirements.txt
    python3 -m spacy download en_core_web_sm
-   brew install tesseract
+   brew install tesseract  # for local installation
+   # For Aurora installation for tesseract see below:
+   # Create local directories if not exist
+   mkdir -p $HOME/.local/bin $HOME/.local/lib
+   # Navigate to a temporary folder
+   cd /tmp
+   # Download Tesseract source (replace version if needed)
+   wget https://github.com/tesseract-ocr/tesseract/archive/refs/tags/5.3.1.tar.gz -O tesseract-5.3.1.tar.gz
+   tar -xzf tesseract-5.3.1.tar.gz
+   cd tesseract-5.3.1
+   # Ensure your shell can find the Tesseract binary:
+   export PATH=$HOME/.local/bin:$PATH
+   export LD_LIBRARY_PATH=$HOME/.local/lib:$LD_LIBRARY_PATH
+   # Check that Tesseract is installed correctly:
+   tesseract --version
+
+# Configure build to install in your local directory
+./autogen.sh
+./configure --prefix=$HOME/.local
+make -j$(nproc)
+make install
    ```
 
 4. **Index documents**
