@@ -5,8 +5,6 @@ import spacy
 from src.utils.logger import get_logger
 from io import BytesIO
 import requests
-import pytesseract
-from pdf2image import convert_from_bytes
 logger = get_logger(__name__)
 
 class BaseExtractor(ABC):
