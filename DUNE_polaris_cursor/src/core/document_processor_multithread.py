@@ -6,7 +6,7 @@ import os
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 from src.extractors.docdb_extractor_multithreaded import DocDBExtractor
 from src.extractors.indico_extractor_multithreaded import IndicoExtractor
-from src.indexing.faiss_manager_reindexed import FAISSManager
+from src.indexing.faiss_manager_langchain import FAISSManager
 from config import DOC_LIMIT_DOCDB, DOC_LIMIT_INDICO
 from src.utils.logger import get_logger
 #import src.indexing.chroma_manager as chroma

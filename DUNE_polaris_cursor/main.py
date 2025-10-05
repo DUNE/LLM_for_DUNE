@@ -19,7 +19,7 @@ from config import (
 
 
 if STORE == 'faiss':
-    from src.indexing.faiss_manager_reindexed import FAISSManager
+    from src.indexing.faiss_manager_langchain import FAISSManager
     db_manager: Optional[FAISSManager] = None
 elif STORE == 'chroma':
     from src.indexing.chroma_manager import ChromaManager 

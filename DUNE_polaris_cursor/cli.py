@@ -18,10 +18,8 @@ sys.path.insert(0, str(Path(__file__).parent))
 from config import STORE, validate_config, create_directories, DOC_LIMIT_DOCDB, DOC_LIMIT_INDICO
 if STORE == 'faiss':
     from src.core.document_processor_multithread import DocumentProcessor
-    from src.indexing.faiss_manager_reindexed import FAISSManager
 elif STORE == 'chroma':
     from src.core.document_processor_chroma import DocumentProcessor
-    from src.indexing.chroma_manager import ChromaManager
 else:
     raise Exception(f"Invalid Store. Must be FAISS or CHROMA. Got {store}")
 

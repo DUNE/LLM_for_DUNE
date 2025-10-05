@@ -1,7 +1,7 @@
 from collections import defaultdict
 import os
 import pickle
-import faiss
+
 import numpy as np
 import torch
 from typing import List, Dict, Any, Tuple
@@ -12,6 +12,11 @@ from config import (
     EMBEDDING_DIM,
     create_directories,
 )
+import faiss
+from langchain_community.docstore.in_memory import InMemoryDocstore
+from langchain_community.vectorstores import FAISS
+from langchain_core.documents import Document
+from src.embedder.embedding_wrappers import OriginalEmbedder
 from src.utils.logger import get_logger
 logger = get_logger(__name__)
 
@@ -25,7 +30,7 @@ class FAISSManager:
         # Setup device & model
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         logger.info(f"Using device: {self.device}")
-        self.model = SentenceTransformer(EMBEDDING_MODEL, device=self.device)
+        self.model = OriginalEmbedder()
         logger.info(f"Loaded sentence transformer {EMBEDDING_MODEL}")
         
         self.metadata_store=defaultdict( dict)
@@ -44,9 +49,11 @@ class FAISSManager:
         self.doc_ids: List[str] = self._load_doc_ids()
 
         self.faiss_index_path = os.path.join(data_path, 'faiss_index.index')
-        self.faiss_index: faiss.Index = self._load_faiss_index()
+        self.faiss_index = self._load_faiss_index()
+        print(type(self.faiss_index))
+        
 
-        logger.info(f"Loaded FAISS index with {self.faiss_index.ntotal} entries")
+        logger.info(f"Loaded FAISS index with {len(self.faiss_index.index_to_docstore_id)} entries")
         logger.info(f"Loaded metadata store with {len(self.metadata_store)} entries")
         logger.info(f"Loaded doc_ids with {len(self.doc_ids)} entries")
 
@@ -80,11 +87,22 @@ class FAISSManager:
 
     def _load_faiss_index(self) -> faiss.Index:
         if Path(self.faiss_index_path).exists():
-            return faiss.read_index(str(self.faiss_index_path))
-        return faiss.IndexFlatL2(EMBEDDING_DIM)
+            return FAISS.load_local(
+                    self.faiss_index_path, self.model, allow_dangerous_deserialization=True
+                )
+        index= faiss.IndexFlatL2(384)
+        vector_store = FAISS(
+            embedding_function=self.model,
+            index=index,
+            docstore= InMemoryDocstore(),
+            index_to_docstore_id={}
+        )
+
+        return vector_store
 
     def _save_faiss_index(self):
-        faiss.write_index(self.faiss_index, str(self.faiss_index_path))
+        self.faiss_index.save_local(self.faiss_index_path)
+        #faiss.write_index(self.faiss_index, str(self.faiss_index_path))
 
     def generate_embeddings(self, texts: List[str]) -> np.ndarray:
         return self.model.encode(texts, convert_to_numpy=True).astype(np.float32)
@@ -110,23 +128,30 @@ class FAISSManager:
         logger.info(f"Adding {len(new_docs)} new documents to FAISS")
 
         # 1) Embed the cleaned text
-        texts = [d["cleaned_text"] for d in new_docs]
+        #texts = [d["cleaned_text"] for d in new_docs]
        
-        embeddings = self.generate_embeddings(texts)
-        logger.info(f"Embedded {len(new_docs)} new docs to FAISS")
+        #embeddings = self.generate_embeddings(texts)
+        #logger.info(f"Embedded {len(new_docs)} new docs to FAISS")
 
 
         # 2) Add to FAISS
 
-        self.faiss_index.add(np.array(embeddings))
-        print(f"Added {len(np.array(embeddings))} embeddings to FAISS")
+        
+        #print(f"Added {len(np.array(embeddings))} embeddings to FAISS")
+        # Check current FAISS index dimension
+        print("FAISS index dimension:", self.faiss_index.index.d)
+
+        # Check dimension of new vectors
+        test_vector = self.model.embed_query("test")
+        print("Embedding model output dimension:", len(test_vector))
 
         # 3) Update doc_ids
         self.doc_ids.extend(d["document_id"] for d in new_docs)
-
+       
         # 4) Write out rich metadata for each
         u=set()
         try:
+            documents=[]
             for d in new_docs:
                 did = d["document_id"]
                 u.add(did)
@@ -147,19 +172,25 @@ class FAISSManager:
                         "keywords":d.get("keywords", ""),
                         "abstract": d.get("abstract", ""),
                         "content_type": d.get("content_type", ""),
-                        "cleaned_text": d.get("cleaned_text", ""),
-                    
+                        "cleaned_text": d.get('cleaned_text', ''),
                     }
+                    documents.append(Document(page_content = d.get('cleaned_text', ''), metadata=self.metadata_store[did] ))
+                
                 else:
-                    #logger.info(f"Storing {d} into store")
                     self.metadata_store[did]={}
                     for key in d.keys():
                         self.metadata_store[did][key] = d[key]
             
+                    documents.append(Document(page_content = d.get('cleaned_text', ''), metadata=self.metadata_store[did] ))
+            
+            self.faiss_index.add_documents(documents=documents)
+         
         except Exception as e:
-            print(f"Error in adding odcumentb {e}, {key}, {d[key]}")
+            import traceback
+            traceback.print_exc()
         
         self.save_all()
+        print("metadata store ", len(self.metadata_store))
         logger.info(f"Successfully added {len(new_docs)} documents to index")
         return len(new_docs)
     
@@ -223,66 +254,57 @@ class FAISSManager:
         """
         logger.info("Rebuilding FAISS index from pruned metadata_store...")
         # 1) fresh index
-        self.faiss_index = faiss.IndexFlatL2(EMBEDDING_DIM)
+        
 
         # 2) re-embed every remaining doc
-        texts = [self.metadata_store[did].get("cleaned_text", "")
+        texts = [Document(page_content=self.metadata_store[did].get("cleaned_text", ""), metadata=self.metadata_store[did])
                  for did in self.doc_ids
                  if did in self.metadata_store]
+        
+        dids_to_remove=[did for did in self.doc_ids
+                 if did in self.metadata_store]
+        
+        
 
-        if texts:
-            embeddings = self.generate_embeddings(texts)
-            embeddings = np.array(embeddings) 
-            self.faiss_index.add(embeddings)
+        if texts and dids_to_remove:
+            #embeddings = self.generate_embeddings(texts)
+            #embeddings = np.array(embeddings) 
+            self.faiss_index.delete(ids=dids_to_remove)
+            self.faiss_index.add_documents(texts)
 
         # 3) persist
         self._save_faiss_index()
-        logger.info(f"Rebuilt FAISS index; now contains {self.faiss_index.ntotal} vectors")
+        logger.info(f"Rebuilt FAISS index; now contains {len(self.faiss_index.index_to_docstore_id)} vectors")
 
     def search(self, query: str, top_k: int = 3) -> Tuple[List[str], List[str]]:
         """
             Finds the docID_number associated with the retrieved text, then goes back to the docID to find header info
         """
-        query_emb = self.generate_embeddings([query])
-        distances, indices = self.faiss_index.search(query_emb, top_k)
-        logger.info(distances)
-        snippets, refs = [], []
-        for idx in indices[0]:
-            if idx < len(self.doc_ids):
-                did_of_txt = self.doc_ids[idx]
-                did_root = did_of_txt.split("_")[0]
-                md_root = self.metadata_store.get(did_root, {})
-                md_text = self.metadata_store.get(did_of_txt, {})
-                #logger.warning(md_text)
-                raw   = md_text.get("cleaned_text", "")
-                if md_text.get('source','') == 'docdb':
-                    link = md_text.get('url', '')
-                    title = md_text.get('title','')
-                else:
-                    event_link = md_root.get('event_url', '')
-                    title = md_root.get("meeting_name", '')
-                    link  = md_text["event_url"]
-                    link = link + "  " + event_link
-                snippets.append(f"Title: {title}\nLink: {link.split('  ')[0]}\ntext: {raw}")
-                
-                if link:
-                    for l in link.split("  "):
-                        
-                        refs.append(l)
-
+        #query_emb = self.generate_embeddings([query])
+        snippets, refs=[],[]
+        #results = self.faiss_index.max_marginal_relevance_search(query, top_k)
+        retriever = self.faiss_index.as_retriever(search_type="mmr", search_kwargs={"k": 1})
+        results = retriever.invoke(query)
+        for doc in results:
+            snippets.append(doc.page_content)
+            try:
+                refs.append(doc.metadata['url'])
+            except:
+                refs.append(doc.metadata['event_url'])
+        #logger.info(distances)
+        logger.info(f"REFS { refs}")
         #logger.warning(f"Links : {refs}")
         return snippets, refs
 
     def save_all(self):
         """Persist metadata, doc_ids, and FAISS index."""
-        self._save_metadata()
-        self._save_doc_ids()
         self._save_faiss_index()
+        self._save_metadata()
 
     def get_stats(self) -> Dict[str, int]:
         return {
             "total_documents": self.num_events,
-            "total_embeddings": self.faiss_index.ntotal,
+            "total_embeddings":  len(self.faiss_index.docstore._dict),
             "total_number_attachments_in_metadata": len(self.metadata_store),
         }
 
@@ -293,3 +315,4 @@ class FAISSManager:
         self.model = None
         self.metadata_store = None
         self.doc_ids = None
+

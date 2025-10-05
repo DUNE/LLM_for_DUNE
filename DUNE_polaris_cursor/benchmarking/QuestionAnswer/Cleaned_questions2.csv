@@ -1,0 +1,298 @@
+,question,answer,link
+0, What is the purpose of the Muon Monitors Working Group as outlined in the document? ," The goals of the Muon Monitors Working Group are to evaluate requirements for neutrino beam monitoring and potential for neutrino flux, document the current design and ongoing work in detector development and tests, and simulate the response in the LBNF beamline to evaluate the muon monitoring system’s performance. "," https://indico.fnal.gov/event/10591/contributions/3770/attachments/2525/3023/MuonsUpdate.pdf
+
+"
+1, What are the primary goals of the Muon Monitors as mentioned in the document? , The primary goals of the Muon Monitors are to determine the absolute muon flux greater than 6 GeV to 5% accuracy and to measure the beam direction to within 0.2 mrad. ," https://indico.fnal.gov/event/10591/contributions/3770/attachments/2525/3023/MuonsUpdate.pdf
+
+"
+2, What are the three types of detectors mentioned for muon monitoring? ," The three types of detectors mentioned for muon monitoring are ionization counters, Cherenkov counters, and stopped muon counters. "," https://indico.fnal.gov/event/10818/attachments/3877/5147/MuonMeeting.pdf
+
+"
+3, What is the main challenge of beam optimization as described in the document? ," The main challenge of beam optimization is the large parameter space, with a reference design having around 40 parameters, making multidimensional optimization challenging due to the slow speed of GEANT4 simulation. "," https://indico.fnal.gov/event/10797/contributions/5267/attachments/3810/5070/2015-11-04_Plan_for_Beam_Optimization_at_Berkeley.pdf
+
+"
+4, What is the purpose of the Beam Simulation Group as outlined in the document? ," The purpose of the Beam Simulation Group is to collaborate with the Beam Interface WG and Beam Optimization Task Force to build tools needed for beam optimization and other beam studies, and to provide beam flux simulations and systematic uncertainties for beam-based physics studies. "," https://indico.fnal.gov/event/10438/contributions/2644/attachments/1777/2071/DUNE_BeamSim_24Sept2015.pdf
+
+"
+5, What are the engineering considerations for the three-horn optimized design according to Cory Crowley? ," The engineering considerations include acceptable horn lengths, the need for thicker neck walls due to joule heating, the requirement for welds and spider supports, and the potential need for nickel plating which could add significant cost. "," https://indico.fnal.gov/event/11316/contributions/7817/attachments/5241/6850/DUNE_BeamMeeting_21January2016.pdf
+
+"
+6, What are the main components of the Near Term Plans for the Beam Simulation Group? ," The main components include producing flux uncertainties and correlations, running with different hadron production models, facilitating beam design optimization, and developing a Fast MC Interface. "," https://indico.fnal.gov/event/10438/contributions/2644/attachments/1777/2071/DUNE_BeamSim_24Sept2015.pdf
+
+"
+7, What is the impact of the optimized target and horns on energy deposition as discussed in the document? ," The optimized target and horns result in a significant reduction in peak energy deposition density, with the optimized target with 42-cm long wings having about 12 times lower peak energy deposition density compared to the baseline. "," https://indico.fnal.gov/event/10564/contributions/3554/attachments/2392/2859/DUNE_Beamopt_NM_100815_DUNE-doc580.pdf
+
+"
+8, What are the conclusions regarding the muon profile with the sculpted hadron absorber? ," The conclusions are that more work is needed in terms of systematic investigations of the muon profile for various geometries and beam conditions, and that if the Muon Profile monitor is accurate enough, it can be used to constrain the beam and focusing alignment. "," https://indico.fnal.gov/event/10438/contributions/2641/attachments/1779/2073/SculptedHASept2015.pdf
+
+"
+9, What are the challenges mentioned in the document regarding the use of muon monitors for neutrino flux prediction? ," The challenges include the potential impact of muons originating in the absorber on the extrapolation of muon flux to neutrino flux, and the need for a full simulation of the flux seen by the muon detectors to understand the beamline design's effects. ", https://indico.fnal.gov/event/10818/attachments/3877/5147/MuonMeeting.pdf
+10, What is the purpose of using CST Studio in the skin depth investigation? , The purpose of using CST Studio is to compare the simulation results with the theoretical calculation of skin depth in a good conductor. ," https://indico.fnal.gov/event/11316/contributions/7818/attachments/5240/6849/CST_Skin_Depth.pdf
+
+"
+11, What is the best fitness achieved in the cylindrical target optimization compared to the reference and NuMI-style target? ," The best fitness achieved in the cylindrical target optimization is 1.98, compared to 1.47 for the reference and 1.97 for the NuMI-style target. "," https://indico.fnal.gov/event/11383/contributions/8081/attachments/5383/7037/DUNE_BeamSim_29January2015.pdf
+
+"
+12, What is the main goal of the neutrino beam optimization discussed by John LoSecco? , The main goal of the neutrino beam optimization is to optimize the neutrino beam using a genetic algorithm by looking at pion phase space and other factors to achieve the best beam configuration. ," https://indico.fnal.gov/event/11383/contributions/8082/attachments/5384/7038/LoSeccoDuneJan2016.pdf
+
+"
+13, What is the purpose of the gas-filled RF hadron monitor study presented by K. Yonehara? ," The purpose of the gas-filled RF hadron monitor study is to develop a radiation-robust hadron profile monitor for multi-MW beams, which is accurate and has no space charge effect. "," https://indico.fnal.gov/event/11447/contributions/8486/attachments/5678/7363/progress020416.pptx
+
+"
+14, What are the main components displayed in the Horn 1 model for the LBNF mechanical horn models? ," The main components displayed in the Horn 1 model are conductors, transitions, connecting ceramics/flange, and current equalization lengths. "," https://indico.fnal.gov/event/11532/contributions/8766/attachments/5858/7585/LBNF_Mechanical_Horn_Models_Final.pptx
+
+"
+15, What is the effect of changing the outer conductor radius on neutrino flux in the optimized 3-horn design? ," Changing the outer conductor radius for all horns resulted in a significant loss of flux, indicating the need for a better geometry. "," https://indico.fnal.gov/event/11605/contributions/9065/attachments/6008/7756/Optimized_3horn.pdf
+
+"
+16, What is the conclusion regarding the current equalization structure length based on CST simulation results? , The CST simulation results indicate that the current equalization structure could be as short as 15-20 inches if uniform distribution is the only consideration. ," https://indico.fnal.gov/event/11605/contributions/9066/attachments/6007/7755/Current_in_Equalization_Structure2.pdf
+
+"
+17, What are the three target options used in the optimization studies presented by Laura Fields? ," The three target options used in the optimization studies are the NuMI Fin Target (Carbon), Spherical Array Target (Carbon), and Cylindrical Target (Beryllium). "," https://indico.fnal.gov/event/11671/contributions/9418/attachments/6216/8003/DUNE_BeamSim_10March2016.pdf
+
+"
+18, What is the main focus of the ICHEP abstracts submitted by the BEAM WG? ," The main focus of the ICHEP abstracts is on neutrino studies, optimization of the LBNF beamline, design of the LBNF beamline, and beamline muon monitors at LBNF/DUNE. "," https://indico.fnal.gov/event/11383/contributions/8083/attachments/5382/7036/ICHEP_Abstracts.docx
+
+"
+19, What is the purpose of the muon monitors simulation update presented by Jeremy Lopez? , The purpose of the muon monitors simulation update is to test the effects of absorber design features on muon and neutrino fluxes and to study the efficiency of a generic muon detector array in detecting changes from nominal flux. , https://indico.fnal.gov/event/11532/contributions/8765/attachments/5859/7586/MuonMonitorsUpdate.pdf
+20," What modifications were made to the muon monitors simulation, and what issues were encountered? "," Modifications included adding an ""alcove"" behind the absorber and a muon tracking plane. Issues encountered were difficulty in getting the absorber layers centered on the beam center and problems with small numbers of protons, neutrons, and no electrons or photons found in the tracking plane. "," https://indico.fnal.gov/event/11671/contributions/9419/attachments/6215/8002/MuonMonitorsUpdate.pdf
+
+"
+21, What was the purpose of testing different tunnel radii in the DUNE experiment? , The purpose was to compare the neutrino energy spectrum for a 2-meter radius tunnel and a 4-meter radius tunnel at beam energies of 120 GeV and 80 GeV. ," https://indico.fnal.gov/event/11720/contributions/9740/attachments/6399/8230/LoSeccoDuneMar17-2016.pdf
+
+"
+22, What were the objectives of the decay pipe radius optimization study? ," The objectives were to understand the relationship between the decay pipe radius and how it affects flux generation, specifically by reducing the radius from the standard 2.0 meters to 1.5 meters in increments of 0.05 meters. "," https://indico.fnal.gov/event/11720/contributions/9741/attachments/6402/8233/MonicaKim.pdf
+
+"
+23, What were the priorities for the additional effort towards the conceptual design of the LBNF beamline? ," The priorities included the integration and mounting of the target into the horn, baffle mounting, absorber modeling, radiation protection, and conventional facilities. "," https://indico.fnal.gov/event/11720/contributions/9742/attachments/6401/8232/Papadimitriou-BeamOptim_Conceptual_Resources_Mar17_2016_v3.pptx
+
+"
+24, What was the main finding from the study on beam alignment and flux uncertainties? , The study found that varying the horn current by +/-2kA resulted in a largest change in the Near/Far ratio of 1.4% in neutrino energies between 7 and 7.5 GeV. ," https://indico.fnal.gov/event/11786/contributions/10050/attachments/6556/8414/pmadigan_BeamAlignment.pdf
+
+"
+25, What was the goal of the study comparing G4LBNF and MARS15 flux simulations? ," The goal was to clarify the origin of a significant difference in muon neutrino fluxes at the near detector between G4LBNE and MARS simulations, which differed by about 50% near the maximum. "," https://indico.fnal.gov/event/11847/contributions/10255/attachments/6717/8731/problem.pdf
+
+"
+26," What were the conclusions from the optimization update presented by Laura Fields on April 7, 2016? "," The conclusions were that significant progress was made with simulations, and the optimized beam substantially improves CP sensitivities. A three-horn design is better both flux-wise and feasibility-wise than a two-horn design. "," https://indico.fnal.gov/event/11877/contributions/10417/attachments/6819/8850/DUNE_BeamSim_7April2016.pdf
+
+"
+27, What were the findings regarding the necessity of a third horn in the optimized geometry? ," The findings indicated that moving from a three-horn system to a two-horn system of the optimized design leads to significant flux changes, suggesting that a third horn is necessary. "," https://indico.fnal.gov/event/11997/contributions/11108/attachments/7274/9370/horn_optimization_studies.pdf
+
+"
+28, What was the purpose of the horn field investigation conducted by Lei Zang? ," The purpose was to evaluate the magnetic field distribution in the horn to make comparisons with experimental measurements, implement tracking simulations, and optimize horn design. "," https://indico.fnal.gov/event/11877/contributions/10420/attachments/6821/8852/Horn_field.pdf
+
+"
+29," What was the outcome of the optimization study with the spherical target presented by Laura Fields on April 21, 2016? "," The optimization with the spherical target was progressing well, with the best fitness achieved being 2.05 compared to the reference beam's 1.47. ", https://indico.fnal.gov/event/11997/contributions/11109/attachments/7271/9367/DUNE_BeamSim_21April2016.pdf
+30, What is the main goal of the muon monitoring system in the DUNE experiment? , The main goal of the muon monitoring system in the DUNE experiment is to provide spill-by-spill beam monitoring and set neutrino flux constraints using an array of ionization detectors and possibly other detector types. ," https://indico.fnal.gov/event/12228/contributions/13066/attachments/8631/11025/MuonMonAndAbsorber.pdf.
+
+"
+31, What are the main features of the optimized beam design discussed by Laura Fields? ," The optimized beam design includes a spherical target with a cylindrical Horn 1, a large Horn 2, and a design that does not require the ""pinch"" of Horn C. "," https://indico.fnal.gov/event/12129/contributions/12462/attachments/8179/10355/DUNE_BeamSim_12May2016.pdf.
+
+"
+32, What are the challenges associated with the nominal absorber design for the DUNE experiment? ," The challenges include the spoiler and mask providing a target to generate more beam, the mask shaping distributions downstream, scalloping causing less energy loss in the beam center, and the absorber width blocking muons related to the most interesting neutrino energy region. "," https://indico.fnal.gov/event/12228/contributions/13066/attachments/8631/11025/MuonMonAndAbsorber.pdf.
+
+"
+33," What is the significance of the ""many universe"" technique in PPFX for DUNE? "," The ""many universe"" technique is used for uncertainty propagation, where each universe uses a random value for each underlying parameter affecting the flux, drawn from Gaussian distributions, to simulate flux for a large number of universes and determine the uncertainty on the predicted flux. "," https://indico.fnal.gov/event/12458/contributions/14262/attachments/9490/12171/DUNE_FOR_PPFX.pdf.
+
+"
+34, What are the requirements for the LBNF Beamline Hadron Absorber according to Salman Tariq? ," The requirements include providing radiation protection, absorbing energy from particles exiting the decay pipe, sustaining operational ability for the experiment's lifetime, and sustaining beam energy deposition under accident situations. "," https://indico.fnal.gov/event/12458/contributions/14261/attachments/9491/12172/LBNFMOJJune2016PublicDFv2.doc.
+
+"
+35, How does the absorber design affect muon monitor signals according to Jeremy Lopez? ," The absorber design significantly influences the shape of particle distributions in the muon alcove, making it difficult to reliably reconstruct beam parameters and challenging to monitor beam changes. "," https://indico.fnal.gov/event/12400/contributions/13970/attachments/9295/11939/MuonMonitors_2016_06_23.pdf.
+
+"
+36, What are the potential benefits of using a graphite section in the LBNF absorber design? ," A graphite section could help in accident conditions by reducing the power in the dump by residual protons and the maximum energy density, potentially allowing for a longer duration of misdirected beam without damage. "," https://indico.fnal.gov/event/12228/contributions/13067/attachments/8630/11024/Thoughts_and_questions_on_the_Absorber.pptx.
+
+"
+37, What are the main conclusions from the muon monitor simulation update by Jeremy Lopez? ," The conclusions include the need for aggressive monitoring goals to keep near/far ratio uncertainties low, the influence of absorber design on sensitivity to beam parameters, and the significant effect of beam energy on signal size and shape. "," https://indico.fnal.gov/event/12400/contributions/13970/attachments/9295/11939/MuonMonitors_2016_06_23.pdf.
+
+"
+38, What are the main components of the LBNF Beamline Absorber according to Salman Tariq? ," The main components include actively cooled aluminum and steel blocks surrounded by concrete, designed to absorb residual energy from protons and secondary particles, and provide radiation protection. "," https://indico.fnal.gov/event/12458/contributions/14261/attachments/9491/12172/LBNFMOJJune2016PublicDFv2.doc.
+
+"
+39, What are the main findings from the radiation damage comparison between aluminum and graphite by N. Mokhov? ," The findings indicate that graphite has a lower threshold for radiation damage compared to aluminum, with a threshold at ~0.2 DPA, and that mitigation is possible with a longer target and wings. ", https://indico.fnal.gov/event/12400/contributions/13972/attachments/9293/11936/DUNE_Mokhov_CvsAl_062316.pdf.
+40, What pressures were used during the pressure scan on June 7 and June 22 for the Gas Cherenkov Detector? ," The pressures used during the pressure scan on June 7 and June 22 were 8, 16, 32, 60, 100, 150, and 200 psi. "," https://indico.fnal.gov/event/12460/contributions/14274/attachments/9506/12189/Gas_Cherenkov_Detector_June_2016.pdf
+
+"
+41, What is the optimized beam energy value recommended for the Muon Monitoring Simulations? ," The optimized beam energy value recommended is ~62 GeV, with considerations also for 80 and 120 GeV. "," https://indico.fnal.gov/event/12460/contributions/14275/attachments/9505/12187/MuonSimulations_2016_06_30.pdf
+
+"
+42, What is the duration of the Muon System Measurements task according to the LBNE Detailed Schedule report? , The duration of the Muon System Measurements task is 513 days. ," https://indico.fnal.gov/event/12522/attachments/9668/12413/Muon_Schedule_07132016.pdf
+
+"
+43, What is the weight of the shield material for the Stopped Muon Detectors (SMD)? ," The shield material weighs about 500 lbs, divided into 6 subassemblies with the maximum weight of 90 lbs for the four walls. "," https://indico.fnal.gov/event/12522/attachments/9669/12414/Muon_meeting_July13_2016.docx
+
+"
+44, What is the current outer conductor radius used for Horn C in the optimization study? , The current outer conductor radius used for Horn C is 643 mm. ," https://indico.fnal.gov/event/12537/contributions/14615/attachments/9704/12462/DUNE_BeamSim_14July2016.pdf
+
+"
+45, What was the purpose of the pressure scans over yaw angle during the Neutrino and Anti-Neutrino beams? , The purpose was to perform pressure scans over yaw angle during Neutrino and Anti-Neutrino beams to analyze the integrated signal per PoT vs total angle in degrees. ," https://indico.fnal.gov/event/12572/contributions/14800/attachments/9851/12714/DUNE_Gas_Cherenkov_Detector_Update.pdf
+
+"
+46, What changes were made to the target parameters in the Muon Simulations Update? ," The baffle ID was changed from 13 mm to 17 mm, the baffle length was set to 1.5 m, the target width was changed from 13.5 mm to 10 mm, and the target length was set to 2 m. "," https://indico.fnal.gov/event/12572/contributions/14802/attachments/9850/12713/MuonSimulationUpdate.pdf
+
+"
+47, What is the main difference between the ideal and realistic designs of Horn A in the Horn comparison study? ," The main difference is that the realistic design of Horn A includes more complex shapes, such as more rounded flares at the end, compared to the ideal design. "," https://indico.fnal.gov/event/12637/contributions/15088/attachments/10029/12927/Tyler_Johnson_7-28-16_Presentation_1.pptx
+
+"
+48, What is the proposed method for measuring meson and muon flux in situ in the LBNF beamline? ," The proposed method involves using a single particle, relatively small aperture, versatile, movable, portable spectrometer capable of identifying pions, kaons, and muons, operating at 53 MHz. "," https://indico.fnal.gov/event/12637/contributions/15089/attachments/10030/12928/MesonFluxInSituV2.pdf
+
+"
+49, What components were removed from Horn A to study neutrino flux loss in the Neutrino Flux Loss Study? ," Components removed include the Target Assembly, Outer Conductor, Downstream OC Flange, Insulator Ring, Downstream IO Transition, and Current Equalizer. ", https://indico.fnal.gov/event/12707/contributions/15582/attachments/10421/13373/Tyler_Johnson_Presentation_8-11-16-1.pptx
+50," What are the goals of using PPFX for DUNE as presented by Amit Bashyal from Oregon State University?  
+"," The goals are to obtain the first estimate of DUNE’s hadron flux uncertainties, obtain an overall interaction map of all particles and sort out the interactions covered and not covered by the current Thin Target Experiment, and improve the DUNE flux prediction using external hadron production data.  
+"," https://indico.fnal.gov/event/12707/contributions/15583/attachments/10420/13372/PPFX_final.pdf  
+
+"
+51," What are the changes made to the target parameters in the Muon Monitors Simulations Update by Jeremy Lopez?  
+"," The changes made to the target parameters include: Baffle ID changed from 13 mm to 17 mm, Baffle Length is 1.5 m, Target is NuMI style with rectangular fins, Target width changed from 13.5 mm to 10 mm, and Target Length is 2 m.  
+"," https://indico.fnal.gov/event/12814/contributions/15854/attachments/10575/13551/DUNE_BeamOpt_Fields_18Aug2016.pdf  
+
+"
+52," What is the main objective of Tyler Johnson's study on the 3-horn optimized design for the LBNF/DUNE Far detector?  
+"," The main objective is to determine the reasons for the significant drop in neutrino flux between the ideal, optimized design and the realistic design, and to understand which factors can be altered to optimize the flux.  
+"," https://indico.fnal.gov/event/12867/contributions/16168/attachments/10834/13845/Thursday_Final_Talk_Tyler_Johnson.pptx  
+
+"
+53," What was agreed upon at the DUNE beam Interface/Optimization/Simulation meeting on September 22, 2016?  
+"," It was agreed to move forward with the ""tapered"" Horn A option identified using a sphere array target.  
+"," https://indico.fnal.gov/event/13017/contributions/16761/attachments/11260/14379/DUNE_WeeklyBeam_Fields_6Oct2016.pdf  
+
+"
+54," What are the two major categories into which flux uncertainties for DUNE can be divided, as discussed in the DUNE Flux Uncertainties presentation by Laura Fields?  
+"," The two major categories are ""Focusing"" uncertainties, due to uncertainties in beamline parameters such as the position of horns, current in horns, density of target, etc., and hadron production uncertainties, which are due to uncertainties in Geant4 models of pions and kaons produced in the target and other beam line material.  
+"," https://indico.fnal.gov/event/12814/contributions/15958/attachments/10649/13643/DUNE_BeamOpt_Fields_18Aug2016.pdf  
+
+"
+55," What are the two systems that impact the optimization of the LBNF beam line design, as mentioned in the Muon Monitors Simulations Update by Jeremy Lopez?  
+"," The two systems that impact the optimization of the LBNF beam line design are the muon monitors and the spectrometer.  
+"," https://indico.fnal.gov/event/13017/contributions/16761/attachments/11260/14379/DUNE_WeeklyBeam_Fields_6Oct2016.pdf  
+
+"
+56," What is the effect of a 1 mm shift in the beam position on the muon signal in the alcove, according to the Muon Monitors Simulations Update by Jeremy Lopez?  
+"," The differences in the muon signal in a plane in the alcove are very subtle with a 1 mm shift in the beam position, and the nominal tolerance is 0.5 mm.  
+"," https://indico.fnal.gov/event/13017/contributions/16762/attachments/11261/14380/MuonMonitorsUpdate.pdf  
+
+"
+57," What is the main conclusion regarding the effect of systematic uncertainties on the energy spectrum, as discussed by Paul Lebrun in the presentation on current equalizer sections for Horn B & C?  
+"," The effect on the energy spectrum is significant, and more work is needed to understand it. The current model assumes a quadrupole-like asymmetry of 0.75 with a decay constant of 1 meter, but the effect on the spectrum is non-negligible, and more precise field map calculations are needed.  
+"," https://indico.fnal.gov/event/13017/contributions/16761/attachments/11260/14379/DUNE_WeeklyBeam_Fields_6Oct2016.pdf  
+
+"
+58," What is the purpose of the PPFX package as used in the DUNE experiment?  
+"," The PPFX package is used to obtain the first estimate of DUNE’s hadron flux uncertainties, create an interaction map of all particles, and improve the DUNE flux prediction using external hadron production data.  
+"," https://indico.fnal.gov/event/12707/contributions/15583/attachments/10420/13372/PPFX_final.pdf  
+
+"
+59," What are the main benefits of the spectrometer concept for the DUNE experiment, as discussed in the Beam Optimization & Systematics presentation by Laura Fields?  
+"," The main benefits of the spectrometer concept are to identify changes in the beam or misalignments that are outside nominal alignment tolerances/uncertainties and to constrain hadroproduction and alignment uncertainties on the neutrino fluxes.  
+"," https://indico.fnal.gov/event/13017/contributions/16761/attachments/11260/14379/DUNE_WeeklyBeam_Fields_6Oct2016.pdf  
+
+"
+60," What is the impact of the horn current reduction on the muon signal, according to the Muon Monitors Simulations Update by Jeremy Lopez?  
+"," A 1% reduction in horn current results in a total muon signal reduction by approximately 2%, with the shape of the spectrum nearly unchanged.  
+", https://indico.fnal.gov/event/13017/contributions/16762/attachments/11261/14380/MuonMonitorsUpdate.pdf  
+61, What is the main challenge in computing the hadron flux for neutrino experiments? ," The main challenge in computing the hadron flux is the difficulty of ab initio calculations due to the non-perturbative regime of QCD and the lack of data on certain scattering processes, such as neutron + Carbon or Kaon + Al interactions. "," https://indico.fnal.gov/event/13305/contributions/18658/attachments/12325/15634/talkMotivationSpectrometer.pdf
+
+"
+62, What is the proposed modification to the DUNE/LBNF concept involving wires? ," The proposed modification involves placing wires in the Decay Pipe, with a current of a few kA, positioned 50 cm off the center, and consisting of about 20 wires. "," https://indico.fnal.gov/event/13340/contributions/18870/attachments/12401/15726/AlbertoTalkSep2016Public.pptx
+
+"
+63, What are the effects of shifting the horn positions on the neutrino flux according to the simulations? ," Shifting the horn positions results in little change in the total neutrino flux, but there is a few percent change in the electron neutrino flux, with not much effect on muon neutrinos. "," https://indico.fnal.gov/event/13414/contributions/19250/attachments/12598/15961/MuonUpdate.pdf
+
+"
+64, What is the purpose of the LBNF/DUNE Flux Spectrometer Concept? ," The purpose of the LBNF/DUNE Flux Spectrometer Concept is to measure the muon and hadron flux after the LBNF focusing horns and before the decay pipe, to improve the precision of neutrino flux measurements. "," https://indico.fnal.gov/event/13465/contributions/19600/attachments/12822/16234/SpectrometerAnswers.pdf
+
+"
+65, What is the reference design for the DUNE Near Detector (ND) according to the document? ," The reference design for the DUNE Near Detector (ND) is the Fine-Grained Tracker (FGT), although high-pressure gas TPC and LArTPC are also being considered. "," https://indico.fnal.gov/event/13510/contributions/19931/attachments/12991/16433/ND_beam_monitoring_121416.pdf
+
+"
+66, Why is the spectrometer considered necessary for DUNE's physics goals? ," The spectrometer is considered necessary for precision measurements of the PMNS matrix elements, as it provides a precise determination of the neutrino fluxes at the production point, which is crucial for accurate oscillation measurements. "," https://indico.fnal.gov/event/13465/contributions/19600/attachments/12822/16234/SpectrometerAnswers.pdf
+
+"
+67, What are the potential impacts on the operational schedule if the spectrometer is installed in situ? ," If the spectrometer is installed in situ, it would require a few days for installation and alignment, followed by a running time of several weeks to characterize the flux, impacting neutrino running at LBNF during this period. "," https://indico.fnal.gov/event/13465/contributions/19600/attachments/12822/16234/SpectrometerAnswers.pdf
+
+"
+68, What are the challenges associated with the in-situ option for the spectrometer? ," The challenges associated with the in-situ option include radiological background from the horns and the chase walls, and the need for low-intensity running and a complex support module for the spectrometer. "," https://indico.fnal.gov/event/13465/contributions/19600/attachments/12822/16234/SpectrometerAnswers.pdf
+
+"
+69, What is the estimated impact of horn misalignments on the neutrino flux? ," Horn misalignments are expected to cause a few percent change in the electron neutrino flux, with little change in the total neutrino flux. "," https://indico.fnal.gov/event/13414/contributions/19250/attachments/12598/15961/MuonUpdate.pdf
+
+"
+70, What is the significance of the spectrometer in relation to the flux times cross-section paradigm? ," The spectrometer is significant because it helps to accurately measure the neutrino parent flux, which is crucial for understanding the differences in neutrino flux composition between the Near and Far detectors, thus addressing uncertainties in the flux times cross-section paradigm. ", https://indico.fnal.gov/event/13465/contributions/19600/attachments/12822/16234/SpectrometerAnswers.pdf
+71," What is the role of the Institutional Board (IB) in the DUNE Collaboration?  
+"," The Institutional Board (IB) is responsible for establishing governance rules of the DUNE collaboration and regulating governance-related issues, including admission of new collaborating institutions and members, oversight of Co-Spokesperson election process, approval of common funds assessments, establishment and governance of detector operations shifts, and establishment of procedures for publication of scientific results and authorship rules.  
+"," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=1&filename=GDC_v9.pdf&version=17
+
+"
+72," What is the expected singles rate from 39Ar in the DUNE experiment, and what are the implications?  
+"," The singles rate from 39Ar is large, but not insurmountable. Dark noise on SiPMs is negligible unless malfunctioning, but the singles rate may have implications for data rate.  
+"," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=5&filename=2015-05-29-Review-followup.pdf&version=1
+
+"
+73," What is the tolerable failure rate for SiPMs in the DUNE experiment without catastrophic performance loss?  
+"," The DUNE experiment can tolerate a 20-30% loss of SiPMs without catastrophic performance loss.  
+"," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=5&filename=2015-05-29-Review-followup.pptx&version=1
+
+"
+74," What are the main features of the Hamamatsu MPPCs tested for the DUNE experiment?  
+"," The Hamamatsu MPPCs tested show low dark rate and fast pulses at LAr temperature. The LCT samples have lower cross talk and after pulsing rate compared to STD samples.  
+"," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=10&filename=Hamamatsu_mppc_characterization.pdf&version=1
+
+"
+75," What are some of the challenges faced by the DUNE collaboration in terms of data handling and job submission?  
+"," Challenges include gridftp timeouts causing job output loss, slow submission of thousands of jobs one by one, and tedious deletion of thousands of jobs.  
+"," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=12&filename=DUNE_FIFE.pdf&version=2
+
+"
+76," What is the purpose of the DUNE Collaboration General Assembly (CGA)?  
+"," The DUNE Collaboration General Assembly (CGA) is a forum for all DUNE collaboration members where all major decisions by the EB and IB as well as collaboration-wide issues are reported and discussed.  
+"," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=1&filename=GDC_v9.pdf&version=17
+
+"
+77," What is the role of the Co-Spokespersons in the DUNE collaboration?  
+"," The Co-Spokespersons are the scientific leaders and representatives of the collaboration, responsible for preparing agendas for collaboration meetings, working closely with the Executive Board on major collaboration matters, and bearing authority and responsibilities for day-to-day matters of the collaboration.  
+"," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=1&filename=GDC_v9.pdf&version=17
+
+"
+78," What is the significance of the 39Ar decay in the DUNE experiment?  
+"," The 39Ar decay is a potentially significant background rate, with a singles rate that is large but manageable, and correlated hits that pose a larger problem, potentially overwhelming supernova event rates.  
+"," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=5&filename=2015-05-29-Review-followup.pptx&version=1
+
+"
+79," What are the responsibilities of the Executive Board (EB) in the DUNE collaboration?  
+"," The Executive Board (EB) is responsible for setting scientific and technical objectives and priorities of the DUNE collaboration, establishing procedures for making technical choices, and overseeing progress and developments in various projects.  
+"," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=1&filename=GDC_v9.pdf&version=17
+
+"
+80," What are some of the improvements needed for the DUNE collaboration's FIFE resources?  
+"," Improvements needed include renaming and creating new instances of resources labeled “lbne,” addressing issues with FIFEMON, and improving documentation to reduce jargon and assumptions of prior knowledge.  
+", https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=12&filename=DUNE_FIFE.pptx&version=2
+81, What is the current status of the photon detector simulation in terms of noise implementation? ," The photon detector simulation has implemented dark noise (10 Hz per channel), cross-talk (16.5%), line noise (2.6 ADC counts RMS), and a pedestal (1500 ‒ arbitrary number for now). "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=11&filename=pd_reco_status_20150529.pdf&version=1
+
+"
+82, What was the outcome of the cryogenic test for the NDL 11-2222B-S SiPMs? ," The NDL 11-2222B-S SiPMs failed the cryogenic test, with one having a 0.1 V operative overvoltage range and the other two having no operative range in the cryostat. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=9&filename=NDL_SiPM_Charaterization.pdf&version=1
+
+"
+83, What are the goals of the measurements program group for the next year? ," The goals include developing necessary tools for data analysis, training a new generation of experts, and getting ready for data taking in spring 2018. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=16&filename=Milestones_for_2015.pdf&version=1
+
+"
+84, What are the current limitations of the photon detector simulation regarding SiPM effects? ," The simulation does not yet allow for the effects of Ar39 decay, afterpulsing, saturation, or performance studies with realistic electronics. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=8&filename=PD_Status_May29_2015.pdf&version=1
+
+"
+85, What was the outcome of the DUNE logo selection process? ," The DUNE logo was approved after a first round of voting from the whole collaboration and a second round from the Institutional Board, with the design being finalized by Fermilab media services. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=15&filename=duneib05june15.pptx&version=4
+
+"
+86, What was the result of the naming contest for the collaboration? , The name DUNE (Deep Underground Neutrino Experiment) was chosen as the clear leader in the first round of voting. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=14&filename=ibminutes-06mar2015.txt&version=1
+
+"
+87, What are the primary science goals of the DUNE experiment? ," The primary science goals include precision measurement of neutrino oscillation parameters, determination of neutrino mass hierarchy, and search for proton decay. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=13&filename=DUNE_2015FNALUsersMeeting_Fields_10June2015.pdf&version=2
+
+"
+88, What are the plans for SiPM R&D at UTA? ," The plans include establishing a multi-channel desktop SiPM DAQ system, characterizing various SiPMs with scintillators, and studying optimal mating schemes between SiPMs and scintillators. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=18&filename=UTA-SiPM-RnD-061215.pptx&version=1
+
+"
+89, What is the purpose of the DUNE near detector? , The purpose of the DUNE near detector is to measure the energy spectrum and composition of the neutrino beam at its source. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=13&filename=DUNE_2015FNALUsersMeeting_Fields_10June2015.pdf&version=2
+
+"
+90, What is the plan for qualifying SiPMs for operation in cryogenic environments? , The plan includes thermally cycling a population of the devices and subjecting another population to a long-term test at cryo temperature. , https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=8&filename=PD_Status_May29_2015.pdf&version=1

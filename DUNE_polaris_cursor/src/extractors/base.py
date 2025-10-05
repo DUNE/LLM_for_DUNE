@@ -21,7 +21,7 @@ class BaseExtractor(ABC):
         """Extract documents from the source"""
         pass
 
-    #old don't use
+
     def get_chunks(self, text, chunk_size):
         if not text: return []
         start = 0

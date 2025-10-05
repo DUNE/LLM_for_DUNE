@@ -1,4 +1,5 @@
 import mlflow
+import asyncio
 from mlflow.genai import scorer
 from mlflow.genai.scorers import Correctness, Guidelines
 
@@ -8,7 +9,7 @@ from config import ( ARGO_API_USERNAME, ARGO_API_KEY,
 import logging
 import pandas as pd
 from config import FERMILAB_SESSION_SECRET
-from src.indexing.faiss_manager_reindexed import FAISSManager
+from src.indexing.faiss_manager_langchain import FAISSManager
 from src.indexing.chroma_manager import ChromaManager
 from src.api.argo_client import ArgoAPIClient
 from src.auth.fermilab_auth import fermilab_auth
@@ -164,6 +165,7 @@ class Evalutation():
     
     def llm_references(self,question):
         context_snippets, references = self.faiss_manager.search(question, top_k=DEFAULT_TOP_K)
+        logger.info(f"REFS {references}")
         return f"question \ {question} \ {','.join(references)}"
 
     #@mlflow.trace

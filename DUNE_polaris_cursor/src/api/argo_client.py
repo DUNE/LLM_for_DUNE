@@ -31,6 +31,7 @@ class ArgoAPIClient:
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"
         }
+        logger.info(f"Using model {model}")
         payload = {
             "user": self.username,
             "model": model,
