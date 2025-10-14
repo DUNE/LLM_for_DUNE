@@ -9,6 +9,7 @@ ARGO_API_USERNAME = os.getenv("ARGO_API_USERNAME")
 ARGO_API_KEY = os.getenv("ARGO_API_KEY")
 ARGO_API_URL = os.getenv("ARGO_API_URL", "https://apps.inside.anl.gov/argoapi/api/v1/resource/chat/")
 
+
 QA_PATH = './benchmarking/QuestionAnswer/Cleaned_questions2.csv'
 
 # Database Configuration

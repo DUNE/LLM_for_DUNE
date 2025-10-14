@@ -2,7 +2,7 @@ import mlflow
 import asyncio
 from mlflow.genai import scorer
 from mlflow.genai.scorers import Correctness, Guidelines
-
+import json
 from config import ( ARGO_API_USERNAME, ARGO_API_KEY, 
     DEFAULT_TOP_K, STORE, QA_PATH
 )
@@ -34,41 +34,30 @@ indico_session=IndicoExtractor()
 docdb_session=DocDBExtractor()
 docdb_session._build_session()
 @scorer
-def relevant_refs(outputs:str, expectations:str):
-    logger.error(outputs)
-    question = outputs.split("\ ")[1]
-    all_refs=outputs.split("\ ")
-    all_refs=all_refs[-1].split(',')
+def relevant_refs(outputs:dict, expectations:dict):
+    #logger.error(outputs)
+    data= json.loads(outputs)
+    question = data['question']
+    references = data['references']
+    contexts = data['context_snippets']
+    
+    logger.info(f"num snipbfore  {len(contexts)}")
     expect = normalize(expectations['expected_response'])
     results=0
-    assert len(all_refs)>0
-    if expect in all_refs:
+    assert len(references)>0
+    if expect in references:
         print("found")
         return 1
     else:
-        prompt = f'Read the content in this document. Determine if it provides an answer to the question: {question}, if so, return a float value closer to 1 in the format of a json with the only permitted key being "score". If the content in the file is not related to the question at all or loosely relates to the question, give a score close to 0'
+        prompt = f'Read this context and determine if it provides an answer to the question: {question}, if so, return a float value closer to 1 in the format of a json with the only permitted key being "score". If the content in the file is not related to the question at all or loosely relates to the question, give a score close to 0'
         #look at the questoin, open the references and check if they relate to the quesiton
-        for link in all_refs:
+        for link, snippet in zip(references,contexts):
             if not link: continue
-            #logger.error(link)
-            raw_text=''
-            if 'docs.dune' in link:
-                content, headers = docdb_session._download_file(link, docdb_session.session, docdb_session.max_file_bytes)
-                if content:
-                    req=docdb_session.session.get(link)
-                    raw_text = docdb_session.get_raw_text(req.headers.get("Content-Type"),content)
-                else:
-                    logger.error(f"Error downloading {link}")
-            else:
-                indico_session._ensure_access()
-                content, headers = indico_session._download_file(link, indico_session.session, docdb_session.max_file_bytes)
-                if content:
-                    req=indico_session.session.get(link)
-                    raw_text = indico_session.get_raw_text(req.headers.get("Content-Type"), content)
-            document_text=raw_text
+            document_text=snippet
             if not document_text:
                 results += 0
                 continue
+            
             resp=argo_client.chat_completion(question=prompt, context=document_text)
             print(resp)
             clean_str = re.sub(r'^```json\s*|```$', '', resp, flags=re.MULTILINE).strip()
@@ -78,17 +67,21 @@ def relevant_refs(outputs:str, expectations:str):
             
             results += float(data.get("score", 0))
     length = 0
-    for i in all_refs:
+    for i in references:
         if i:
             length += 1
+    print(results)
     return results / length
 
 
 @scorer
-def correctness(outputs: str, expectations: str = None) -> int:
+def correctness(outputs: dict, expectations: dict= None) -> int:
+    outputs = outputs.get("generated_response", "")
+    expectations = expectations.get("expected_response", "")
     try:
         question="Using the expected output as the ground truth answer, determine if the generated output is correct .Return a float value between 0 and 1 in the format of a json with the only permitted key being 'score'. You will evaluate correctness like this: Get the main points from the expected output and the generated output. Then evaluate how closely aligned these points are. The words do not need to match exactly. Even if the generated output is phrased differently, as long as the general idea behind the generated output is the same as that behind the expected out, give the generated output a score close to 1. However, if the generated output does not address the same points or convey the same ideas as that of the expected output, then give a value close to 0."
         context = f"Generated output: {outputs}\nExpected out: {expectations}"
+        print(context)
         resp = argo_client.chat_completion(question=question, context=context)
         clean_str = re.sub(r'^```json\s*|```$', '', resp, flags=re.MULTILINE).strip()
         # Parse JSON
@@ -99,6 +92,7 @@ def correctness(outputs: str, expectations: str = None) -> int:
     except Exception as e:
         print(e)
         return e
+    print(results)
     return results
 
 
@@ -113,8 +107,8 @@ def extract_https_url(text):
 class Evalutation():
     def __init__(self, port, experiment_name, data_path):
 
-        self.faiss_manager = FAISSManager(data_path) 
-        #self.faiss_manager = ChromaManager(data_path)#FAISSManager(data_path)
+        #self.faiss_manager = FAISSManager(data_path) 
+        self.faiss_manager = ChromaManager(data_path)#FAISSManager(data_path)
         print(f"connecting to client")
         self.argo_client = ArgoAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
         print("Conntected to client")
@@ -130,6 +124,7 @@ class Evalutation():
         for row in qa.iterrows():
             dictionary={}
             try: link = re.sub(r'\s+', '', row[1]['link'])
+
             except: continue
             dictionary['inputs'] = {'question': row[1]['question']}
 
@@ -161,12 +156,18 @@ class Evalutation():
         context = "\n\n".join(context_snippets)
         # Get answer from Argo API
         answer = self.argo_client.chat_completion(question, context)
-        return answer
-    
+        assert answer
+        return {"generated_response": answer}
     def llm_references(self,question):
         context_snippets, references = self.faiss_manager.search(question, top_k=DEFAULT_TOP_K)
-        logger.info(f"REFS {references}")
-        return f"question \ {question} \ {','.join(references)}"
+        #logger.info(f"REFS {references}")
+        data = {
+            "question": question,
+            "references": references,
+            "context_snippets": context_snippets
+        }
+
+        return json.dumps(data) #f"question \ {question} \ {','.join(references)} \{json.dumps(context_snippets)}"
 
     #@mlflow.trace
     def evaluate(self,method):
@@ -224,9 +225,9 @@ logger = init_logger('benchmarking_logger')
 val = Evalutation(args.port, args.experiment_name, args.data_path)
 results = val.evaluate(args.method)
 
-
+print(results.metrics.keys())
 for key in results.metrics:
-    if '/mean' in key:
+    if '/' in key:
         metric=key.split('/')[0]
         DATA_FILE = f"{args.savedir}/{key.split('/')[0]}.json"
 logger.info(f"Logging metrics to {DATA_FILE}")

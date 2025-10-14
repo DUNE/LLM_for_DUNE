@@ -1,13 +1,13 @@
 from collections import defaultdict
 import os
 import pickle
-
+from FlagEmbedding import FlagReranker
 import numpy as np
 import torch
 from typing import List, Dict, Any, Tuple
 from sentence_transformers import SentenceTransformer
 from src.embedder.embedding_wrappers import ChatlasEmbedder, OriginalEmbedder
-
+from sentence_transformers import CrossEncoder
 from config import (
     EMBEDDING_MODEL,
     EMBEDDING_DIM,
@@ -25,7 +25,13 @@ class ChromaManager:
     def __init__(self, data):
         # Prevent thread‐related segfaults
         self._configure_threading()
-        
+        #self.reranker=CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2', max_length=512)        
+
+
+        self.reranker=CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')
+        #f.reranker = AutoModel.from_pretrained("allenai/longformer-base-4096", torch_dtype="auto")
+    
+        #self.reranker = FlagReranker('BAAI/bge-reranker-v2-m3', use_fp16=True) # Setting use_fp16 to True speeds up computation with a slight performance degradation
 
         self.chroma_client = chromadb.PersistentClient(path=data, settings=Settings())
         print("Collections available:", self.chroma_client.list_collections())
@@ -82,7 +88,9 @@ class ChromaManager:
                     self.docdb_content_modified[id]  = md['content_last_modified_date']
                     self.docdb_metadata_modified[id] = md['metadata_last_modified_date']
                 except:
+                    logger.info(f"error with {id}")
                     continue
+                    
             self.doc_ids.add(id)
        
             event_id = id.split("_")[0]
@@ -127,7 +135,11 @@ class ChromaManager:
             length += len(d)
         logger.info(f'Storing document of length {length} in chunks')
 
-        if length == 0: return  0
+        if length == 0: return 0
+        logger.info(f"Length = {length}")
+        logger.info(f"up_ids = {up_ids}, mode={mode}")
+        print(f"ids :{type(up_ids)}\ndocuments: {type(doc_texts)}\nmetadatas: {type(metadatas)}")
+    
    
         if mode == 'update':
             self.chroma_collection.update(
@@ -168,26 +180,32 @@ class ChromaManager:
             logger.error(f"Error in updating list of doc_ids with Indico/DocDB: {e}")
 
     def add_documents(self, documents: List[Dict[str, Any]], num_events: int) -> int:
+        logger.info("in add documents")
         self.num_events+=num_events
         #which index each doc id is at in documents
         map_ids_to_idx = {d['document_id']:idx for idx,d in enumerate(documents)}
     
+
         self.update_indico_docdb_record(documents)
+        logger.info("updated global var")
+
         
         #all ids to add/update
         ids = set(map_ids_to_idx.keys())
 
         #update existing ids in chroma
         ids_to_update = list(self.doc_ids.intersection(ids))
+        print(self.doc_ids, ids)
         
 
         added = self.add_to_chroma(documents = documents, ids = ids_to_update, ids_to_idx_map =  map_ids_to_idx, mode = 'update')
+        logger.info(" updated to chroma documents")
 
 
         #add new ids to chroma
         ids_to_add = ids - self.doc_ids 
     
-        if ids_to_add:
+        if ids_to_add is not None:
             added += self.add_to_chroma(documents= documents, ids= ids_to_add, ids_to_idx_map=map_ids_to_idx, mode='add')
         self.doc_ids.update(ids_to_add)
 
@@ -216,8 +234,7 @@ class ChromaManager:
         return self.docdb_metadata_modified
     
 
-    
-    def search(self, query: str, top_k: int = 3) -> Tuple[List[str], List[str]]:
+    def no_rerank_search(self, query: str, top_k: int = 3) -> Tuple[List[str], List[str]]:
         """
             Finds the docID_number associated with the retrieved text, then goes back to the docID to find header info
         """
@@ -234,6 +251,33 @@ class ChromaManager:
         #check if results are returned as connected idices 
         #ie if metadata idx1 is assoc w dcyments idx 1
 
+        return snippets, refs
+    def search(self, query: str, top_k: int = 3) -> Tuple[List[str], List[str]]:
+        """
+            Finds the docID_number associated with the retrieved text, then goes back to the docID to find header info
+        """
+        results = self.chroma_collection.query(query_texts=[query],  n_results=top_k*6)
+# rerank the results with original query and documents returned from Chroma
+        #scores = self.reranker.predict([(query, doc) for doc in results["documents"][0]])
+        
+        scores = []
+        scores = self.reranker.predict(
+            [(query, doc) for doc in results["documents"][0]], 
+            batch_size=6)
+        
+        top_k_indices = np.argsort(scores)[-top_k:][::-1] 
+        snippets, refs = [], []
+        for i in top_k_indices:
+            md = results['metadatas'][0][i]
+            link  = md.get("event_url", "")
+            title = md.get("meeting_name", "")
+            if link:
+                refs.append(link)
+            snippets.append(results['documents'][0][i])
+        #might be able to zip these for oops together. 
+        #check if results are returned as connected idices 
+        #ie if metadata idx1 is assoc w dcyments idx 1
+        print(len(snippets))
         return snippets, refs
 
     def save_all(self):
@@ -259,3 +303,4 @@ class ChromaManager:
         self.docdb_metadata_modified = None
 
         self.doc_ids = None
+

@@ -10,14 +10,15 @@ import requests
 from dotenv import load_dotenv
 load_dotenv()
 from pathlib import Path
+import sys
+print(sys.path)
+sys.path.append("/home/newg2/Projects/LLM/DUNE/gitcurrent/LLM_for_DUNE/DUNE_polaris_cursor/")
 from src.indexing.chroma_manager import ChromaManager
 
 
 USERNAME = os.getenv('ARGO_API_USERNAME', 'aleena')
 API_KEY = os.getenv('ARGO_API_KEY', 'XXX')
-QUESTION = f'''You are given a dictionary with link:text pairs. 
-Your job is to use the each text to generate a question from that respective text. 
-Then give the answer to that question from the text. The question should be answerable by reading the text. 
+QUESTION=f'''You are given a dictionary with link:text pairs. Your job is to use the each text to generate a question from that respective text. Then give the answer to that question from the text. The question should be answerable by reading the text. 
 The question should not ask about dates or names of files or otherly overly specific questions. The 
 questions should be DUNE focused and of various difficulties.  
 The link should be the link associated with the text you used to generate that question Return your answer very strictly in this format: 
@@ -65,7 +66,8 @@ class ArgoAPIClient:
         timeout: int = 30
     ) -> str:
         """Send a chat completion request to Argo API"""
-
+        print(model)
+        print(self.username, self.api_key)
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"
@@ -120,8 +122,10 @@ class ArgoAPIClient:
                 context="This is a test",
                 timeout=10
             )
+            print(test_response)
             return not test_response.startswith("[ERROR]")
         except Exception as e:
+
             return False
     
 from collections import defaultdict
@@ -140,14 +144,23 @@ def get_qa(resp):
     question_String='**Question:**'
     answer_String = '**Answer:**'
     link_String='**Link:**'
+    
     while end < len(resp):
-        start = start + resp[start:].index(question_String) + len(question_String)
-        end = start + resp[start:].index(answer_String)
+        try:
+            start = start + resp[start:].index(question_String) + len(question_String)
+        except:
+            print(resp[start:])
+            assert False
+        try:
+            end = start + resp[start:].index(answer_String)
+        except:
+            print(resp[start:])
+            assert False
         question = resp[start:end]
         ans['question'].append(question)
         
-
         answer_start =  end + len(answer_String)
+        
         try:
           answer_end = answer_start + resp[answer_start:].index(link_String)
         except:
@@ -160,6 +173,7 @@ def get_qa(resp):
             link_end = link_start + resp[link_start:].index(question_String)
         except:
             link_end=len(resp)
+        print("Link end ", link_end, "/", len(resp))
 
         ans['link'].append(resp[link_start+len(link_String): link_end])
         start = link_end
@@ -214,13 +228,12 @@ if __name__=='__main__':
     start = 0
 
     #number of times to iterate
-    num_loops=10
+    num_loops=30
 
     #number of sources and associated text to pass into the LLM at once
     source_text_pairs_per_loop = int(len(texts)/num_loops)
     argo_client = ArgoAPIClient(USERNAME, API_KEY)
     assert argo_client.health_check() 
-
     links = list(texts.keys())
     for i in range(num_loops):
         end = (i+1)* source_text_pairs_per_loop
@@ -230,17 +243,14 @@ if __name__=='__main__':
         for link in links[start:end]:
             context += link + ":" + texts[link]
         context += '}'
-
         resp = argo_client.chat_completion(timeout=60, question=QUESTION, context=context)
-        
         if isinstance(resp, str):
             qa =get_qa(resp)
             qa_pairs['question'].extend(qa['question'])
             qa_pairs['answer'].extend(qa['answer'])
             qa_pairs['link'].extend(qa['link'])
-        
         start = end
     
     import pandas as pd
-    pd.DataFrame(qa_pairs).to_csv(os.path.join(args.save_dir, "QA_3.csv"))
+    pd.DataFrame(qa_pairs).to_csv(os.path.join(args.save_dir, "QA.csv"))
 

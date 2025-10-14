@@ -4,11 +4,11 @@
 db=Chroma
 cs=2000
 chatlas=("Faiss-chatlas" "Chroma-chatlas")
-multiqa=("NewFAISS")  #("Faiss-multiqa", "Chroma-multiqa")
+multiqa=("e5_embedder")  #("Faiss-multiqa", "Chroma-multiqa")
 for dir in "${multiqa[@]}"; do
     for item in "$dir"/*; do
         name=$(basename "$item")
-        save=metrics/${name}/correctness
+        save=metrics/gpt4o/${name}/correctness
         echo $item
         echo $name
         echo $save
@@ -17,12 +17,13 @@ for dir in "${multiqa[@]}"; do
         if [ ! -d "$save" ]; then
             mkdir -p "$save"
         fi
-        #python3.11 -m benchmarking.evaluation --port 9 --experiment_name test --method correctness --data_path "$item" --savedir $save
+
+        python3.11 -m benchmarking.evaluation --port 9 --experiment_name test --method correctness --data_path "$item" --savedir $save
 	
 	#Run relevant source retrieval evaluation
-	save=metrics/gpt5/${name}/relevant_refs
+	save=metrics/gpt4o/${name}/relevant_refs
 	if [ ! -d "$save" ]; then
-            mkdir -p "$save"
+        	mkdir -p "$save"
         fi
 	python3.11 -m benchmarking.evaluation --port 9 --experiment_name test --method relevant_refs --data_path "$item" --savedir $save
         
