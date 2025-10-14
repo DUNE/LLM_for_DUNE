@@ -29,9 +29,7 @@ class ChromaManager:
 
 
         self.reranker=CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')
-        #f.reranker = AutoModel.from_pretrained("allenai/longformer-base-4096", torch_dtype="auto")
     
-        #self.reranker = FlagReranker('BAAI/bge-reranker-v2-m3', use_fp16=True) # Setting use_fp16 to True speeds up computation with a slight performance degradation
 
         self.chroma_client = chromadb.PersistentClient(path=data, settings=Settings())
         print("Collections available:", self.chroma_client.list_collections())
