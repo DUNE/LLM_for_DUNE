@@ -1,7 +1,6 @@
 from collections import defaultdict
 import os
 import pickle
-from FlagEmbedding import FlagReranker
 import numpy as np
 import torch
 from typing import List, Dict, Any, Tuple
