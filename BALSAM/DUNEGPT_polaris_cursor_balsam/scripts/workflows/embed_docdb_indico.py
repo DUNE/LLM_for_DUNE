@@ -3,7 +3,7 @@ import yaml
 
 #Machine variables
 #########################
-queue = "prod"         # debug or prod 
+queue = "debug"         # debug or prod 
 project="LLM_for_DUNE" #
 job_mode="mpi"          #
 #########################
@@ -38,11 +38,11 @@ Functions
 """
 
 begin_index = 0 #0
-spill_size = 2 #4
-end_index = 2 #4
-wall_time_min = 60 #180
+spill_size = 1 #4
+end_index = 1 #4
+wall_time_min = 30 #180
 num_nodes = 1 #4
-doc_limit = 250 if queue == 'prod' else 50
+doc_limit = 25000 #if queue == 'prod' else 50
 def create_single_dependent_job(app_id, i, parent_ids, params, node_packing_count, start):
     params.update({"i": i})
     Job.objects.create( app_id=app_id,

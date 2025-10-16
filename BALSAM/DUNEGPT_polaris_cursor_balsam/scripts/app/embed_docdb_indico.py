@@ -4,12 +4,11 @@ import yaml
 '''
 Create and store Embeddings
 '''
-
-yaml_file_path = '/lus/flare/projects/LLM_for_DUNE/users/Rishika/BALSAM/DUNEGPT_polaris_cursor_balsam/specs/embed_docdb_indico/embed_docdb_indico.yaml'
+yaml_file_path = '/lus/flare/projects/LLM_for_DUNE/users/Rishika/LLM_for_DUNE/BALSAM/DUNEGPT_polaris_cursor_balsam/specs/embed_docdb_indico/embed_docdb_indico.yaml'
 site_name = "DUNEGPT_polaris_cursor_balsam"
  
-path_to_python = f"/lus/flare/projects/LLM_for_DUNE/users/Rishika/BALSAM/"
-path_module = f"/lus/flare/projects/LLM_for_DUNE/users/Rishika/DUNEGPT_polaris_cursor"
+path_to_python = f"/lus/flare/projects/LLM_for_DUNE/users/Rishika/LLM_for_DUNE/BALSAM/"
+path_module = f"/lus/flare/projects/LLM_for_DUNE/users/Rishika/LLM_for_DUNE/DUNE_polaris_cursor"
 
 """
 Functions
@@ -37,7 +36,7 @@ class embed(ApplicationDefinition):
     environment_variables = env
     
     command_template = (
-        f"{path_to_python}/new_venv/bin/python3 cli.py index --indico-limit 0 "
+            f"{path_to_python}/new_venv/bin/python3 cli.py index"
     )
 
 
@@ -55,6 +54,7 @@ class embed(ApplicationDefinition):
         source {path_to_python}/new_venv/bin/activate
         cd {path_module}
         python3 -m spacy download en_core_web_sm
+        python3 update_sqlite.py
         python3 {path_module}/config.py
 
         '''
