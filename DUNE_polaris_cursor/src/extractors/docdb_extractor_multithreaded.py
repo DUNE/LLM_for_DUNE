@@ -198,7 +198,7 @@ class DocDBExtractor(BaseExtractor, Session):
         """Extract RetrieveFile links and per-link metadata from a ShowDocument page (latest revision)."""
         try:
             logger.info(f"Parsing {webpage_url}")
-
+            
             response = self.session.get(webpage_url)
             if not response.ok:
                 return [], []
@@ -455,7 +455,6 @@ class DocDBExtractor(BaseExtractor, Session):
                     logger.error(f"Error processing page {page_url}: {e}")
                 
                 
-
         logger.info(f"{len(all_links)} were extracted: from {len(documents_processed)} websites")
         # Download files (parallel)
         documents: List[Dict[str, Any]] = []
@@ -477,7 +476,7 @@ class DocDBExtractor(BaseExtractor, Session):
                     qs = parse_qs(urlparse(link).query)
                     doc_id = qs.get("docid", ["unknown"])[0]
 
-                    raw_text = self.get_raw_text(content_type=ct, content=content)
+                    raw_text, document_type = self.get_raw_text(content_type=ct, content=content)
                     cleaned_text_list = raw_text.split()
                     chunks = self.get_chunks(cleaned_text_list, chunk_size=chunk_size)
                     logger.info(f"Found {len(chunks)} chunks for {link}")
@@ -486,12 +485,13 @@ class DocDBExtractor(BaseExtractor, Session):
                         root_id = doc_id
                         
                         child_id = int(existing_ids.get(doc_id,'0_0').split("_")[-1])
-                        
+                        metadata['document_type'] = document_type
                         documents.append({
                             'document_id': f"{root_id}_{child_id+1}",
                             'cleaned_text': chunk,
                             'content_type': ct,
                             'metadata': metadata,
+                            
                         })
                         existing_ids[doc_id] = f"{root_id}_{child_id+1}"
                         logger.info(f"Added chunk from {link} to documents")
@@ -522,6 +522,7 @@ class DocDBExtractor(BaseExtractor, Session):
                 dataset.append({
                     'document_id': doc['document_id'],
                     'vector_id': unique_id,
+                    'document_type':metadata['document_type'],
                     'cleaned_text': cleaned_text,
                     'event_url': metadata['url'],
                     'title': metadata['title'],

@@ -395,12 +395,13 @@ class IndicoExtractor(BaseExtractor, Session):
     
 
     
-    def add_chunks_to_doc(self, event_id, chunk_size, raw_text, docs, doc, attachments_total):
+    def add_chunks_to_doc(self, event_id, document_type, chunk_size, raw_text, docs, doc, attachments_total):
 
         chunks = self.get_chunks(raw_text, chunk_size)
         for i,chunk in enumerate(chunks):
             doc['document_id']= f"{event_id}_{attachments_total}"
             doc['cleaned_text'] = chunk
+            doc['document_type'] = document_type
             docs.append(doc)
 
             attachments_total += 1
@@ -412,7 +413,6 @@ class IndicoExtractor(BaseExtractor, Session):
         link = a['link_url']
 
         try:
-            print(link)
             response,_ = self._download_file(link, self.session, self.max_file_bytes )
             print(response)
             return 
@@ -436,12 +436,13 @@ class IndicoExtractor(BaseExtractor, Session):
             doc['abstract'] = 'none'
             doc["source"]= "indico"
             
-            
             content, _ = self._download_file(download_url, self.session, self.max_file_bytes)
+
             
             if content:
-                raw_text = self.get_raw_text(content_type,content).split()
-                docs, attachments_total = self.add_chunks_to_doc(event_id, chunk_size, raw_text, docs, doc, attachments_total)
+                raw_text, document_type = self.get_raw_text(content_type,content)
+                raw_text=raw_text.split()
+                docs, attachments_total = self.add_chunks_to_doc(event_id, document_type, chunk_size, raw_text, docs, doc, attachments_total)
                 
                 
             else:
@@ -462,10 +463,12 @@ class IndicoExtractor(BaseExtractor, Session):
             id_ = a.get('href').split("/")[-2]
             ids.append(id_)
         return ids
-
+    
     def extract_documents(self, limit: int = 50, start: int = 0, chunk_size: int = 80000) -> List[Dict[str, Any]]:
         logger.info(f"Extracting documents from Indico category {self.category_id} (limit: {limit})")
         self._ensure_access()
+
+
 
 
         events=[]
@@ -523,8 +526,8 @@ class IndicoExtractor(BaseExtractor, Session):
               
                     
                     if content:
-                        raw_text = self.get_raw_text(a['content_type'],content).strip()
-                        dataset, attachments_total = self.add_chunks_to_doc(event_id, chunk_size, raw_text, dataset, doc, attachments_total)
+                        raw_text, document_type= self.get_raw_text(a['content_type'],content).strip()
+                        dataset, attachments_total = self.add_chunks_to_doc(event_id,document_type, chunk_size, raw_text, dataset, doc, attachments_total)
                        
                         
                         
@@ -583,15 +586,17 @@ class IndicoExtractor(BaseExtractor, Session):
                             resp.raise_for_status()
                             content = resp.content
                             if a["file_type"] == "pdf":
-                                raw_text = self.extract_text_from_pdf(content)
+                                raw_text,document_type = self.extract_text_from_pdf(content)
+                                
                             else:
                                 raw_text = self.extract_text_from_pptx(content)
+                                document_type='slides'
                             if raw_text and raw_text.strip():
                                 parsed_path = urlparse(a["url"]).path
                                 doc_id = "/".join([p for p in parsed_path.split("/") if p][-3:])
                                 
 
-                                dataset, attachments_total = self.add_chunks_to_doc(doc_id, chunk_size, raw_text, dataset, {}, attachments_total)
+                                dataset, attachments_total = self.add_chunks_to_doc(doc_id, document_type, chunk_size, raw_text, dataset, {}, attachments_total)
                             event_counts.add(event_id)
                                 
                               
