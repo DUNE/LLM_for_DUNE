@@ -1,9 +1,13 @@
+import os
+
+#os.environ["PATH"] = "/lus/flare/projects/LLM_for_DUNE/users/Rishika/LLM_for_DUNE/BALSAM/DUNEGPT_polaris_cursor_balsam/balsam_venv/bin:" + os.environ["PATH"]
+#os.environ["PYTHONHOME"] = "/lus/flare/projects/LLM_for_DUNE/users/Rishika/LLM_for_DUNE/BALSAM/DUNEGPT_polaris_cursor_balsam/balsam_venv/"
 from balsam.api import ApplicationDefinition, BatchJob, Job, Site
 import yaml
 
 #Machine variables
 #########################
-queue = "debug"         # debug or prod 
+queue = "prod"         # debug or prod 
 project="LLM_for_DUNE" #
 job_mode="mpi"          #
 #########################
@@ -36,13 +40,13 @@ version = "v0"
 """
 Functions
 """
-
+num_jobs=4
+num_nodes=2
 begin_index = 0 #0
-spill_size = 1 #4
-end_index = 1 #4
-wall_time_min = 30 #180
-num_nodes = 1 #4
-doc_limit = 25000 #if queue == 'prod' else 50
+spill_size = num_nodes #4
+end_index = num_jobs #4
+wall_time_min = 180 #180
+doc_limit = 250 #if queue == 'prod' else 50
 def create_single_dependent_job(app_id, i, parent_ids, params, node_packing_count, start):
     params.update({"i": i})
     Job.objects.create( app_id=app_id,

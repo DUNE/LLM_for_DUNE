@@ -1,0 +1,50 @@
+{
+    "42568380": {
+        "index": "1",
+        "queue": "prod",
+        "workflow": "embed_docdb_indico_embed_v0",
+        "job_start": "0",
+        "num_nodes": "4",
+        "document_limit": "250",
+        "num_jobs_per_node": "4",
+        "docdb_throughput": 2.2438268357783806,
+        "job_duration": 111.41679741666667,
+        "docs_processed_docdb": 250
+    },
+    "42568381": {
+        "index": "2",
+        "queue": "prod",
+        "workflow": "embed_docdb_indico_embed_v0",
+        "job_start": "0",
+        "num_nodes": "4",
+        "document_limit": "250",
+        "num_jobs_per_node": "4",
+        "docdb_throughput": 2.484275138326837,
+        "job_duration": 100.63297585000001,
+        "docs_processed_docdb": 250
+    },
+    "42568382": {
+        "index": "3",
+        "queue": "prod",
+        "workflow": "embed_docdb_indico_embed_v0",
+        "job_start": "0",
+        "num_nodes": "4",
+        "document_limit": "250",
+        "num_jobs_per_node": "4",
+        "docdb_throughput": 2.5532305948587894,
+        "job_duration": 97.91516696666666,
+        "docs_processed_docdb": 250
+    },
+    "42568383": {
+        "index": "4",
+        "queue": "prod",
+        "workflow": "embed_docdb_indico_embed_v0",
+        "job_start": "0",
+        "num_nodes": "4",
+        "document_limit": "250",
+        "num_jobs_per_node": "4",
+        "docdb_throughput": 2.1533228159228246,
+        "job_duration": 116.09963826666667,
+        "docs_processed_docdb": 250
+    }
+}

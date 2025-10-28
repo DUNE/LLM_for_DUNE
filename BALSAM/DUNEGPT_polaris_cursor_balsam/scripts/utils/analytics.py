@@ -53,28 +53,35 @@ for ev in sorted(events, key=lambda e: (e.job_id, e.timestamp)):
 job_labels = []
 docs_processed = []
 durations = []
-
+start_times=[]
+end_times=[]
 print("\nJob run durations:")
 for job in jobs:
     print(f"Tags: {job.tags}")
     job_id = job.id
     job_labels.append(str(job_id))
 
-    doc_count = int(job.tags.get("doc_count", 0))  # fallback to 0
+    doc_count = int(job.tags.get("document_limit", 0))  # fallback to 0
     docs_processed.append(doc_count)
 
     times = job_times.get(job_id, {})
+    
     if 'start' in times and 'end' in times:
         duration = (times['end'] - times['start']).total_seconds() / 60
         durations.append(duration)
         print(f"Job {job_id} ran for {duration:.2f} minutes")
+
+        start_times.append(times['start'])
+        end_times.append(times['end'])
     else:
         durations.append(0)
         print(f"Job {job_id} missing start or end time")
 
+#Record duration of run
+start_times.sort()
+end_times.sort()
+print(f"Took {end_times[-1] - start_times[0]} to extract {sum(docs_processed)} events")
 # Plot throughput (docs/minute)
-docs_processed = [40, 32, 0]
-links_processed = [50,60,0]
 throughput = [d / t if t > 0 else 0 for d, t in zip(docs_processed, durations)]
 print(f"Throughput for {job_ids[0]} = {throughput}")
 plt.figure(figsize=(8, 5))
@@ -115,7 +122,6 @@ for i, job in enumerate(jobs):
     config[job.id]['docdb_throughput'] = throughput[i]
     config[job.id]['job_duration'] = durations[i]
     config[job.id]['docs_processed_docdb'] = docs_processed[i]
-config['total_documents'] = sum(links_processed[:len(jobs)])
 save_to_json(config, file)
 
 

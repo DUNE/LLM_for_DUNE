@@ -7,9 +7,8 @@ Create and store Embeddings
 yaml_file_path = '/lus/flare/projects/LLM_for_DUNE/users/Rishika/LLM_for_DUNE/BALSAM/DUNEGPT_polaris_cursor_balsam/specs/embed_docdb_indico/embed_docdb_indico.yaml'
 site_name = "DUNEGPT_polaris_cursor_balsam"
  
-path_to_python = f"/lus/flare/projects/LLM_for_DUNE/users/Rishika/LLM_for_DUNE/BALSAM/"
+path_to_python = "/lus/flare/projects/LLM_for_DUNE/users/Rishika/LLM_for_DUNE/BALSAM/DUNEGPT_polaris_cursor_balsam"
 path_module = f"/lus/flare/projects/LLM_for_DUNE/users/Rishika/LLM_for_DUNE/DUNE_polaris_cursor"
-
 """
 Functions
 """
@@ -36,27 +35,43 @@ class embed(ApplicationDefinition):
     environment_variables = env
     
     command_template = (
-            f"{path_to_python}/new_venv/bin/python3 cli.py index"
+        f"{path_to_python}/new_venv/bin/python3.11 cli.py index"
     )
-
 
     def shell_preamble(self):
         return f'''
+        cd ~
+        wget https://www.sqlite.org/2024/sqlite-autoconf-3450100.tar.gz
+        tar xzf sqlite-autoconf-3450100.tar.gz
+        cd sqlite-autoconf-3450100
+        ./configure --prefix=$HOME/sqlite3
+        make
+        make install
+
+        export CFLAGS="-I$HOME/sqlite3/include"
+        export LDFLAGS="-L$HOME/sqlite3/lib"
+        export LD_LIBRARY_PATH=$HOME/sqlite3/lib:$LD_LIBRARY_PATH
+
+
         export INDEX={self.job.data["i"]}
         export DOCUMENT_LIMIT={self.job.tags["document_limit"]}
         export DDB_START_IDX={self.job.data["ddb_start"]}
         export IND_START_IDX={self.job.data["ind_start"]}
+
         module load autoconf cmake
         module load frameworks
         module load cmake
         module use /soft/modulefiles
+
         cd {path_to_python}
         source {path_to_python}/new_venv/bin/activate
+        ./new_venv/bin/pip install chromadb
+        echo Installed
+        ./new_venv/bin/pip install -r {path_module}/requirements.txt
         cd {path_module}
-        python3 -m spacy download en_core_web_sm
-        python3 update_sqlite.py
-        python3 {path_module}/config.py
-
+        {path_to_python}/new_venv/bin/python3.11 -m spacy download en_core_web_sm
+        {path_to_python}/new_venv/bin/python3.11 update_sqlite.py --venv_path {path_to_python}/new_venv
+        python {path_module}/config.py
         '''
 
 embed.sync()
