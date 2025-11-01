@@ -1,4 +1,4 @@
-from chATLAS_Embed.EmbeddingModels import SentenceTransformerEmbedding
+#from chATLAS_Embed.EmbeddingModels import SentenceTransformerEmbedding
 from src.utils.logger import get_logger
 from sentence_transformers import SentenceTransformer
 logger = get_logger(__name__)

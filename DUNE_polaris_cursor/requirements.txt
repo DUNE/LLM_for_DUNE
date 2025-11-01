@@ -24,9 +24,9 @@ python-pptx==0.6.21
 beautifulsoup4==4.12.2
 pytesseract
 pillow
-pdf2image
 python-docx
 openpyxl
+rank-bm25==0.2.2
 
 # CLI
 click==8.1.7
@@ -55,7 +55,6 @@ pyee==11.1.0
 cloudscraper>=1.2.70
 
 # Embeddings
-chATLAS_Embed
 
 # Vector DB / Chroma
 chromadb>=0.3.29

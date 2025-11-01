@@ -1,861 +1,282 @@
 ,question,answer,link
-0, What is the primary purpose of the LBNF/DUNE Procurement Plan? , The primary purpose of the LBNF/DUNE Procurement Plan is to describe the procurement processes and methods to acquire the goods and services necessary to support the development of the Long Baseline Neutrino Facilities (LBNF) for the Deep Underground Neutrino Experiment (DUNE). ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=81&filename=LBNF-DUNE%20Procurement%20Plan%20-%20May%202020.pdf&version=13.
+0, What are the primary scientific goals of the DUNE experiment? ," The primary scientific goals of the DUNE experiment include studying CP violation and mass hierarchy in the lepton sector using a multi-kilotonne liquid argon underground detector and a high-intensity neutrino beam from Fermilab, searching for proton decay, searching for neutrinos from supernovae, and conducting an ancillary science program including precise atmospheric neutrino measurements to complement beam neutrino physics. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=97&filename=dune-underground-vk-v3.pdf&version=4.
 
 "
-1, What are the main scientific goals of the DUNE experiment? ," The main scientific goals of the DUNE experiment include studying CP violation and mass hierarchy in the lepton sector, searching for proton decay, and searching for neutrinos from supernovae. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=97&filename=dune-underground-vk-v3.pdf&version=4.
+1, What is the purpose of the Change Control Board (CCB) in the LBNF/DUNE project? ," The Change Control Board (CCB) considers whether changes accommodate project interfaces, are sufficiently described and justified, have technical, cost, and schedule merit, and are ready for recommendation to the next level. The CCB makes recommendations to the LBNF Project Director on changes that affect the Project baseline cost, schedule, and technical specifications. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=49&filename=2024-09-29%20Systems%20Engineering%20Management%20Plan.pdf&version=24.
 
 "
-2, What is the role of the Co-Spokespersons in the DUNE collaboration? ," The Co-Spokespersons are the scientific leaders and representatives of the collaboration, responsible for preparing agendas for collaboration meetings, working closely with the Executive Board on major collaboration matters, and bearing authority and responsibilities for the day-to-day matters of the collaboration. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=1&filename=GDC_v9.pdf&version=17.
+2, What are the main components of the DUNE Far Detector design? ," The DUNE Far Detector design includes four similar modules, each with a total/active/fiducial mass of 17.1/13.8/11.6 kt. The design allows for staged construction and flexibility in technology choice, with a single-phase as the baseline design and a two-phase as an alternative design. Photon detection is used for initial time reconstruction for underground physics. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=97&filename=dune-underground-vk-v3.pdf&version=4.
 
 "
-3, What is the significance of the 1300 km baseline for the DUNE experiment? ," The 1300 km baseline is significant for the DUNE experiment because it allows for the study of neutrino oscillations over a long distance, which is optimal for measuring CP violation, mass ordering, and the θ23 octant in a long-baseline experiment. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=29&filename=ahep.pdf&version=5.
+3, What is the role of the LBNF/DUNE Risk Manager? ," The LBNF/DUNE Risk Manager guides the LBNF/DUNE teams in the risk management process, using a risk register, applying the Fermilab Project Risk Management Procedure, evaluating risks through a Monte Carlo analysis, and other standard risk management processes. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=49&filename=2024-09-29%20Systems%20Engineering%20Management%20Plan.pdf&version=24.
 
 "
-4, What is the purpose of the Interface Control Document (ICD) in the context of LBNF/DUNE? ," The purpose of the Interface Control Document (ICD) is to provide complete information about the technical and programmatic interfaces between different entities involved in the LBNF/DUNE project, ensuring proper configuration management and change control. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=71&filename=Interface%20Control%20Document%2071.pdf&version=3.
+4, How does the DUNE experiment plan to study neutrinos from supernovae? ," The DUNE experiment plans to study neutrinos from supernovae by detecting a burst of neutrinos emitted during the core collapse of massive stars. The liquid argon detectors are sensitive predominantly to electron neutrinos, allowing for complementary studies to other experiments. The burst of neutrinos provides a unique opportunity to test collapse models and is complementary to other detectors. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=97&filename=dune-underground-vk-v3.pdf&version=4.
 
 "
-5, What is the primary focus of the DUNE Near Detector Strategy? ," The primary focus of the DUNE Near Detector Strategy is to constrain systematic uncertainties for the DUNE oscillation analysis, which drives the design and implies the capability to precisely measure exclusive neutrino interactions, resulting in a self-contained non-oscillation neutrino physics program. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=41&filename=DUNE%20Physics.pdf&version=6.
+5, What is the significance of the DUNE experiment's capability to detect proton decay? ," The significance of the DUNE experiment's capability to detect proton decay lies in its potential to test grand unified theories (GUTs) that predict baryon number violation, which is physics beyond the standard model. The experiment aims to improve sensitivity to certain decay modes, such as those motivated by supersymmetry, by utilizing the strengths of liquid argon detectors. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=97&filename=dune-underground-vk-v3.pdf&version=4.
 
 "
-6, What are the main components of the LBNF Neutrino Beam? ," The main components of the LBNF Neutrino Beam include a high-power, wide-band, tunable neutrino beam at Fermilab, underground and surface facilities to host a highly-capable near detector, and a primary beamline to transport protons to the target to create the neutrino beam. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=48&filename=LBNF%20Neutrino%20Beam.pdf&version=5.
+6, What are the main challenges in simulating cosmic muons for the DUNE experiment? ," The main challenges in simulating cosmic muons for the DUNE experiment include handling the large number of cosmic muons, about 68 within the readout window, and ensuring that most of these muons can be easily vetoed. The simulation effort overlaps with the calibration group, and many existing tools need to be adapted for DUNE. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=16&filename=Milestones_for_2015.pdf&version=1.
 
 "
-7, What is the role of the DUNE Technical Board? ," The DUNE Technical Board functions as the DUNE Change Control Board, making recommendations to the DUNE Executive Board regarding proposed changes that affect the Project baseline cost, schedule, and technical specifications. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=82&filename=2019-10-14-LBNF%20DUNE%20Configuration%20Management%20Plan.docx&version=10.
+7, How does the DUNE experiment plan to achieve precision in neutrino oscillation measurements? ," The DUNE experiment plans to achieve precision in neutrino oscillation measurements by using a high-intensity wide-band neutrino beam originating at Fermilab, a highly capable near detector to constrain systematic errors, and a large fiducial mass liquid argon far detector located 1300 km away at the Sanford Underground Research Facility. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=80&filename=DUNE-Nowak.pdf&version=2.
 
 "
-8, What is the purpose of the DUNE Photon Detector Designs? ," The purpose of the DUNE Photon Detector Designs is to develop a light guide photon detector for the DUNE LAr TPC, which involves exploring various designs and testing their performance to ensure effective photon detection in the experiment. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=38&filename=DPF-DUNE-PhotoDet-150804.pdf&version=3.
+8, What is the purpose of the photon detection system in the DUNE Far Detector? ," The purpose of the photon detection system in the DUNE Far Detector is to provide initial time reconstruction for underground physics, which is crucial for identifying and analyzing neutrino interactions and other rare events. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=97&filename=dune-underground-vk-v3.pdf&version=4.
 
 "
-9, What are the responsibilities of the LBNF/DUNE Change Control Board? ," The responsibilities of the LBNF/DUNE Change Control Board include considering whether changes accommodate project interfaces, are sufficiently described and justified, have technical, cost, and schedule merit, and are ready for recommendation to the next level. ", https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=49&filename=2024-09-29%20Systems%20Engineering%20Management%20Plan.docx&version=24.
-10, What is the primary purpose of the 35-ton DAQ system at PC4? , The primary purpose of the 35-ton DAQ system at PC4 is to address the networking needs of the prototype’s DAQ system and to support data movement from the PC4 to the central Fermilab’s computing and storage resources. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=94&filename=35-ton-daq.pdf&version=1.
+9, What are the expected benefits of using liquid argon detectors in the DUNE experiment? ," The expected benefits of using liquid argon detectors in the DUNE experiment include improved event reconstruction capabilities, particularly for proton decay modes that are difficult to detect with other technologies, and enhanced sensitivity to electron neutrinos from supernovae, providing complementary data to other neutrino detection methods. ", https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=97&filename=dune-underground-vk-v3.pdf&version=4.
+10, What is the primary goal of the DUNE experiment in terms of neutrino physics? ," The primary goal of the DUNE experiment is to explore the physics potential of a large, underground, liquid argon neutrino detector, including the study of neutrino oscillations, nucleon decay, and supernova burst neutrinos. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=35&filename=DUNE_UndergroundPhysics_Grant_2015.pdf&version=1.
 
 "
-11, What are the main components of the DUNE far detector? ," The DUNE far detector is a 40 kt fiducial mass liquid argon time-projection chamber (LAr TPC), divided into four independent 10 kt modules, each housed in its own cavern. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=41&filename=WG1-Strait-DUNE_Physics.pdf&version=6.
+11, What are the two detector designs being explored for the DUNE Far Detector? , The two detector designs being explored for the DUNE Far Detector are the single-phase reference design and the dual-phase alternate design. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=35&filename=DUNE_UndergroundPhysics_Grant_2015.pdf&version=1.
 
 "
-12, What is the role of the Institutional Board (IB) in the DUNE collaboration? ," The Institutional Board (IB) is responsible for establishing governance rules of the DUNE collaboration and regulating governance-related issues, including admission of new collaborating institutions and members, oversight of Co-Spokesperson election process, and approval of common funds assessments. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=1&filename=GDC_v9.docx&version=17.
+12, What is the significance of the 4850 Y depth for the DUNE Far Detector? ," The 4850 Y depth is significant for the DUNE Far Detector as it helps reduce cosmic-ray backgrounds, which is crucial for detecting rare events such as nucleon decay and supernova burst neutrinos. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=35&filename=DUNE_UndergroundPhysics_Grant_2015.pdf&version=1.
 
 "
-13, What is the significance of the Interface Control Documents (ICDs) in the LBNF/DUNE project? ," Interface Control Documents (ICDs) are used to identify and document interface boundaries and responsibilities around the boundaries between two entities, ensuring that subsystems on both sides of the interface clearly understand their scope of work and deliverables. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=49&filename=2024-09-29%20Systems%20Engineering%20Management%20Plan.pdf&version=24.
+13, What are the main components of the Far Site Cryogenics Infrastructure for the DUNE experiment? ," The main components of the Far Site Cryogenics Infrastructure include cryogenic fluids infrastructure, cryostats, cryogenics controls, and cryogenics management. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=45&filename=Far%20Site%20Cryogenics%20Infrastructure%20Organization_titles%20only.pdf&version=39.
 
 "
-14, What is the primary scientific goal of the DUNE experiment? ," The primary scientific goal of the DUNE experiment is to address fundamental open questions in particle physics and astroparticle physics, including neutrino oscillation physics to search for CP violation in the leptonic sector, determine the ordering of the neutrino mass eigenstates, and make precision measurements of oscillation parameters. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=41&filename=WG1-Strait-DUNE_Physics.pdf&version=6.
+14, What is the role of the Procurement Department in the DUNE project? ," The Procurement Department is responsible for conducting procurement activities in a manner most advantageous to FRA and the government, ensuring effective competition, and assisting in ""make or buy"" decisions. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=81&filename=Procurement%20Manual.pdf&version=13.
 
 "
-15, What are the responsibilities of the Speakers Committee in the DUNE collaboration? , The primary functions of the Speakers Committee are to ensure that the DUNE Collaboration is well represented at international conferences and to manage the assignment of DUNE speakers for all presentations given on behalf of the DUNE Collaboration at international conferences and workshops. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=57&filename=DUNE_Speakers_Committee_Rulesv1.5.docx&version=3.
+15, What are the challenges associated with supernova neutrino detection in the DUNE experiment? , The challenges associated with supernova neutrino detection include accurately reconstructing the true neutrino energy and developing precise models of argon reactions at low energies. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=35&filename=DUNE_UndergroundPhysics_Grant_2015.pdf&version=1.
 
 "
-16, What is the purpose of the LBNF/DUNE Preliminary Hazard Analysis Report? ," The purpose of the LBNF/DUNE Preliminary Hazard Analysis Report is to identify potential hazards associated with the LBNF/DUNE project, assess the risks, and outline mitigation strategies to ensure safety during the project's operation. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=92&filename=LBNF-DUNE_PHAR-20150623.pdf&version=1.
+16, What is the purpose of the TallBo experiment in the context of DUNE? ," The purpose of the TallBo experiment is to test and compare different photon detection technologies, such as TPB-dipped acrylic and WLS fibers, for potential use in the DUNE experiment. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=33&filename=PhotoDetMtg-150724.pdf&version=1.
 
 "
-17, What is the role of the Long-Baseline Neutrino Facility (LBNF) in the DUNE project? ," The Long-Baseline Neutrino Facility (LBNF) is responsible for designing, building, and commissioning the facilities necessary to mount the DUNE experiment, including the neutrino beam, cryostats, cryogenics systems, and conventional facilities at both Fermilab and the Sanford Underground Research Facility. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=41&filename=WG1-Strait-DUNE_Physics.pdf&version=6.
+17, What are the key considerations for the cavern design in the DUNE experiment? ," Key considerations for the cavern design include the size and stability of the concrete floor, the dimensions of the cryostat, and the integration of cryogenics and detector components in a 3D model. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=50&filename=LBNF-DUNEtobefinalised-v5.xlsx&version=3.
 
 "
-18, What are the main challenges addressed by the DUNE near detector? ," The DUNE near detector must constrain the systematic uncertainties for the oscillation analysis, which requires it to have the capability to precisely measure exclusive neutrino interactions of all four species in the beam: νμ, ν̅μ, νe, and ν̅e. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=41&filename=WG1-Strait-DUNE_Physics.pdf&version=6.
+18, What is the significance of the iEFIG in the DUNE project? ," The iEFIG is significant in the DUNE project as it addresses cryogenic issues and cavern layouts, and considers strategies for civil work, such as excavation plans for detector modules. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=14&filename=ibminutes-20feb2015.txt&version=1.
 
 "
-19, What is the significance of the 35-ton prototype in the DUNE experiment? , The 35-ton prototype is significant in the DUNE experiment as it serves to test and validate the design and operation of the DAQ system and other components before full-scale implementation in the DUNE experiment. , https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=94&filename=35-ton-daq.pdf&version=1.
-20, What is the primary goal of the DUNE experiment as outlined in the P5 report? ," The primary goal of the DUNE experiment is to measure CP violation in the leptonic sector, determine the neutrino mass hierarchy, and conduct precision tests of the three-flavor oscillation hypothesis. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=13&filename=DUNE_2015FNALUsersMeeting_Fields_10June2015.pdf&version=2
+19, What are the expected benefits of using liquid argon time projection chambers (LArTPC) in DUNE compared to other technologies? ," The expected benefits of using LArTPC in DUNE include higher detector resolution, which enhances sensitivity to neutrino interactions and allows for better discrimination of event features compared to water Cherenkov detectors. ", https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=35&filename=DUNE_UndergroundPhysics_Grant_2015.pdf&version=1.
+20, What is the role of the Systems Engineering team in the LBNF/DUNE project? ," The Systems Engineering team provides technical leadership and directs the work of subproject teams through the development and tracking of requirements, interface control documents, design and CAD integration, requirement verification efforts, and adherence to change control processes. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=49&filename=2024-09-29%20Systems%20Engineering%20Management%20Plan.docx&version=24
 
 "
-21, What is the significance of the LBNF/DUNE project being hosted by Fermilab? ," The LBNF/DUNE project being hosted by Fermilab is significant because it allows for the creation of a world-leading experimental program in neutrino physics, nucleon decay, and astroparticle physics, with strong international collaboration. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=48&filename=LBNF%20Neutrino%20Beam.pptx&version=5
+21, What are the main components of the LBNF Neutrino Beam as described in the document? ," The main components of the LBNF Neutrino Beam include underground and surface facilities at the Sanford Underground Research Facility, cryostats, refrigeration and purification systems, a high-power, wide-band, tunable neutrino beam at Fermilab, and facilities to host a near detector at Fermilab. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=48&filename=LBNF%20Neutrino%20Beam.pdf&version=5
 
 "
-22, What are the main components of the DUNE Far Detector? ," The main components of the DUNE Far Detector include the Time Projection Chamber (TPC), photon detection system, readout electronics, DAQ, and the installation and integration of these systems. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=53&filename=LogisticsWorkshop-LBNFDUNEOverview-20150810.pptx&version=1
+22, What is the purpose of the Interface Control Document (ICD) in the LBNF/DUNE project? ," The purpose of the Interface Control Document (ICD) is to provide complete information about the technical and programmatic interfaces between different entities within the LBNF/DUNE project, ensuring that all revisions require change control procedures before approval. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=70&filename=Interface%20Control%20Document%2070.pdf&version=3
 
 "
-23, How does the DUNE experiment plan to achieve its scientific objectives? ," The DUNE experiment plans to achieve its scientific objectives by using a high-intensity wide-band neutrino beam, a highly capable near detector to constrain systematic errors, and a large fiducial mass liquid argon far detector located at a long baseline. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=41&filename=DUNE%20Physics.pptx&version=6
+23, What is the role of the Configuration Management (CM) process in the LBNF/DUNE project? ," The Configuration Management (CM) process is designed to ensure that LBNF/DUNE/Integration configuration documentation is identified, released, and controlled, and that changes are proposed, controlled, managed, approved, implemented, and tracked. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=49&filename=2024-09-29%20Systems%20Engineering%20Management%20Plan.docx&version=24
 
 "
-24, What is the role of the Near Detector in the DUNE experiment? ," The role of the Near Detector in the DUNE experiment is to measure the energy spectrum and composition of the neutrino beam at its source, which helps in constraining systematic uncertainties for the oscillation analysis. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=13&filename=DUNE_2015FNALUsersMeeting_Fields_10June2015.pdf&version=2
+24, What are the responsibilities of the LBNF Far Site Conventional Facilities in relation to the LBNF Nitrogen Systems? ," The LBNF Far Site Conventional Facilities are responsible for architectural, civil, structural, mechanical, electrical, and plumbing design and construction, while the LBNF Nitrogen Systems are responsible for the nitrogen dewar, vaporizer, and compressor sizes and equipment support. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=70&filename=Interface%20Control%20Document%2070.pdf&version=3
 
 "
-25, What are the expected benefits of the dual-phase technology for the DUNE Far Detector? ," The expected benefits of the dual-phase technology for the DUNE Far Detector include finer readout pitch, lower energy thresholds, and better pattern recognition, which could enhance the detector's performance. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=41&filename=DUNE%20Physics.pptx&version=6
+25, What is the significance of the LBNF Neutrino Beam's design for 2.4 MW operation? ," The LBNF Neutrino Beam is designed for 2.4 MW operation to avoid prohibitively expensive upgrades later and to ensure that all elements that cannot be replaced later are designed for this power level, enhancing the physics reach of DUNE. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=48&filename=LBNF%20Neutrino%20Beam.pdf&version=5
 
 "
-26, How does the DUNE experiment plan to address systematic uncertainties in its measurements? , The DUNE experiment plans to address systematic uncertainties by using a highly capable near detector to measure the unoscillated beam and by conducting detailed studies of neutrino interactions and nuclear effects. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=60&filename=DDC_DUNE_Systematics_NuFact2015.pdf&version=1
+26, What are the key elements of Configuration Management (CM) in the LBNF/DUNE project? ," The key elements of Configuration Management (CM) include Configuration Identification, Change Control, Configuration Status Accounting, and Configuration Verification, which ensure that all project elements are identified, controlled, and verified against the intended design. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=49&filename=2024-09-29%20Systems%20Engineering%20Management%20Plan.docx&version=24
 
 "
-27, What is the significance of the LBNF beamline for the DUNE experiment? ," The LBNF beamline is significant for the DUNE experiment as it provides a high-power, wide-band, tunable neutrino beam that is essential for conducting long-baseline neutrino oscillation studies. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=48&filename=LBNF%20Neutrino%20Beam.pptx&version=5
+27, What is the role of the LBNF/DUNE Systems Engineering Management Plan (SEMP)? ," The LBNF/DUNE Systems Engineering Management Plan (SEMP) describes the organization, processes, products, and methodology implemented by the LBNF and DUNE management teams to ensure coordinated development of the facilities and detectors for the experiment. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=49&filename=2024-09-29%20Systems%20Engineering%20Management%20Plan.docx&version=24
 
 "
-28, What are the primary science goals of the DUNE experiment? ," The primary science goals of the DUNE experiment include measuring CP violation in the leptonic sector, determining the neutrino mass hierarchy, conducting precision tests of the three-flavor oscillation hypothesis, searching for nucleon decay, and detecting supernova neutrinos. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=13&filename=DUNE_2015FNALUsersMeeting_Fields_10June2015.pdf&version=2
+28, How does the LBNF Neutrino Beam optimize its focusing system for greater physics reach? ," The LBNF Neutrino Beam optimizes its focusing system for greater physics reach by using a genetic algorithm to optimize for CP Violation sensitivity, adjusting the shape and size of horns, and varying the target length, among other strategies. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=48&filename=LBNF%20Neutrino%20Beam.pdf&version=5
 
 "
-29, How does the DUNE experiment plan to utilize the data from supernova neutrinos? ," The DUNE experiment plans to utilize the data from supernova neutrinos to gain insights into the dynamics of supernova explosions, study neutrino oscillations, and test beyond the Standard Model physics such as neutrino magnetic moments. ", https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=13&filename=DUNE_2015FNALUsersMeeting_Fields_10June2015.pdf&version=2
-30, What is the primary goal of the DUNE experiment in terms of neutrino physics? ," The primary goal of the DUNE experiment is to study neutrino oscillations to test CP violation in the lepton sector, determine the ordering of the neutrino masses, and test the three-neutrino paradigm. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=28&filename=dune-eps-procs.pdf&version=2
+29, What is the purpose of the Change Control Board (CCB) in the LBNF/DUNE project? ," The Change Control Board (CCB) is composed of technical and administrative representatives who recommend approval or disapproval of proposed changes to the project's approved configuration, ensuring that changes are reviewed and approved systematically. ", https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=49&filename=2024-09-29%20Systems%20Engineering%20Management%20Plan.docx&version=24
+30, What are the primary scientific objectives of the DUNE experiment? ," The primary scientific objectives of the DUNE experiment include neutrino oscillation physics to search for CP violation in the leptonic sector, determine the ordering of the neutrino mass eigenstates, make precision measurements of oscillation parameters, test the three-neutrino paradigm, searches for baryon number violating processes (nucleon decay), and neutrino astrophysics, most notably precision measurements of neutrinos from a core-collapse supernova within the Galaxy. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=94&filename=NS-DN-35T-teststand-PC4.docx&version=1
 
 "
-31, What are the two main types of detectors being considered for the DUNE Far Detector modules? , The two main types of detectors being considered for the DUNE Far Detector modules are the single-phase liquid argon time projection chamber (LArTPC) and the dual-phase LArTPC. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=97&filename=dune-underground-vk-v3.pptx&version=4
+31, What is the significance of the DUNE far detector being located deep underground at the Sanford Underground Research Facility? ," The DUNE far detector's location deep underground at the Sanford Underground Research Facility is significant because it allows for the reduction of background noise from cosmic rays, enabling more precise measurements of neutrino interactions and searches for rare processes like nucleon decay. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=41&filename=WG1-Strait-DUNE_Physics.pdf&version=6
 
 "
-32, How does the DUNE experiment plan to achieve sensitivity to the neutrino mass hierarchy? ," The DUNE experiment plans to achieve sensitivity to the neutrino mass hierarchy by using a long baseline of 1,300 km, which allows for the observation of matter effects in neutrino oscillations, and by utilizing both beam and atmospheric neutrinos. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=97&filename=dune-underground-vk-v3.pptx&version=4
+32, How does the DUNE experiment plan to address systematic uncertainties in oscillation parameter measurements? ," The DUNE experiment plans to address systematic uncertainties in oscillation parameter measurements by using a highly-capable near detector system, which will provide precise measurements of exclusive neutrino interactions and help constrain systematic uncertainties. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=67&filename=Wilson-DUNE-Lomonosov2015-Aug15.pdf&version=2
 
 "
-33, What is the significance of the DUNE Near Detector in the experiment? ," The DUNE Near Detector is significant because it will precisely measure the pre-oscillation neutrino beam, providing a ""before"" picture to compare with the ""after"" oscillations observed in the Far Detector, and it will also study neutrino interactions. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=28&filename=dune-eps-procs.pdf&version=2
+33, What are the potential benefits of using dual-phase readout technology in the DUNE far detector? ," The potential benefits of using dual-phase readout technology in the DUNE far detector include improved signal-to-noise ratio and the ability to amplify the ionization signal, which could enhance the detector's sensitivity and resolution. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=41&filename=WG1-Strait-DUNE_Physics.pdf&version=6
 
 "
-34, What are some of the non-accelerator physics topics that the DUNE Far Detector aims to explore? ," The DUNE Far Detector aims to explore non-accelerator physics topics such as atmospheric neutrino measurements, searches for nucleon decay, and measurement of astrophysical neutrinos, especially those from a core-collapse supernova. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=28&filename=dune-eps-procs.pdf&version=2
+34, What is the role of the Long-Baseline Neutrino Facility (LBNF) in the DUNE experiment? ," The Long-Baseline Neutrino Facility (LBNF) provides the infrastructure necessary for the DUNE experiment, including the neutrino beamline, cryostats, cryogenics systems, and conventional facilities at both Fermilab and the Sanford Underground Research Facility. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=92&filename=LBNF-DUNE_PHAR-20150623.docx&version=1
 
 "
-35, How does the DUNE experiment plan to handle the logistics of construction at the SURF site? ," The DUNE experiment plans to handle the logistics of construction at the SURF site by developing a detailed plan for simultaneous construction of conventional facilities, cryostat, and cryogenic systems installations underground, and by coordinating through a single entity for efficient management. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=53&filename=LogisticsWorkshop-LBNFDUNEOverview-20150810.pdf&version=1
+35, How does the DUNE experiment aim to achieve a 5σ determination of CP violation? ," The DUNE experiment aims to achieve a 5σ determination of CP violation by optimizing the neutrino beam design and controlling systematic errors, allowing for precise measurements of oscillation parameters over a broad range of energies. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=41&filename=WG1-Strait-DUNE_Physics.pdf&version=6
 
 "
-36, What is the role of the LBNF in the DUNE experiment? ," The role of the LBNF (Long-Baseline Neutrino Facility) in the DUNE experiment is to provide the facilities at Fermilab and at the Sanford Underground Research Facility (SURF) to enable the scientific program of DUNE, including the construction of the Near and Far Site Facilities. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=53&filename=LogisticsWorkshop-LBNFDUNEOverview-20150810.pdf&version=1
+36, What is the significance of the DUNE experiment's ability to measure neutrinos from a core-collapse supernova? ," The significance of the DUNE experiment's ability to measure neutrinos from a core-collapse supernova lies in its potential to provide detailed information about the supernova process, including the neutronization burst, which can offer insights into stellar evolution and the mechanisms of supernova explosions. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=41&filename=WG1-Strait-DUNE_Physics.pdf&version=6
 
 "
-37, What are the expected benefits of using a liquid argon time projection chamber (LArTPC) in the DUNE experiment? ," The expected benefits of using a liquid argon time projection chamber (LArTPC) in the DUNE experiment include fine spatial resolution, which allows for detailed reconstruction of neutrino interactions, and a low energy threshold, which is ideal for identifying events such as proton decay and supernova neutrinos. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=97&filename=dune-underground-vk-v3.pptx&version=4
+37, What are the expected benefits of the DUNE near detector's Fine-Grained Tracker design? ," The expected benefits of the DUNE near detector's Fine-Grained Tracker design include precise measurements of neutrino interactions, which are crucial for reducing systematic uncertainties in oscillation analyses and supporting a comprehensive neutrino physics program. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=41&filename=WG1-Strait-DUNE_Physics.pdf&version=6
 
 "
-38, How does the DUNE experiment plan to contribute to the understanding of supernova neutrinos? ," The DUNE experiment plans to contribute to the understanding of supernova neutrinos by using its liquid argon detectors, which are sensitive to electron neutrinos, to observe the time evolution of neutrino light curves from supernovae, providing insights into the collapse models and complementing other detectors. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=97&filename=dune-underground-vk-v3.pptx&version=4
+38, How does the DUNE experiment plan to handle the networking needs of its DAQ system for the 35-Ton Cryostat prototype? ," The DUNE experiment plans to handle the networking needs of its DAQ system for the 35-Ton Cryostat prototype by providing an Ethernet network with VLANs and subnets, ensuring connectivity for data movement from the prototype to Fermilab's computing and storage resources. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=94&filename=NS-DN-35T-teststand-PC4.docx&version=1
 
 "
-39, What is the significance of the DUNE experiment's international collaboration? ," The significance of the DUNE experiment's international collaboration is that it brings together a wide range of expertise and resources from around the world, facilitating the construction and operation of a highly capable long-baseline neutrino facility and enhancing the scientific impact of the experiment. ", https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=53&filename=LogisticsWorkshop-LBNFDUNEOverview-20150810.pdf&version=1
-40, What is the primary purpose of the DUNE Speakers Committee? , The primary purpose of the DUNE Speakers Committee is to ensure that the DUNE Collaboration is well represented at international conferences and to manage the assignment of DUNE speakers for all presentations given on behalf of the DUNE Collaboration at international conferences and workshops. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=57&filename=DUNE_Speakers_Committee_Rulesv1.5.pdf&version=3
+39, What is the purpose of the Interface Control Document (ICD) in the context of the LBNF/DUNE project? ," The purpose of the Interface Control Document (ICD) in the context of the LBNF/DUNE project is to provide complete information about the technical and programmatic interfaces between different entities involved in the project, ensuring proper configuration management and coordination. ", https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=71&filename=Interface%20Control%20Document%2071.docx&version=3
+40, What is the purpose of the Interface Control Document (ICD) in the DUNE experiment? ," The Interface Control Document (ICD) provides complete information about the technical and programmatic interfaces between different entities involved in the DUNE experiment. It ensures that all revisions require change control procedures before approval, as per the LBNF/DUNE Configuration Management Plan. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=73&filename=Interface%20Control%20Document%2073.docx&version=2.
 
 "
-41, What are the main scientific objectives of the DUNE experiment? ," The main scientific objectives of the DUNE experiment include neutrino oscillation physics to search for CP violation in the leptonic sector, determine the ordering of the neutrino mass eigenstates, make precision measurements of oscillation parameters, test the three-neutrino paradigm, searches for baryon number violating processes (nucleon decay), and neutrino astrophysics, particularly precision measurements of neutrinos from a core-collapse supernova within the Galaxy. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=48&filename=WG1-Strait-DUNE_Physics.pdf&version=5
+41, What is the significance of the 39Ar decay in the DUNE experiment's photon detection system? ," The 39Ar decay is significant because it produces a potentially large background rate of photons, which can affect the detection efficiency and data rate. The study of 39Ar decay helps in understanding its impact on the photon detection system and in developing strategies to mitigate its effects. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=5&filename=2015-05-29-Review-followup.pptx&version=1.
 
 "
-42, What is the role of the Near Detector in the DUNE experiment? ," The role of the Near Detector in the DUNE experiment is to constrain the systematic uncertainties for the oscillation analysis, which requires it to have the capability to precisely measure exclusive neutrino interactions of all four species in the beam: νμ, ν̄μ, νe, and ν̄e. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=48&filename=WG1-Strait-DUNE_Physics.pdf&version=5
+42, Why is determining the T0 important for track reconstruction in the DUNE experiment? , Determining the T0 is important because it helps resolve the ambiguity in the x position of tracks caused by random cosmic event timings. Knowing the T0 allows for accurate reconstruction of the particle's path through the detector. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=64&filename=15_08_14_FlashT0.pdf&version=3.
 
 "
-43, What is the significance of the dual-phase technology in the DUNE experiment? ," The dual-phase technology is recognized by the DUNE collaboration as having potential, and a dual-phase implementation of the DUNE far detector is presented as an alternative design in the Conceptual Design Report. If demonstrated, it could form the basis of the second or subsequent 10-kt far detector modules. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=80&filename=DUNE-Nowak.pptx&version=2
+43, What are the responsibilities of the Nitrogen and Argon systems in the LBNF/DUNE Interface Control Document? ," The Nitrogen and Argon systems are responsible for the design, quality assurance, and implementation of cryogenic systems, including equipment and piping. They also handle system engineering, performance test plans, and functional test plans for their respective systems. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=74&filename=Interface%20Control%20Document%2074.pdf&version=2.
 
 "
-44, What is the purpose of the Interface Control Document (ICD) in the DUNE project? ," The purpose of the Interface Control Document (ICD) is to provide complete information about the technical and programmatic interfaces between the two entities named within the document, ensuring proper configuration management as per the LBNF/DUNE Configuration Management Plan. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=71&filename=Interface%20Control%20Document%2071.docx&version=3
+44, What was the purpose of the first meeting of the ELBNF proto-institutional board? ," The purpose of the first meeting was to discuss the White Paper on International Governance, the Memorandum of Collaboration, the formation of co-Spokespersons election committee, and the formation of a Collaboration governance document. It also included discussions on working groups and the collaboration name. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=14&filename=ibminutes-22jan2015.txt&version=1.
 
 "
-45, What are the main components of the LBNF/DUNE risk analysis? ," The main components of the LBNF/DUNE risk analysis include identifying high and medium rank risks in terms of cost impact, assessing schedule impacts that could delay the critical path, and determining risk cost contingency. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=66&filename=2015-08-14---LBNF-DUNE-Risk-Analysis-CD1-Refresh-DOE-Review-Lucas-Taylor--POST-REVIEW-UPDATES.pptx&version=1
+45, What are the main components of the Beamline Project in the DUNE experiment? ," The main components of the Beamline Project include the Primary Beam Complex, Decay Pipe and Systems, Target Complex, Absorber Complex, and their respective management and integration tasks. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=46&filename=Beamline_including%20names%20and%20WBS.pdf&version=32.
 
 "
-46, What is the significance of the LArTPC technology in the DUNE experiment? ," The LArTPC (Liquid Argon Time Projection Chamber) technology is significant in the DUNE experiment because it provides high spatial and energy resolution, which is crucial for detecting neutrino interactions and potential nucleon decay modes with high efficiency and low background. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=48&filename=WG1-Strait-DUNE_Physics.pdf&version=5
+46, How does the DUNE experiment plan to handle SiPM failures in the photon detection system? , The DUNE experiment considers a tolerable SiPM failure rate of 20-30% without catastrophic performance loss. The study suggests that increasing the overall amount of light can make the system more tolerant to SiPM failures. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=5&filename=2015-05-29-Review-followup.pptx&version=1.
 
 "
-47, How does the DUNE experiment plan to achieve a 5σ determination of CP violation? , The DUNE experiment plans to achieve a 5σ determination of CP violation in half the possible phase space in approximately 10 years by optimizing the neutrino beam profile and combining atmospheric neutrinos with beam data to increase sensitivity. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=80&filename=DUNE-Nowak.pptx&version=2
+47, What is the role of the Interface Control Document in managing changes in the DUNE experiment? , The Interface Control Document plays a crucial role in managing changes by requiring all revisions to undergo change control procedures as identified in the LBNF/DUNE Configuration Management Plan before approval. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=73&filename=Interface%20Control%20Document%2073.docx&version=2.
 
 "
-48, What is the role of the Far Detector in the DUNE experiment? ," The role of the Far Detector in the DUNE experiment is to detect neutrinos over a long baseline of 1300 km, allowing for the study of neutrino oscillations, CP violation, and the neutrino mass hierarchy with high precision. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=48&filename=WG1-Strait-DUNE_Physics.pdf&version=5
+48, What challenges are associated with photon detection from 39Ar decay in the DUNE experiment? ," The challenges include a large singles rate from 39Ar decay, which can overwhelm the system's dark noise and affect data rates. Correlated hits from decays close to the photon detectors pose a larger problem, requiring potential mitigation strategies. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=5&filename=2015-05-29-Review-followup.pptx&version=1.
 
 "
-49, What are the expected benefits of using a graphite section in the LBNF absorber design? ," The expected benefits of using a graphite section in the LBNF absorber design include the ability to safely handle accident conditions by reducing the maximum energy density and allowing for a longer duration of misdirected beam before reaching critical limits, compared to the current aluminum design. ", https://indico.fnal.gov/event/12228/contributions/13067/attachments/8630/11024/Thoughts_and_questions_on_the_Absorber.pptx
-50, What is the purpose of the RAL 1.5 m cantilevered target simulations in the DUNE experiment? ," The purpose of the RAL 1.5 m cantilevered target simulations is to investigate CP sensitivity and neutrino flux by moving the target upstream and extending its length to compensate, as well as flaring out Horn A's upstream inner conductor. "," https://indico.fnal.gov/event/22528/contributions/68148/attachments/42869/51750/jbRALTarget21Nov2019.pdf.
+49, How does the DUNE experiment plan to match tracks and flashes for accurate reconstruction? ," The DUNE experiment plans to match tracks and flashes by analyzing the correlation between photoelectrons and the central X position of the track, as well as the time difference related to drift velocity. The process involves looping through tracks and photons to find the best match based on these parameters. ", https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=64&filename=15_08_14_FlashT0.pdf&version=3.
+50, What is the primary science program of the DUNE experiment? ," The primary science program of the DUNE experiment includes neutrino oscillation physics, CP symmetry violation in the leptonic sector, mass hierarchy, precision oscillation physics, nucleon decay, supernova burst physics, and precision neutrino interactions studies. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=80&filename=DUNE-Nowak.pptx&version=2.
 
 "
-51, What are the goals of the muon monitor system in the LBNF beamline? ," The goals of the muon monitor system in the LBNF beamline are to monitor beam stability, determine the energy/momentum spectrum of muons, and provide information on the neutrino flux spectrum. "," https://indico.fnal.gov/event/16683/contributions/39024/attachments/24153/29878/muon_overview_mar18.pdf.
+51, What is the purpose of the DUNE Near Detector? , The DUNE Near Detector is designed to constrain systematic errors in the DUNE experiment. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=80&filename=DUNE-Nowak.pptx&version=2.
 
 "
-52, How does the stroboscopic approach enhance the DUNE PRISM Near Detector program? ," The stroboscopic approach enhances the DUNE PRISM Near Detector program by providing Far Detector oscillated time slices, allowing for the measurement of oscillated flux at the near detector and improving the precision of neutrino energy spectrum measurements. "," https://indico.fnal.gov/event/58470/contributions/260157/attachments/163921/217106/DUNE_BIWG_SG_ECA.pdf.
+52, How does the DUNE experiment plan to determine the neutrino mass hierarchy? ," The DUNE experiment plans to determine the neutrino mass hierarchy by optimizing the neutrino beam profile, which can greatly improve sensitivity and reduce the time needed for a definitive measurement. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=80&filename=DUNE-Nowak.pptx&version=2.
 
 "
-53, What is the main challenge in using the current absorber geometry for muon monitoring in the DUNE experiment? ," The main challenge in using the current absorber geometry for muon monitoring is that it significantly influences the shape of the particle distributions in the muon alcove, making it difficult to reliably reconstruct beam parameters such as centroid, intensity, and width. "," https://indico.fnal.gov/event/12228/contributions/13066/attachments/8631/11025/MuonMonAndAbsorber.pdf.
+53, What are the main features of the DUNE experiment's far detector? ," The main features of the DUNE experiment's far detector include a ~40 kt fiducial mass liquid argon detector located 1300 km from the neutrino source, with a staged construction of four ~10 kt detector modules. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=80&filename=DUNE-Nowak.pptx&version=2.
 
 "
-54, What is the purpose of the PPFX package in the context of the DUNE experiment? ," The purpose of the PPFX package in the context of the DUNE experiment is to improve the prediction of DUNE's neutrino flux and the estimation of hadron production uncertainties using hadron production data, thereby reducing the systematic uncertainties associated with the GEANT4-based flux prediction. "," https://indico.fnal.gov/event/14103/contributions/23739/attachments/15270/19453/ppfx_for_dune.docx.
+54, What is the significance of the dual-phase technology in the DUNE experiment? ," The dual-phase technology is recognized by the DUNE collaboration as a potential alternative design for the far detector, which could form the basis of the second or subsequent 10-kt far detector modules if demonstrated successfully. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=80&filename=DUNE-Nowak.pptx&version=2.
 
 "
-55, How does the EMPHATIC data contribute to the PPFX framework for DUNE? ," The EMPHATIC data contributes to the PPFX framework for DUNE by providing measurements of proton-carbon forward scattering, which are used to refine the hadron production models and reduce uncertainties in the neutrino flux predictions. "," https://indico.fnal.gov/event/59445/contributions/264790/attachments/166574/221925/ppfx_emphatic.pdf.
+55, What is the role of the LBNF beamline operations in the DUNE experiment? ," The LBNF beamline operations are responsible for the day-to-day safe running of the accelerator complex, including machine development and maintenance, under the control of the Accelerator Division Operations Department. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=92&filename=LBNF-DUNE_PHAR-20150623.pdf&version=1.
 
 "
-56, What is the significance of the horn geometry optimization in the DUNE beamline design? ," The significance of the horn geometry optimization in the DUNE beamline design is to maximize the neutrino flux and improve CP sensitivity by adjusting the horn shapes and positions, which directly affect the focusing of secondary particles and the resulting neutrino beam profile. "," https://indico.fnal.gov/event/12814/contributions/15959/attachments/10647/13641/LBNF_Optimized_Horn__Module_Design_Update_V2.pdf.
+56, How does the DUNE experiment plan to handle potential hazards during its operations? ," The DUNE experiment plans to handle potential hazards by employing a hazard analysis process that begins at the conceptual design stage, identifying and mitigating hazards early, and using a formal project review process involving ES&H subcommittees. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=92&filename=LBNF-DUNE_PHAR-20150623.pdf&version=1.
 
 "
-57," What are the main components of the LBNF beamline absorber, and what is its primary function? "," The main components of the LBNF beamline absorber include actively cooled aluminum and steel blocks surrounded by concrete. Its primary function is to absorb the residual energy from protons and secondary particles that have not decayed, providing radiation protection and maintaining acceptable temperatures in the absorber. "," https://indico.fnal.gov/event/12228/contributions/13068/attachments/8628/11021/LBNF_Absorber_Requirements-6-2-16_v1.pdf.
+57, What is the purpose of the DUNE FIFE Report? ," The DUNE FIFE Report outlines the organization, workflows, schedules, plans, and computing infrastructure for the DUNE experiment, highlighting areas that work well and those that need improvement. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=12&filename=DUNE_FIFE.pptx&version=2.
 
 "
-58, What is the role of the 3DST detector in the DUNE near detector configuration? ," The role of the 3DST detector in the DUNE near detector configuration is to serve as an active target for neutrino interactions, providing high statistics and precise cross-section measurements, and to monitor the neutrino beam as the only detector always on-axis. "," https://indico.fnal.gov/event/20093/contributions/55408/attachments/34543/42227/3DST_intro.pdf.
+58, What are some of the challenges faced by the DUNE experiment's computing infrastructure? ," Some challenges faced by the DUNE experiment's computing infrastructure include issues with FIFEMON monitoring, BlueArc quotas, gridftp timeouts, and the need for improved documentation and user support. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=12&filename=DUNE_FIFE.pptx&version=2.
 
 "
-59, How does the annular beam option in G4LBNF aim to improve the DUNE beamline performance? ," The annular beam option in G4LBNF aims to improve the DUNE beamline performance by reducing thermal and mechanical stress on the target, potentially leading to a more stable and efficient neutrino beam production. ", https://indico.fnal.gov/event/12781/contributions/15856/attachments/10574/13550/AnnularBeamAugust2016V2.pdf.
-60, What are the main considerations for the engineering design of the three-horn optimized design in the DUNE experiment? ," The main considerations include acceptable horn lengths, the need for a thicker neck wall for Horn A due to joule heating, the requirement for welds and spider supports, and the potential cost and limitations associated with nickel plating. "," https://indico.fnal.gov/event/11316/contributions/7817/attachments/5241/6850/DUNE_BeamMeeting_21January2016.pdf.
+59, What is the focus of the Preliminary Hazard Analysis Report for the DUNE experiment? ," The focus of the Preliminary Hazard Analysis Report for the DUNE experiment is to qualitatively evaluate each hazard area, identify initiators and consequences, establish pre- and post-mitigation risk categories, and ensure that potential risks from operations and maintenance are acceptable. ", https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=92&filename=LBNF-DUNE_PHAR-20150623.pdf&version=1.
+60, What is the purpose of the Interface Control Document (ICD) in the DUNE experiment? ," The Interface Control Document (ICD) provides complete information about the technical and programmatic interfaces between the DUNE Far Detector and the LBNF Argon Systems, ensuring proper configuration management and coordination between these entities. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=77&filename=Interface%20Control%20Document%2077.pdf&version=3
 
 "
-61, What is the purpose of the LBNF Hadron Absorber in the DUNE experiment? ," The LBNF Hadron Absorber is designed to operate with minimal maintenance during the experiment's lifetime, support beam power up to 2.4 MW, sustain beam-energy deposition under normal and accident conditions, provide radiation protection, and allow for the replacement of core blocks in case of unforeseen failures. "," https://indico.fnal.gov/event/12228/contributions/13069/attachments/8629/11022/B02-12-Hartsell-Absorber.pptx.
+61, What are the main components covered under the Electronics/Readout conceptual design for the DUNE experiment? ," The Electronics/Readout conceptual design includes the management and safety of electronics, electrical design and characterization of cables and bases, front-end electronics, trigger systems, data acquisition systems, monitoring and control systems, and power, racks, and cooling systems. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=93&filename=Preliminary%20WBS_Element%20and%20Dictionary-06082023.xlsx&version=1
 
 "
-62, What are the main differences between the G4LBNF and MARS simulations in the DUNE experiment? ," The main differences include variations in the muon neutrino spectra, discrepancies in the geometry and magnetic field descriptions of horn A and C, and differences in the treatment of pion and muon decays. "," https://indico.fnal.gov/event/14355/contributions/25013/attachments/15915/20208/neut2017.pdf.
+62, What is the focus of the SiPM R&D conducted by UTA for the DUNE experiment? ," The SiPM R&D at UTA focuses on the coupling between scintillation counters and SiPMs, ensuring mechanical stability and transmission efficiency, and characterizing various SiPMs with scintillators to optimize the readout scheme for the DUNE experiment. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=18&filename=UTA-SiPM-RnD-061215.pptx&version=1
 
 "
-63, What are the methods used to determine beam focusing uncertainties in the DUNE experiment? ," The methods include running sets of simulations from -5σ to 5σ, combining X and Y uncertainties in quadrature, fitting ND and FD flux uncertainties as a function of σ, and taking the best χ²/dof to average the absolute value of distance ±1σ values of the best fit. "," https://indico.fnal.gov/event/44538/contributions/192084/attachments/131838/161596/20200723_BeamFocusingUncert.pdf.
+63, What is the purpose of the document migration from LBNE docdb to DUNE docdb? ," The document migration from LBNE docdb to DUNE docdb aims to transfer essential documents needed for reviews and active documents requiring maintenance or updates, ensuring that the DUNE project has access to relevant and up-to-date documentation. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=99&filename=docdb-migration-instructions.pptx&version=2
 
 "
-64, What is the goal of the beam optimization process at Berkeley for the DUNE experiment? ," The goal of the beam optimization process is to maximize CP sensitivity by optimizing the placement of the target and the shape of focusing magnets, using Geant4 simulations and FastMC sensitivity calculations. "," https://indico.fnal.gov/event/10797/contributions/5267/attachments/3810/5070/2015-11-04_Plan_for_Beam_Optimization_at_Berkeley.pdf.
+64, What is the role of the Near Site Conventional Facilities (NSCF) in the DUNE project? ," The Near Site Conventional Facilities (NSCF) are responsible for the construction and design management of the conventional facilities required for the DUNE project, including overseeing subcontracts and coordinating with various stakeholders. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=46&filename=Near%20Site%20CF%20Organization_including%20names%20and%20WBS.pdf&version=32
 
 "
-65, Why is it challenging to compute the hadron flux for the DUNE experiment? ," It is challenging due to the complexity of hadron production models, the lack of data for certain interactions, and the need to model both focusing uncertainties and hadronic collisions. "," https://indico.fnal.gov/event/13305/contributions/18658/attachments/12325/15634/talkMotivationSpectrometer.pdf.
+65, What are the responsibilities of the Far Site ESH Coordinator in the DUNE project? ," The Far Site ESH Coordinator is responsible for overseeing environmental, safety, and health (ESH) aspects at the far site, ensuring compliance with safety regulations and coordinating with other project managers and subcontractors. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=45&filename=LBNF%20Far%20Site%20Cryo%20Construction-ESH%20Oversight_including%20names%20and%20WBS.pdf&version=39
 
 "
-66, What are the main improvements in Geant4 version 4.10.1 for the DUNE experiment? ," The improvements include bug fixes, more accurate physics lists, support for multi-threading, and a more accurate production yield for neutrinos from kaons. "," https://indico.fnal.gov/event/11158/contributions/6962/attachments/4651/6083/StatusDec2015.pdf.
+66, What is the significance of the LAr Cryogenics System in the DUNE experiment? ," The LAr Cryogenics System is crucial for the DUNE experiment as it involves the design, construction, and operation of the cryogenic systems necessary for maintaining the liquid argon environment required for the detector's operation. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=93&filename=Preliminary%20WBS_Element%20and%20Dictionary-06082023.xlsx&version=1
 
 "
-67, What is the purpose of the muon monitors in the DUNE experiment? ," The muon monitors are used to monitor the effects of beam profile changes, understand the correlation of muon data to the neutrino beam, and help understand horn current variation effects. "," https://indico.fnal.gov/event/21527/contributions/63208/attachments/39643/47979/LBNF_beam_meeting.pdf.
+67, What are the main tasks involved in the LAr Installation & Commissioning for the DUNE experiment? ," The LAr Installation & Commissioning involves pre-installation planning, detector installation, commissioning, coordination with external parties, and development of the commissioning plan, ensuring all systems are ready for operation. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=93&filename=Preliminary%20WBS_Element%20and%20Dictionary-06082023.xlsx&version=1
 
 "
-68, What are the design objectives for the helium-cooled graphite target concepts in the DUNE experiment? ," The design objectives include creating a 4λ long total graphite target, using helium cooling similar to T2K, and investigating replaceable target mounting concepts to minimize support material. "," https://indico.fnal.gov/event/14355/contributions/25012/attachments/15916/20209/2017_03_15_RAL_target_proposal-v3.pptx.
+68, How does the DUNE project ensure the purity of Liquid Argon within the cryostat? , The DUNE project ensures the purity of Liquid Argon within the cryostat by providing filtration systems to meet contamination requirements and monitoring the infiltration rate of electronegative contaminants like oxygen and nitrogen. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=77&filename=Interface%20Control%20Document%2077.pdf&version=3
 
 "
-69, What is the purpose of the gas-filled RF hadron monitor in the DUNE experiment? ," The gas-filled RF hadron monitor is designed to be radiation robust and accurate, with no space charge effect, to measure the permittivity shift by observing RF modulation. ", https://indico.fnal.gov/event/11447/contributions/8486/attachments/5678/7362/progress020416.pdf.
-70, What is the purpose of implementing the NA61 60 GeV pion incident data into PPFX for the DUNE experiment? , The purpose is to incorporate the NA61 60 GeV pion incident data into PPFX to improve the accuracy of the DUNE flux predictions by accounting for uncertainties and systematic covariances in the charged pion interactions. ," https://indico.fnal.gov/event/52307/contributions/230280/attachments/150225/193677/Update_Nilay.pdf.
+69, What is the purpose of the Water System conceptual design in the DUNE experiment? ," The Water System conceptual design covers the design of the Water Supply and Purification Plant for the Water Cherenkov Detector subsystem, including material compatibility testing and ensuring the system meets the requirements for long-term operation. ", https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=93&filename=Preliminary%20WBS_Element%20and%20Dictionary-06082023.xlsx&version=1
+70, What is the significance of measuring CP violation in the neutrino sector for the DUNE experiment? ," Measuring CP violation in the neutrino sector is significant for the DUNE experiment because it could provide insights into the baryon-antibaryon asymmetry in the universe. A precise measurement or stringent limit on CP violation would be interesting and challenging for theorists, as it may indicate a connection between CP violation in the lepton sector and the observed matter-antimatter imbalance. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=29&filename=ahep.pdf&version=5
 
 "
-71, How does the DUNE experiment plan to address the systematic uncertainties in neutrino flux predictions? ," The DUNE experiment plans to address systematic uncertainties in neutrino flux predictions by using a covariance matrix of the fluxes in energy bins, which is constrained with a near detector to estimate sensitivities. "," https://indico.fnal.gov/event/13305/contributions/18657/attachments/12326/15635/DUNE_WeeklyBeam_Fields_10Nov2016.pdf.
+71, How does the DUNE experiment plan to address systematic uncertainties in neutrino measurements? ," The DUNE experiment plans to address systematic uncertainties in neutrino measurements by using spectral analysis, which requires absolute and relative flux normalization. The goal is to achieve a 2% uncertainty on ν_e signal normalization relative to the ν_μ rate, added in quadrature with an overall 5% normalization. Improvements in neutrino interaction models and the use of liquid Argon detectors in test beams are also anticipated to reduce uncertainties. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=29&filename=ahep.pdf&version=5
 
 "
-72, What is the significance of the uniform beam simulation technique for the DUNE experiment? ," The uniform beam simulation technique allows for efficient beam scan studies by generating a single high-statistics simulation sample, which can be used to study different beam configurations and reduce computational overhead. "," https://indico.fnal.gov/event/59551/contributions/265223/attachments/166484/221778/Uniform_beam_sim_SG.pdf.
+72, What are the main components of the Near Site Cryogenics Infrastructure for the DUNE experiment? ," The main components of the Near Site Cryogenics Infrastructure for the DUNE experiment include the Cryogenics Process Infrastructure, LHe Controls, Management, and LAr systems. These components are essential for maintaining the cryogenic conditions necessary for the experiment's operations. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=46&filename=Near%20Site%20Cryo_with%20names%20and%20WBS.pdf&version=32
 
 "
-73, What is the role of the LBNF Beamline in the DUNE experiment? ," The LBNF Beamline is responsible for delivering a high-intensity neutrino beam to the DUNE detectors, and its design and optimization are crucial for maximizing the physics potential of the experiment. "," https://indico.fnal.gov/event/16367/contributions/37190/attachments/23082/28620/LBNF-Beamline_BIWG_Feb8_2018_VP_v2.pdf.
+73, What is the purpose of the Blurred Clustering algorithm in the DUNE experiment? ," The purpose of the Blurred Clustering algorithm in the DUNE experiment is to form initial 2D clusters within the LArSoft framework. It aims to ensure smooth and isotropic clustering by filling in 'holes' and removing 'peninsulas' to achieve a smooth cluster edge. The algorithm is designed to convert clusters of bins into clusters of recob::Hits, removing fake hits and ensuring the final clusters are made solely from initial hits. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=54&filename=blurredClustering.pdf&version=1
 
 "
-74, How does the DUNE experiment plan to use muon monitors in the neutrino beamline? ," The DUNE experiment plans to use muon monitors to observe muons that emerge from the back of the absorber, which helps constrain the neutrino flux by correlating muon production with neutrino production. "," https://indico.fnal.gov/event/13662/contributions/20860/attachments/13540/17262/Requirements-and-absorber.key.pdf.
+74, How does the DUNE experiment plan to qualify SiPMs for operation in cryogenic environments? , The DUNE experiment plans to qualify SiPMs for operation in cryogenic environments by thermally cycling a population of the devices and subjecting another population to long-term testing at cryogenic temperatures. These tests aim to ensure the reliability of SiPMs in cold conditions and to project failure rates. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=8&filename=PD_Status_May29_2015.pdf&version=1
 
 "
-75, What is the purpose of the DUNE PRISM program in the context of neutrino energy measurement? ," The DUNE PRISM program aims to reduce uncertainties in neutrino energy measurement by using a range of different incident neutrino energy spectra, allowing for better calibration of the relationship between observed and true neutrino energies. "," https://indico.fnal.gov/event/19231/contributions/51047/attachments/31789/38973/NDFluxHornConfigs_OffAxis2.pdf.
+75, What are the primary criteria for the optical detector down-select in the DUNE experiment? ," The primary criteria for the optical detector down-select in the DUNE experiment are relative performance and cost. Other considerations include the complexity of production and handling, as well as simulation and reconstruction performance comparisons between designs. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=8&filename=PD_Status_May29_2015.pdf&version=1
 
 "
-76, What is the impact of the optimized 3-horn design on the DUNE experiment's neutrino flux? ," The optimized 3-horn design is intended to improve the neutrino flux by focusing more pions into the decay pipe, thereby increasing the neutrino yield and enhancing the experiment's sensitivity to oscillation parameters. "," https://indico.fnal.gov/event/11997/contributions/11108/attachments/7274/9370/horn_optimization_studies.pdf.
+76, What are the challenges associated with using SiPMs in the DUNE experiment's photon detection system? ," The challenges associated with using SiPMs in the DUNE experiment's photon detection system include potential effects like premature aging in cryogenic environments, determining an acceptable failure rate, and ensuring that the chosen SiPMs meet reliability requirements. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=8&filename=PD_Status_May29_2015.pdf&version=1
 
 "
-77, How does the DUNE experiment plan to use the NA61/SHINE data for improving hadron production uncertainties? ," The DUNE experiment plans to use the NA61/SHINE data to improve hadron production uncertainties by incorporating the data into PPFX, which will help refine the predictions of particle yields and interactions in the neutrino beamline. "," https://indico.fnal.gov/event/62288/contributions/280697/attachments/173311/234560/LuRen_PPFX_20231205.pdf.
+77, What is the role of the Cluster Merging algorithm in the DUNE experiment? , The role of the Cluster Merging algorithm in the DUNE experiment is to combine fragmented clusters associated with the same track into complete tracks or showers. It uses Principal Component Analysis (PCA) to determine alignment and considers factors like cluster size and separation to justify merging. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=54&filename=blurredClustering.pdf&version=1
 
 "
-78, What is the significance of the beam alignment studies for the DUNE experiment? ," Beam alignment studies are significant for the DUNE experiment as they help quantify the impact of misalignments on the neutrino flux, ensuring that the beam is accurately directed to maximize the experiment's sensitivity to neutrino oscillations. "," https://indico.fnal.gov/event/11786/contributions/10050/attachments/6556/8414/pmadigan_BeamAlignment.pdf.
+78, How does the DUNE experiment plan to improve the performance of its photon detection system? ," The DUNE experiment plans to improve the performance of its photon detection system by developing a requirement for SiPM reliability, completing simulation and reconstruction development, and conducting tests with baseline configurations. The experiment also considers alternative designs and ongoing R&D to enhance system performance. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=38&filename=DPF-DUNE-PhotoDet-150804.pdf&version=3
 
 "
-79, How does the DUNE experiment plan to address the challenges of neutrino energy reconstruction? , The DUNE experiment plans to address the challenges of neutrino energy reconstruction by using a combination of near detector measurements and linear combinations of different neutrino fluxes to better calibrate the relationship between observed and true neutrino energies. , https://indico.fnal.gov/event/14429/contributions/25282/attachments/16050/20364/ndflux_032017.pdf.
-80, What is the purpose of the muon monitor array in the DUNE experiment? ," The purpose of the muon monitor array is to find the correlation between muon monitor data and simulation, and to use a combination of data and simulation to identify issues with the beam, such as the incoming proton beam and neutrino flux. "," https://indico.fnal.gov/event/21688/contributions/64155/attachments/40338/48894/LBNF_BIWG.pdf.
+79, What are the expected benefits of using light guides for photon detection in the DUNE experiment? ," The expected benefits of using light guides for photon detection in the DUNE experiment include large active-area UV-collecting capabilities, low-voltage SiPM bias, and scalability. Light guides are designed to efficiently collect and transport scintillation light to SiPMs, improving the overall photon detection efficiency. ", https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=38&filename=DPF-DUNE-PhotoDet-150804.pdf&version=3
+80, What was the purpose of the naming contest discussed in the ELBNF phone meeting? ," The purpose of the naming contest was to decide on a name for the experiment, with the voter's first choice being DUNE, which stands for Deep Underground Neutrino Experiment. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=14&filename=ibminutes-13mar2015.txt&version=1.
 
 "
-81, How does the LBNF Absorber design manage the heat generated by the beam? , The LBNF Absorber design manages the heat generated by the beam through an air-cooled system designed to remove 225 kW of energy from the surrounding absorber core blocks and steel shielding. ," https://indico.fnal.gov/event/12228/contributions/13068/attachments/8628/11020/LBNF_Absorber_Design-6-2-16.pdf.
+81, What is the role of the DUNE Technical Coordinator in the Change Control Process? ," The DUNE Technical Coordinator is responsible for participating in the Project Change Control Board, chairing the DUNE Change Control Board, advising on pending changes, overseeing project configuration management activities, and ensuring that changes to controlled documents are recorded and tracked. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=82&filename=2019-10-14-LBNF%20DUNE%20Configuration%20Management%20Plan.docx&version=10.
 
 "
-82, What is the significance of the horn current in the DUNE experiment's neutrino beamline? ," The horn current is significant in the DUNE experiment's neutrino beamline because it affects the momentum spectra for muons, with both the flux and peak location changing with different horn currents. "," https://indico.fnal.gov/event/21688/contributions/64155/attachments/40338/48894/LBNF_BIWG.pdf.
+82, What is the primary goal of the DUNE experiment as described in the experimental program document? ," The primary goal of the DUNE experiment is to conduct a comprehensive investigation of neutrino oscillations to test CP violation in the lepton sector, determine the ordering of neutrino masses, and test the three-neutrino paradigm. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=28&filename=dune-eps-procs.pdf&version=2.
 
 "
-83, What is the role of the EMPHATIC experiment in improving DUNE's flux uncertainties? ," The EMPHATIC experiment aims to improve DUNE's flux uncertainties by conducting hadron production measurements, including using a replica target and horn at the Fermilab Test Beam Facility to validate the beam simulation and uncertainties. "," https://indico.fnal.gov/event/45399/contributions/196248/attachments/134143/165856/ECA_Sept2020.pdf.
+83, How does the DUNE experiment plan to study neutrino oscillations? ," The DUNE experiment plans to study neutrino oscillations using a new, more intense beam of neutrinos from Fermilab to a 40kt liquid argon Time Projection Chamber located deep underground at the Sanford Underground Research Facility. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=28&filename=dune-eps-procs.pdf&version=2.
 
 "
-84, How does the DUNE experiment plan to use the Near Detector to predict the Far Detector flux? ," The DUNE experiment plans to use a beam matrix method to predict the Far Detector flux from the Near Detector flux, which involves constructing a transfer matrix based on the prediction for the neutrino flux at the Near Detector. "," https://indico.fnal.gov/event/11383/contributions/8083/attachments/5382/7036/ICHEP_Abstracts.docx.
+84, What are the responsibilities of the LBNF Project Manager in the Change Control Process? ," The LBNF Project Manager is responsible for chairing the Project Change Control Board, advising on pending changes, overseeing project configuration management activities, and ensuring that changes to controlled documents are recorded and tracked. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=82&filename=2019-10-14-LBNF%20DUNE%20Configuration%20Management%20Plan.docx&version=10.
 
 "
-85, What is the impact of the target assembly on neutrino flux in the DUNE experiment? ," The target assembly, including components like the Inconel spring and aluminum support structures, affects the neutrino flux, and its removal was studied to understand its contribution to flux loss. "," https://indico.fnal.gov/event/12707/contributions/15582/attachments/10421/13373/Tyler_Johnson_Presentation_8-11-16-1.pptx.
+85, What are the technical and programmatic interfaces described in the Interface Control Document? ," The Interface Control Document provides complete information about the technical and programmatic interfaces between two entities, including tables that link to other controlled documents or drawings defining entity configurations and standards. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=100&filename=Interface%20Control%20Document%20100.docx&version=3.
 
 "
-86," What are the main components of the LBNF Absorber core, and what are their functions? "," The main components of the LBNF Absorber core include the Aluminum Spoiler, Aluminum Mask blocks, sculpted Aluminum blocks, solid Aluminum blocks, and Steel blocks, which are designed to absorb and manage the energy from the beam. "," https://indico.fnal.gov/event/12228/contributions/13068/attachments/8628/11020/LBNF_Absorber_Design-6-2-16.pdf.
+86, What is the significance of the photon detector reconstruction efficiency study for the DUNE experiment? ," The photon detector reconstruction efficiency study is significant for the DUNE experiment as it estimates the reconstruction efficiency of photon detectors, which is crucial for accurately detecting and analyzing neutrino interactions. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=26&filename=pd_reco_efficiency.pdf&version=1.
 
 "
-87, How does the DUNE experiment plan to address the uncertainties in hadron production for flux predictions? ," The DUNE experiment plans to address uncertainties in hadron production for flux predictions by conducting new measurements with NA61/SHINE and EMPHATIC, aiming to reduce reliance on assumptions and improve the accuracy of flux predictions. "," https://indico.fnal.gov/event/45399/contributions/196248/attachments/134143/165856/ECA_Sept2020.pdf.
+87, What are the main components of the DUNE experiment's beam neutrino physics goals? ," The main components of the DUNE experiment's beam neutrino physics goals include sensitivity to the CP-violating phase δ and the neutrino mass hierarchy, achieved through a tunable energy beam and a long baseline to enhance matter effects. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=28&filename=dune-eps-procs.pdf&version=2.
 
 "
-88, What is the purpose of the beam focusing uncertainty studies in the DUNE experiment? ," The purpose of the beam focusing uncertainty studies in the DUNE experiment is to estimate the impact of beamline geometry and focusing element deviations on the neutrino flux, using simulations to understand and quantify these uncertainties. "," https://indico.fnal.gov/event/23731/contributions/73704/attachments/46093/55411/20200319_MMSim_and_BeamFocusingUncert_fin.pdf.
+88, How does the DUNE experiment plan to utilize the near detector? ," The DUNE experiment plans to utilize the near detector to precisely measure the pre-oscillation neutrino beam, establish a precise ""before and after"" measurement, and study neutrino interactions to expand knowledge of how neutrinos interact with matter. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=28&filename=dune-eps-procs.pdf&version=2.
 
 "
-89, How does the DUNE experiment utilize muon monitors to track beam conditions? ," The DUNE experiment utilizes muon monitors to track beam conditions by analyzing the muon flux and its correlation with beam parameters, allowing for the identification of beam misalignments and other issues. ", https://indico.fnal.gov/event/13264/contributions/18275/attachments/12067/15343/MuonUpdate.pdf.
-90, What is the primary goal of the forward hadron scattering experiment at the CERN PS test beam? ," The primary goal is to study hadron interactions in the momentum range of 1-10 GeV/c, which is complementary to NA61 and EMPHATIC experiments. "," https://indico.fnal.gov/event/49259/contributions/216083/attachments/143655/181885/Hadron-scattering-CERN-PS-WCTE.pdf.
+89, What are the responsibilities of the DUNE Consortia Leaders in the Change Control Process? ," The DUNE Consortia Leaders are responsible for serving on the DUNE Change Control Board, maintaining configuration management control over their area of responsibility, assessing impacts of proposed changes, and notifying the DUNE Technical Coordinator of any need to change documentation or systems. ", https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=82&filename=2019-10-14-LBNF%20DUNE%20Configuration%20Management%20Plan.docx&version=10.
+90, What is the role of the Co-Spokespersons in the DUNE collaboration? ," The Co-Spokespersons are the scientific leaders and representatives of the collaboration, sharing leadership, authority, and responsibilities equally. They prepare agendas for collaboration meetings, work closely with the Executive Board on major collaboration matters, seek advice from the Institutional Board, and bring major issues to the Collaboration General Assembly for discussions. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=1&filename=GDC_v9.docx&version=17.
 
 "
-91, How does the muon monitor system contribute to the DUNE experiment? ," The muon monitor system provides spill-by-spill beam monitoring and helps set neutrino flux constraints, ensuring good neutrino data quality. "," https://indico.fnal.gov/event/12303/contributions/13283/attachments/8742/11149/MuonMonAndAbsorber_v2.pdf.
+91, What is the primary scientific objective of the DUNE experiment? ," The primary scientific objective of the DUNE experiment is to address fundamental open questions in particle physics and astroparticle physics, including neutrino oscillation physics to search for CP violation in the leptonic sector, determine the ordering of the neutrino mass eigenstates, make precision measurements of oscillation parameters, test the three-neutrino paradigm, search for nucleon decay, and study neutrino astrophysics. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=48&filename=WG1-Strait-DUNE_Physics.pdf&version=5.
 
 "
-92, What is the significance of the absorber design in relation to muon monitors in the DUNE experiment? , The absorber design affects the muon monitors by shaping the particle distributions and potentially complicating the measurement of beam parameters. ," https://indico.fnal.gov/event/12303/contributions/13283/attachments/8742/11149/MuonMonAndAbsorber_v2.pdf.
+92, How does the DUNE experiment plan to achieve its scientific goals? ," The DUNE experiment plans to achieve its scientific goals by utilizing a massive liquid argon time-projection chamber (LAr TPC) located at a depth of 4,300 meters water equivalent at the Sanford Underground Research Facility, a high-power, broad-band, sign-selected neutrino beam at Fermilab, and a precision neutrino detector located on the Fermilab site. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=48&filename=WG1-Strait-DUNE_Physics.pdf&version=5.
 
 "
-93, What is the purpose of the Water Cherenkov Test Experiment (WCTE) at CERN PS? ," The WCTE at CERN PS serves as a particle identification and calorimetric detector, capable of μ/π separation and other particle identification tasks. "," https://indico.fnal.gov/event/49259/contributions/216083/attachments/143655/181885/Hadron-scattering-CERN-PS-WCTE.pdf.
+93, What is the purpose of the LBNF/DUNE Change Request Process? ," The purpose of the LBNF/DUNE Change Request Process is to review documentation for completeness, assess cost and schedule implications, consult change control thresholds and authorities tables to establish workflow and approval levels, and ensure that changes accommodate project interfaces, are sufficiently described and justified, have technical, cost, and/or schedule merit, and are ready for recommendation to the next level. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=49&filename=LBNF-DUNE%20Change%20Request%20Process_Oct%202022.pdf&version=24.
 
 "
-94, How does the LBNF beamline design contribute to the DUNE experiment's goals? ," The LBNF beamline design, with its optimized three-horn system and long target, is tailored to enhance sensitivity to CP violation in neutrino oscillations. "," https://indico.fnal.gov/event/60740/contributions/272539/attachments/169902/228228/LBNF%20Optimization%20-%20Leon.pdf.
+94, What is the role of the Executive Board in the DUNE collaboration? ," The Executive Board is the main decision-making body of the collaboration, responsible for setting scientific and technical objectives and priorities of the DUNE collaboration, taking into account financial aspects and other resources. It establishes procedures for making technical choices and oversees progress and developments in various projects. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=1&filename=GDC_v9.docx&version=17.
 
 "
-95, What role does the Hydrostatic Leveling System (HLS) play in the LBNF beamline? ," The HLS monitors the vertical position of beam components, such as horns, to ensure proper alignment and stability during operation. "," https://indico.fnal.gov/event/45399/contributions/196247/attachments/134112/165799/2020-09-10_HLS-BIWG-mtg.pdf.
+95, What are the responsibilities of the LBNF/DUNE-US Acquisition Officer and Procurement Managers? ," The LBNF/DUNE-US Acquisition Officer and Procurement Managers are responsible for ensuring that all project FRA procurements comply with all FRA and DOE requirements, and they serve as the primary contact between the Project Managers and the FRA Finance/Procurement Department. They have oversight of the work of matrixed procurement staff and may coordinate procurements with other institutions as appropriate. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=81&filename=LBNF-DUNE%20Procurement%20Plan%20-%20May%202020.pdf&version=13.
 
 "
-96, What is the impact of the NA61/SHINE experiment on the DUNE experiment's neutrino flux predictions? , The NA61/SHINE experiment provides crucial hadron production data that helps refine and reduce uncertainties in DUNE's neutrino flux predictions. ," https://indico.fnal.gov/event/69561/contributions/316132/attachments/187905/259208/NEAT_2025_Fields_DUNEFlux.pdf.
+96, How does the DUNE experiment plan to handle systematic uncertainties in its measurements? ," The DUNE experiment plans to handle systematic uncertainties in its measurements by using a near detector to constrain these uncertainties, which requires the capability to precisely measure exclusive neutrino interactions of all four species in the beam. This approach naturally results in a self-contained non-oscillation neutrino physics program that exploits the intense LBNF beam. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=48&filename=WG1-Strait-DUNE_Physics.pdf&version=5.
 
 "
-97, How does the EMPHATIC experiment complement the NA61/SHINE experiment for DUNE's needs? ," The EMPHATIC experiment focuses on low-energy and forward-angle measurements, providing additional data to improve hadron production models for DUNE. "," https://indico.fnal.gov/event/69561/contributions/316132/attachments/187905/259208/NEAT_2025_Fields_DUNEFlux.pdf.
+97, What is the significance of the DUNE near detector's design? ," The significance of the DUNE near detector's design lies in its ability to constrain systematic uncertainties for the oscillation analysis, which requires precise measurement capabilities for exclusive neutrino interactions. The reference design is a NOMAD-inspired Fine-Grained Tracker, which includes a central straw-tube tracker with embedded nuclear targets and a lead-scintillator sampling electromagnetic calorimeter inside a large-aperture dipole magnet. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=48&filename=WG1-Strait-DUNE_Physics.pdf&version=5.
 
 "
-98, What is the significance of the muon energy spectrum measurements for the DUNE experiment? ," Measuring the muon energy spectrum is crucial for identifying beam problems and accurately determining the neutrino flux, especially at energies down to 3-4 GeV. "," https://indico.fnal.gov/event/13017/contributions/16762/attachments/11261/14380/MuonMonitorsUpdate.pdf.
+98, What is the process for electing a new Co-Spokesperson in the DUNE collaboration? ," The process for electing a new Co-Spokesperson in the DUNE collaboration involves the Institutional Board Chair initiating the election process by establishing a Co-Spokesperson Search Committee, which receives nominations and produces a list of candidates willing to stand for election. The election is held electronically using the Preferential Voting System, and in the case of a single candidate, a simple Yes or No vote is conducted. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=1&filename=GDC_v9.docx&version=17.
 
 "
-99, How does the PPFX package contribute to the DUNE experiment's flux predictions? , PPFX uses external hadron production data to correct and improve the accuracy of DUNE's neutrino flux predictions by accounting for uncertainties in hadron interactions. , https://indico.fnal.gov/event/12458/contributions/14262/attachments/9490/12171/DUNE_FOR_PPFX.pdf.
-100, What is the primary goal of the DUNE experiment? ," The primary goal of the DUNE experiment is precision measurements of 3-flavor neutrino mixing parameters, including the CP-violating phase and mass hierarchy. "," https://indico.fnal.gov/event/57403/contributions/255633/attachments/162260/214465/NA61%2B%2B_2022_Fields_DUNENeeds.pdf.
+99, What are the main components of the DUNE far detector? ," The main components of the DUNE far detector include a 40 kt fiducial mass liquid argon time-projection chamber (LAr TPC) located deep underground at the Sanford Underground Research Facility. The detector is divided into four independent 10 kt modules, each housed in its own cavern, allowing for staged construction and flexibility for the evolution of LAr TPC technology. ", https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=48&filename=WG1-Strait-DUNE_Physics.pdf&version=5.
 
-"
-101, How does the DUNE experiment plan to correct its neutrino flux predictions? ," The DUNE experiment plans to correct its neutrino flux predictions through reweighting using the PPFX package, which applies weights to interactions based on external data constraints. "," https://indico.fnal.gov/event/57403/contributions/255633/attachments/162260/214465/NA61%2B%2B_2022_Fields_DUNENeeds.pdf.
-
-"
-102, What is the significance of replica target measurements for the DUNE experiment? , Replica target measurements are considered the gold standard of hadron production measurements for neutrino experiments and are crucial for accurately predicting neutrino fluxes in the DUNE experiment. ," https://indico.fnal.gov/event/57403/contributions/255633/attachments/162260/214465/NA61%2B%2B_2022_Fields_DUNENeeds.pdf.
-
-"
-103, What are the main components of the LBNF beamline for the DUNE experiment? ," The main components of the LBNF beamline for the DUNE experiment include a primary proton beam of 60-120 GeV, an initial beam power of 1.2 MW upgradable to 2.4 MW, a wide-band beam based on the NuMI design, and a decay pipe filled with helium. "," https://indico.fnal.gov/event/18647/contributions/48238/attachments/30037/36988/nuint2018_bishai.pdf.
-
-"
-104, What is the purpose of the muon monitors in the DUNE experiment? ," The purpose of the muon monitors in the DUNE experiment is to measure the intensity, spatial profile, and spectrum of muons downstream of the hadron absorber to provide quick feedback on the beam quality. "," https://indico.fnal.gov/event/13662/contributions/20860/attachments/13539/17261/Response.pdf.
-
-"
-105, How does the DUNE experiment plan to handle uncertainties in hadron production? ," The DUNE experiment plans to handle uncertainties in hadron production by using a ""Many-Universes"" method to propagate uncertainties from external data constraints to the flux predictions. "," https://indico.fnal.gov/event/57403/contributions/255633/attachments/162260/214465/NA61%2B%2B_2022_Fields_DUNENeeds.pdf.
-
-"
-106, What is the role of the PPFX package in the DUNE experiment? ," The PPFX package is used in the DUNE experiment to provide central value corrections and a vector of weights to calculate hadron production uncertainties, using data from experiments like MIPP and NA49. "," https://indico.fnal.gov/event/70046/contributions/318401/attachments/189245/261272/DUNE_26June.pdf.
-
-"
-107, Why is it important for the DUNE experiment to have accurate correlation matrices for hadron production data? ," Accurate correlation matrices for hadron production data are important for the DUNE experiment because they significantly impact the flux uncertainties, and guessing at these correlations can lead to inaccurate predictions. "," https://indico.fnal.gov/event/57403/contributions/255633/attachments/162260/214465/NA61%2B%2B_2022_Fields_DUNENeeds.pdf.
-
-"
-108, What are the expected benefits of using a gas-filled RF monitor in the LBNF beamline? ," The expected benefits of using a gas-filled RF monitor in the LBNF beamline include radiation robustness, remote calibration capability, and the ability to provide absolute beam profile measurements. "," https://indico.fnal.gov/event/13816/contributions/21963/attachments/14265/18170/Hadron020917_KYonehara.pptx.
-
-"
-109, What are the main challenges associated with the ionization chambers used in the DUNE experiment's hadron monitor? ," The main challenges associated with the ionization chambers used in the DUNE experiment's hadron monitor include degradation due to radiation damage, non-linear response at high proton flux, and the need for long-term stability. ", https://indico.fnal.gov/event/13816/contributions/21963/attachments/14265/18170/Hadron020917_KYonehara.pptx.
-110, What is the primary goal of the LBNF/DUNE Flux Spectrometer Concept? , The primary goal of the LBNF/DUNE Flux Spectrometer Concept is to measure the absolute neutrino parent flux after the focusing horns to an accuracy of 1 to 2%. ," https://indico.fnal.gov/event/13605/contributions/20477/attachments/13316/16928/SpectrometerAnswers.pdf.
-
-"
-111, How does the DUNE experiment plan to address the challenge of wide-band beam for ND cross-section and flux measurements? , The DUNE experiment plans to address the challenge of wide-band beam for ND cross-section and flux measurements by exploring options such as varying horn currents and adding large dipole bending magnets to the LBNF beamline to create narrow-band beams. ," https://indico.fnal.gov/event/16472/contributions/37686/attachments/23381/29001/beam_020718.pdf.
-
-"
-112, What are the potential benefits of installing the spectrometer in an ex situ configuration for the DUNE experiment? ," The potential benefits of installing the spectrometer in an ex situ configuration include measuring the dominant source of flux uncertainties, hadroproduction models, and avoiding the need for low-intensity running and complex support modules required for in situ measurements. "," https://indico.fnal.gov/event/13605/contributions/20477/attachments/13316/16928/SpectrometerAnswers.pdf.
-
-"
-113, What is the impact of varying horn currents on the neutrino flux in the DUNE experiment? ," Varying horn currents can scan different ranges of the beam spectra with the full Near Detector, allowing for the exploration of different energy ranges without requiring additional modifications to the beam or Near Detector. "," https://indico.fnal.gov/event/16472/contributions/37686/attachments/23381/29001/beam_020718.pdf.
-
-"
-114," What is the significance of the CP sensitivity in the DUNE experiment, and how is it affected by the target design? "," The CP sensitivity is significant for measuring CP violation in neutrino oscillations, and it is affected by the target design as different target configurations can lead to variations in neutrino flux and CP sensitivity. "," https://indico.fnal.gov/event/14811/contributions/27837/attachments/17567/22134/HornAdedxTalkJune24V2.pdf.
-
-"
-115, How does the DUNE experiment plan to improve the precision of neutrino flux measurements? , The DUNE experiment plans to improve the precision of neutrino flux measurements by using a flux spectrometer to measure the absolute neutrino parent flux after the focusing horns to an accuracy of 1 to 2%. ," https://indico.fnal.gov/event/13605/contributions/20477/attachments/13316/16928/SpectrometerAnswers.pdf.
-
-"
-116," What are the challenges associated with the in situ option for the DUNE spectrometer, and how might they be addressed? ", Challenges associated with the in situ option include radiological background from the horns and the need for low-intensity running. These might be addressed by using a simplified detector in situ and ensuring precise alignment and positioning. ," https://indico.fnal.gov/event/13605/contributions/20477/attachments/13316/16928/SpectrometerAnswers.pdf.
-
-"
-117, What are the potential impacts of the spectrometer on the operational schedule of the LBNF beamline? ," For the in situ option, the spectrometer is expected to impact the operational schedule by requiring roughly 6% of LBNF running time for installation, running, and removal. "," https://indico.fnal.gov/event/13605/contributions/20477/attachments/13316/16928/SpectrometerAnswers.pdf.
-
-"
-118, How does the DUNE experiment plan to address uncertainties in hadron production models? ," The DUNE experiment plans to address uncertainties in hadron production models by using a spectrometer to measure the hadron flux after the focusing horns, which would help constrain these models. "," https://indico.fnal.gov/event/13605/contributions/20477/attachments/13316/16928/SpectrometerAnswers.pdf.
-
-"
-119, What are the advantages of using a narrow-band beam for the DUNE experiment's Near Detector cross-section measurements? ," The advantages of using a narrow-band beam include improved accuracy in measuring the true neutrino energy, which is crucial for precise cross-section measurements and reducing uncertainties in neutrino energy reconstruction. ", https://indico.fnal.gov/event/16472/contributions/37686/attachments/23381/29001/beam_020718.pdf.
-120, What is the purpose of the DUNE Beam Interface Working Group's to-do list? ," The purpose of the DUNE Beam Interface Working Group's to-do list is to summarize ongoing work within the group, compile tasks that need to be done, keep it updated on Redmine, and identify areas where work is being done, where more work could be done or will be needed, and where no work is currently being done. "," https://indico.fnal.gov/event/20527/contributions/58185/attachments/36422/44324/dune_biwg_update.pdf.
-
-"
-121, What are the design objectives for the LBNF helium-cooled target concept proposal? ," The design objectives for the LBNF helium-cooled target concept proposal include a 4λ (approximately 2 meters) long graphite target fully installed in the first horn, a target radius of 3σ with σ ranging from 1 to 4 mm, and investigating a simplified target that is fully helium-cooled similar to T2K. "," https://indico.fnal.gov/event/14478/contributions/25550/attachments/16201/20526/2017_03_15_RAL_target_proposal-v3b.pptx.
-
-"
-122, What is the goal of the interpolation of hadron production data from NA61? ," The goal of the interpolation of hadron production data from NA61 is to interpolate hadron production data from p+C interactions, specifically focusing on π+ and K+ data, to improve the modeling of hadron production in simulations. "," https://indico.fnal.gov/event/50412/contributions/221486/attachments/145970/186029/NA61KaonUpdate06.pdf.
-
-"
-123, What are the three types of detectors used in the Muon Monitors for the DUNE experiment? ," The three types of detectors used in the Muon Monitors for the DUNE experiment are ionization detector arrays, threshold gas Cherenkov detectors, and stopped muon counters. "," https://indico.fnal.gov/event/10818/attachments/3877/5147/MuonMeeting.pdf.
-
-"
-124, What are the differences between the 2017 and 2020 idealized horn designs for the DUNE experiment? ," The differences between the 2017 and 2020 idealized horn designs for the DUNE experiment include changes in the cylinder dimensions, tapering, and wall thicknesses. The 2020 design features a narrower cylinder with an initial opening and a second half that is tapered, while the 2017 design has a first half that is tapered. "," https://indico.fnal.gov/event/47626/contributions/207930/attachments/139750/175501/Horn_Upgrade_Project_BIWG_Zev.pdf.
-
-"
-125, What are the key considerations for target selection criteria in the DUNE experiment? ," The key considerations for target selection criteria in the DUNE experiment include optimizing physics performance, ensuring target lifetime, managing power density, minimizing radiation damage, and considering the impact on other systems such as the horn and absorber design. "," https://indico.fnal.gov/event/17933/contributions/45144/attachments/28050/34698/2018_08_09_Target_selection_criteria_Densham.pdf.
-
-"
-126, How does MINERvA use PPFX for flux predictions? ," MINERvA uses PPFX by running the g4numi beam simulation to produce Dk2nu files, which are then fed to PPFX to produce flux uncertainties at the center of the MINERvA detector. This process involves generating neutrino energy distributions and universes, which are used for detector simulation and analysis. "," https://indico.fnal.gov/event/57663/contributions/257022/attachments/162887/227274/PPFX_Workshop_2023_MINERvA.pdf.
-
-"
-127, What is the motivation for varying horn currents and configurations in the DUNE experiment? ," The motivation for varying horn currents and configurations in the DUNE experiment is to restrict the wide-band neutrino beam to a more well-defined neutrino energy, which would benefit Near Detector cross-section and flux measurements by improving calibration and reducing uncertainties. "," https://indico.fnal.gov/event/17888/contributions/44942/attachments/27938/34579/NDFluxHornConfigs4.odp.pdf.
-
-"
-128, What is the purpose of using machine learning on muon monitors in the DUNE experiment? ," The purpose of using machine learning on muon monitors in the DUNE experiment is to analyze the muon monitor signals to extract information about the target and beam conditions, allowing for the detection of target changes and improving the accuracy of beam monitoring. "," https://indico.fnal.gov/event/55840/contributions/248378/attachments/158810/208533/BeamMonitor081122.pptx.
-
-"
-129, What was the issue identified with the neutrino flux prediction in the DUNE experiment? ," The issue identified with the neutrino flux prediction in the DUNE experiment was a consistent non-physical bump around 4.5 GeV for all deformations applied to the Inner Conductor for the neutrino flux, which did not exist for the pions, indicating a potential error in the source code or eventRates.C file. ", https://indico.fnal.gov/event/14928/contributions/28500/attachments/17938/22559/nlira_07202017_2.pdf.
-130, What is the main purpose of the PPFX package in the context of neutrino experiments? ," The main purpose of the PPFX package is to predict the neutrino flux, addressing the challenge of accurately modeling neutrino production from hadron decays, especially given the low Q2 interactions and uncertainties in QCD predictions. "," https://indico.fnal.gov/event/57663/contributions/257017/attachments/162842/215341/ppfx_introduction.pdf.
-
-"
-131, How does the PPFX approach differ from previous methods used by neutrino experiments to handle uncertainties in flux predictions? ," The PPFX approach differs by using a non-fitting method where the Monte Carlo is run to determine invariant cross-sections in fine bins, and data/MC ratios are computed, rather than fitting data and MC predictions to a functional form. "," https://indico.fnal.gov/event/57663/contributions/257017/attachments/162842/215341/ppfx_introduction.pdf.
-
-"
-132," What is the significance of the ""many universes"" method in PPFX? "," The ""many universes"" method in PPFX is significant because it allows for the incorporation of uncertainties from hundreds of data points by generating multiple varied datasets, which helps establish the uncertainty and covariance in neutrino flux predictions. "," https://indico.fnal.gov/event/57663/contributions/257017/attachments/162842/215341/ppfx_introduction.pdf.
-
-"
-133, What role does the NA61 data play in the PPFX framework? , The NA61 data provides crucial hadron production measurements that are used to constrain the simulation and improve the accuracy of neutrino flux predictions in the PPFX framework. ," https://indico.fnal.gov/event/57663/contributions/257017/attachments/162842/215341/ppfx_introduction.pdf.
-
-"
-134," How does PPFX handle interactions that occur in materials other than carbon, such as aluminum or iron? "," PPFX handles interactions in materials other than carbon by tabulating the material particles have passed through and applying corrections for these materials, such as aluminum and iron, using InteractionReweighting objects. "," https://indico.fnal.gov/event/57663/contributions/257017/attachments/162842/215341/ppfx_introduction.pdf.
-
-"
-135, What is the impact of the skin effect on the magnetic field distribution in the DUNE beam optimization? ," The skin effect causes the magnetic field to decay as a 1/r function outside the inner conductor and rise linearly inside the inner conductor, affecting the current distribution and potentially impacting the neutrino flux. "," https://indico.fnal.gov/event/14537/contributions/25760/attachments/16312/20649/Skin_effect.pdf.
-
-"
-136, What is the purpose of the genetic optimization algorithm in the context of DUNE beam optimization? ," The genetic optimization algorithm is used to optimize various beam parameters, such as horn current, proton momentum, and target fin width, to improve the CP sensitivity and overall performance of the DUNE beam. "," https://indico.fnal.gov/event/14537/contributions/25760/attachments/16312/20649/Skin_effect.pdf.
-
-"
-137, How does the PPFX package account for uncertainties in hadron production data? ," PPFX accounts for uncertainties in hadron production data by using a covariance matrix to generate multiple datasets, allowing for the calculation of data/MC ratios and the propagation of uncertainties through the flux predictions. "," https://indico.fnal.gov/event/57663/contributions/257017/attachments/162842/215341/ppfx_introduction.pdf.
-
-"
-138, What is the significance of the NA49 data in the PPFX approach? ," The NA49 data is significant in the PPFX approach as it provides the major dataset used to make flux predictions, offering detailed measurements of hadron production that are crucial for constraining the simulation and improving flux accuracy. "," https://indico.fnal.gov/event/57663/contributions/257017/attachments/162842/215341/ppfx_introduction.pdf.
-
-"
-139, What challenges does PPFX aim to address in predicting neutrino flux for experiments like MINERvA? ," PPFX aims to address the challenges of accurately predicting neutrino flux by dealing with low Q2 interactions and QCD uncertainties, which are not well predicted by Monte Carlo codes, to ensure that cross-sections can be measured as accurately as possible. ", https://indico.fnal.gov/event/57663/contributions/257017/attachments/162842/215341/ppfx_introduction.pdf.
-140, What is the primary goal of the DUNE experiment? ," The primary goal of the DUNE experiment is to make precision measurements of three-flavor neutrino mixing parameters, including the CP-violating phase and mass hierarchy. "," https://indico.fnal.gov/event/60630/contributions/271894/attachments/169057/226784/MODE_2023_Fields_LBNFDUNEOptimization.pdf
-
-"
-141, How does the DUNE experiment plan to achieve its physics goals? , The DUNE experiment plans to achieve its physics goals by using a neutrino beam created at Fermilab and sending it through the Earth to a large detector at the Sanford Underground Research Facility (SURF) in South Dakota. ," https://indico.fnal.gov/event/60630/contributions/271894/attachments/169057/226784/MODE_2023_Fields_LBNFDUNEOptimization.pdf
-
-"
-142, What is the significance of the optimized beam design for DUNE? ," The optimized beam design for DUNE significantly improves the muon neutrino flux, particularly in the critical 1-4 GeV region, which translates into better physics sensitivities and potentially faster achievement of physics milestones. "," https://indico.fnal.gov/event/60630/contributions/271894/attachments/169057/226784/MODE_2023_Fields_LBNFDUNEOptimization.pdf
-
-"
-143, What are the components of the LBNF beamline design for DUNE? ," The LBNF beamline design for DUNE includes 120 GeV protons at 1.2 MW, three horns, and a long target optimized for sensitivity to CP violation. "," https://indico.fnal.gov/event/60630/contributions/271894/attachments/169057/226784/MODE_2023_Fields_LBNFDUNEOptimization.pdf
-
-"
-144, What is the role of the Near Detector in the DUNE experiment? ," The Near Detector in the DUNE experiment is designed to sample the unoscillated neutrino beam and provide a suite of rich physics programs, including measuring the unoscillated flux and characterizing the beam. "," https://indico.fnal.gov/event/60630/contributions/271894/attachments/169057/226784/MODE_2023_Fields_LBNFDUNEOptimization.pdf
-
-"
-145, How does the DUNE experiment plan to handle systematic uncertainties in the neutrino flux prediction? ," The DUNE experiment plans to handle systematic uncertainties in the neutrino flux prediction by using covariance matrices that encapsulate all information regarding uncertainties and correlations, with major contributors being hadron production and beam focusing. "," https://indico.fnal.gov/event/64561/contributions/290475/attachments/177562/241780/DUNE%20Systematic%20Flux%20Uncertainties%20%5BIan%20D.%20Kotler%2C%20APS%20DPF-PHENO%202024%5D.pdf
-
-"
-146, What are the main sources of systematic uncertainty in DUNE's neutrino flux prediction? , The main sources of systematic uncertainty in DUNE's neutrino flux prediction are hadron production and beam focusing effects. ," https://indico.fnal.gov/event/64561/contributions/290475/attachments/177562/241780/DUNE%20Systematic%20Flux%20Uncertainties%20%5BIan%20D.%20Kotler%2C%20APS%20DPF-PHENO%202024%5D.pdf
-
-"
-147, What is the purpose of the Package to Predict the Flux (PPFX) in the context of DUNE? ," The purpose of the Package to Predict the Flux (PPFX) in the context of DUNE is to calculate weights due to various hadronic processes and absorption processes, which are used to predict the neutrino flux. "," https://indico.fnal.gov/event/50591/contributions/222242/attachments/146369/186829/ABashyal08202021_PPFX.pdf
-
-"
-148, How does the DUNE experiment plan to optimize the neutrino beamline? ," The DUNE experiment plans to optimize the neutrino beamline using a genetic algorithm that identifies parameters from a large phase space to optimize CP sensitivity, including horn shapes, target dimensions, and horn currents. "," https://indico.fnal.gov/event/60630/contributions/271894/attachments/169057/226784/MODE_2023_Fields_LBNFDUNEOptimization.pdf
-
-"
-149, What is the significance of the Near Detector's ability to move off-axis in the DUNE experiment? ," The Near Detector's ability to move off-axis in the DUNE experiment, known as PRISM, allows it to deconvolve the flux from the neutrino cross-section on Argon, providing a more detailed characterization of the beam. ", https://indico.fnal.gov/event/64561/contributions/290475/attachments/177562/241780/DUNE%20Systematic%20Flux%20Uncertainties%20%5BIan%20D.%20Kotler%2C%20APS%20DPF-PHENO%202024%5D.pdf
-150, What is the primary purpose of the LBNF beamline at Fermilab? , The primary purpose of the LBNF beamline at Fermilab is to provide a neutrino beam of sufficient intensity and appropriate energy range to meet the goals of the DUNE experiment with respect to long-baseline neutrino-oscillation physics. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=191&filename=Volume%203%2C%20Annex%203A%2C%20Beamline%20at%20the%20Near%20Site_25June_2015.pdf&version=1
-
-"
-151, What is the role of the Near Detector Systems (NDS) in the DUNE experiment? , The role of the Near Detector Systems (NDS) in the DUNE experiment is to reduce systematic errors to match the high-statistics phase precision sensitivity for the long-baseline neutrino oscillation studies. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=183&filename=cdrvol4.pdf&version=2
-
-"
-152, What is the strategy for implementing the DUNE Far Detector according to the LBNF Project? , The strategy for implementing the DUNE Far Detector involves providing four cryostats at the 4850L of the Sanford Underground Research Facility (SURF) in which the DUNE Collaboration will deploy four 10-kt (fiducial) mass far detector LArTPCs. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=183&filename=cdrvol4.pdf&version=2
-
-"
-153, What is the significance of the cryogenic system in the DUNE experiment? ," The cryogenic system is significant in the DUNE experiment as it is responsible for the cooling and purification of liquid argon, which is crucial for the operation of the liquid argon time projection chambers (LArTPCs) used in the detectors. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=128&filename=130.07.05.02%20Cryogenics%20System%20Final%20Design%20BOE%20Report.xlsx&version=1
-
-"
-154, What is the purpose of the Interface Control Document (ICD) in the LBNF/DUNE project? , The purpose of the Interface Control Document (ICD) in the LBNF/DUNE project is to provide complete information about the technical and programmatic interfaces between different entities involved in the project. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=196&filename=Interface%20Control%20Document%20196.docx&version=4
-
-"
-155, How does the DUNE experiment plan to handle the transportation of excavated material? ," The DUNE experiment plans to handle the transportation of excavated material by implementing a traffic control plan, which includes widening roads, posting caution signs, and limiting delivery trucks in certain areas to ensure safety and efficiency. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=122&filename=LBNF-DUNE%20Final%20EA%20and%20FONSI.pdf&version=4
-
-"
-156, What is the role of the DUNE Coordination Office? ," The role of the DUNE Coordination Office is to oversee the execution of the DUNE Host Lab plan, coordinate with the LBNF/DUNE-US Project, the DUNE Collaboration, Fermilab management, and the relevant pieces of the Department of Energy (DOE). "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=117&filename=Apprndix%20E%20-%20PMP-ND-draft.pdf&version=70
-
-"
-157, What are the key components of the LBNF Beamline? ," The key components of the LBNF Beamline include the Primary Beam, the Neutrino Beam, and System Integration, which are essential for creating a high-intensity neutrino beam from the initial proton beam. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=191&filename=Volume%203%2C%20Annex%203A%2C%20Beamline%20at%20the%20Near%20Site_25June_2015.pdf&version=1
-
-"
-158, What is the purpose of the LBNF/DUNE Environmental Assessment? ," The purpose of the LBNF/DUNE Environmental Assessment is to evaluate the potential environmental impacts from construction and operation at both Fermilab and SURF, ensuring compliance with environmental standards. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=122&filename=LBNF-DUNE%20Final%20EA%20and%20FONSI.pdf&version=4
-
-"
-159, What is the function of the cryostat in the DUNE Far Detector? ," The function of the cryostat in the DUNE Far Detector is to house the liquid argon and provide mechanical support for the detector module components, ensuring a stable environment for particle detection. ", https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=188&filename=DUNE-annex-FD-ref-design.pdf&version=1
-160, What is the primary scientific focus of the LBNF/DUNE experiment? ," The primary scientific focus of the LBNF/DUNE experiment is to address fundamental questions about the Universe, including the origin of the matter-antimatter asymmetry, the fundamental underlying symmetries of the Universe, the possibility of a Grand Unified Theory, and the dynamics of supernovae explosions. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=181&filename=volume-physics.pdf&version=2
-
-"
-161, What are the main components of the LBNF/DUNE project at the Fermilab site? ," The main components at the Fermilab site include magnets and support equipment to transport the extracted protons to the target, a target and target hall, magnetic focusing horns, a decay tunnel, a beam absorber, and conventional facilities to support the technical components of the primary proton beam, the neutrino beam, and the near detectors. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=118&filename=PPEP_LBNFDUNE_refresh_v7.docx&version=3
-
-"
-162, What is the purpose of the Preliminary Security Vulnerability Assessment Report (PSVAR) for the LBNF/DUNE Project? ," The purpose of the PSVAR is to identify the security requirements and integrate these requirements into the LBNF/DUNE Project at the early design phase, assessing the implementation of those requirements throughout the Project. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=119&filename=LBNF-DUNE_PSVAR-20150623.pdf&version=1
-
-"
-163, What is the role of the Near Detector in the DUNE physics program? ," The Near Detector plays a role in the overall DUNE physics program by enabling measurements and new physics searches, including precision measurements of neutrino interactions and searches for new physics phenomena. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=181&filename=volume-physics.pdf&version=2
-
-"
-164, What are the main components of the cryogenic systems for the LBNF/DUNE project? ," The cryogenic systems include LN2 and LAr receiving facilities, a transfer system to deliver LAr to the cryostat, a cryostat purge system, LAr recondensers, a purification system, and a LN2 refrigeration plant. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=123&filename=RFP%20for%20JacobsEstimate%20Cryogenics%20Deliverables.pdf&version=1
-
-"
-165," What is the significance of the 1,300 km separation between the Fermilab and SURF sites for the LBNF/DUNE project? "," The 1,300 km separation between the Fermilab and SURF sites presents an optimal baseline for LBNF's neutrino-oscillation physics goals, allowing for precise measurements of neutrino oscillations over a long distance. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=119&filename=LBNF-DUNE_PSVAR-20150623.pdf&version=1
-
-"
-166, What are the primary goals of the LBNF/DUNE experiment's primary science program? ," The primary goals include precision measurements of neutrino oscillation parameters, searching for proton decay, and detecting neutrino flux from core-collapse supernovae within our galaxy. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=181&filename=volume-physics.pdf&version=2
-
-"
-167, What is the purpose of the LBNF/DUNE Interface Control Document? ," The purpose of the Interface Control Document is to provide complete information about the technical and programmatic interfaces between different entities involved in the LBNF/DUNE project, ensuring proper coordination and integration. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=103&filename=Interface%20Control%20Document%20103.pdf&version=3
-
-"
-168, What is the role of the LAr Project Management infrastructure at Brookhaven National Laboratory? ," The LAr Project Management infrastructure at Brookhaven National Laboratory is responsible for the management of the LAr Project, including design, fabrication, operation, and scientific exploitation of the Liquid Argon Detector sub-project of the DUNE. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=121&filename=Indiana%20Univ%20150928_4%20REVISED%20FY16%20Proposal%20SOW%20%26%20Budget%20BNL%20Mufson.pdf&version=2
-
-"
-169, What are the environmental considerations for the LBNF/DUNE project at the Fermilab site? ," The environmental considerations include minimizing impacts on air quality, geology, health and safety, storm water, land use, noise, socioeconomics, sustainability, traffic, utilities, and waste disposal, with measures such as revegetation, dust and erosion control, and reducing GHG emissions. ", https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=122&filename=LBNF-DUNE%20Final%20EA-Word%20Version.docx&version=4
-170, What is the primary purpose of the LBNF/DUNE Preliminary Security Vulnerability Assessment Report (PSVAR)? , The primary purpose of the PSVAR is to identify the security requirements and integrate these requirements into the LBNF/DUNE Project at the early design phase of the Project’s life cycle. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=119&filename=LBNF-DUNE_PSVAR-20150623.docx&version=1.
-
-"
-171, What is the role of the Deputy Project Director for Facilities in the LBNF/DUNE Project? ," The Deputy Project Director for Facilities is responsible for the successful execution of the conventional facilities and beamline for the LBNF/DUNE Project, providing programmatic leadership, strategic planning, and general oversight of LBNF/DUNE facilities. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=117&filename=PMP-AppendixB-FSCF-BSI-SMP-20220830.pdf&version=70.
-
-"
-172, What is the significance of the fine-grained tracker (FGT) in the DUNE near neutrino detector? ," The fine-grained tracker (FGT) is significant because it will measure the neutrino event rates and cross sections on argon, water, and other nuclear targets for both charged current (CC) and neutral current (NC) scattering events, providing excellent position and angular resolutions. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=190&filename=DUNE-annex-ND-ref-design-optim.pdf&version=1.
-
-"
-173, What is the main focus of the DUNE experiment's long-baseline program? ," The main focus of the DUNE experiment's long-baseline program is to complete our understanding of the oscillation phenomenology, with great prospects to discover CP violation or set stringent limits on the allowed values of the CP phase. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=180&filename=LBNF-DUNE-project-volume.pdf&version=1.
-
-"
-174, What is the purpose of the Interface Control Document (ICD) in the LBNF/DUNE Project? , The purpose of the Interface Control Document (ICD) is to provide complete information about the technical and programmatic interfaces between two entities within the LBNF/DUNE Project. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=104&filename=Interface%20Control%20Document%20104.docx&version=3.
-
-"
-175, What is the role of the LBNF/DUNE Far Site Logistics Manager (FSLM)? ," The role of the LBNF/DUNE Far Site Logistics Manager (FSLM) is to lead the coordination of logistics, material movement, and interfaces with existing Sanford Lab operations, as well as with simultaneous construction and installation of CF, cryogenics, and the DUNE detectors at Sanford Lab. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=139&filename=SURF%20Transport%20Logistics%20Plan-20180219.docx&version=5.
-
-"
-176, What is the expected outcome of the DUNE experiment's search for nucleon decay? ," The expected outcome of the DUNE experiment's search for nucleon decay is to significantly extend lifetime sensitivity for specific nucleon decay modes, such as the p → K+ν¯ channel, potentially improving current limits by an order of magnitude. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=180&filename=LBNF-DUNE-project-volume.pdf&version=1.
-
-"
-177, What is the purpose of the LBNF/DUNE Project Management Plan (PMP)? ," The purpose of the LBNF/DUNE Project Management Plan (PMP) is to describe the project management, high-level governance, and oversight structures; responsibilities, systems, project management documents, and processes used for managing the LBNF/DUNE enterprise to achieve its scientific, technical, cost, and schedule objectives for the construction project. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=117&filename=PMP-OverallProject.pdf&version=70.
-
-"
-178, What is the significance of the natural convection calculations for the LBNF cryostats? ," The significance of the natural convection calculations for the LBNF cryostats is to ensure that the ventilation of the cavern space at the far-detector is sufficient to keep the cavern warm, preventing condensation and maintaining the structural integrity of the cryostats. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=162&filename=Summary%20of%20natural%20convection%20calculations%20for%20LBNF%20Cryostats.docx&version=1.
-
-"
-179, What is the primary goal of the DUNE near detector? , The primary goal of the DUNE near detector is to provide precision measurements of neutrino interactions that are essential for controlling the systematic uncertainties in the long-baseline oscillation physics program. , https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=180&filename=LBNF-DUNE-project-volume.pdf&version=1.
-180," What is the primary purpose of the LBNF/DUNE Quality Assurance Plan?  
-"," The primary purpose of the LBNF/DUNE Quality Assurance Plan is to ensure compliance with quality requirements, integrate quality into project processes, and establish performance metrics to monitor the project's performance.  
-"," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=120&filename=LBNF-DUNE-Quality-Assurance-Plan%20June%202023_FINAL.pdf&version=12
-
-"
-181," What is the role of the LBNF/DUNE-US Quality Assurance Manager?  
-"," The LBNF/DUNE-US Quality Assurance Manager is responsible for ensuring that a quality system is established, implemented, and maintained in accordance with Fermilab requirements, and for developing, monitoring, and controlling the project's QA policies and procedures.  
-"," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=120&filename=LBNF-DUNE-Quality-Assurance-Plan%20June%202023_FINAL.pdf&version=12
-
-"
-182," What is the function of the membrane cryostat in the DUNE experiment?  
-"," The membrane cryostat is used to contain liquid argon for the DUNE experiment, utilizing a stainless steel membrane to contain the liquid cryogen and transmit pressure loading through rigid foam insulation to the surrounding outer support structure.  
-"," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=124&filename=130.07.09%20%20%28CERN%20Test%20Cryostat%29%20BOE%20Rev%206.docx&version=1
-
-"
-183," What is the main risk associated with commodity price fluctuations in the LBNF/DUNE project?  
-"," The main risk associated with commodity price fluctuations is the potential increase or decrease in overall project costs if commodity prices change more than planned through project escalation rates.  
-"," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=172&filename=Risk%20BEAM-120-Commodities%20cost%20volatility-05252023.pdf&version=6
-
-"
-184," What alternative method for delivering liquid argon is discussed in the document?  
-"," The document discusses an alternative method for delivering liquid argon using a skip to haul an argon dewar through the Ross shaft, which is loaded and unloaded at the 4850L.  
-"," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=163&filename=LAr%20Alternatives_Findings.pdf&version=1
-
-"
-185," What are the design parameters for the LBNF cryostat?  
-"," The design parameters for the LBNF cryostat include an internal volume of 13,107 m³, a total LAr mass of 17.1 kt, and a cryostat inside depth of 14.0 m, among others.  
-"," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=192&filename=LBNF-annex-cryo-ref-design.pdf&version=1
-
-"
-186," What is the primary focus of the DUNE Near Neutrino Detector?  
-"," The primary focus of the DUNE Near Neutrino Detector is to measure neutrino event rates and cross sections on argon, water, and other nuclear targets for both charged current and neutral current scattering events.  
-"," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=190&filename=DUNE-annex-ND-ref-design.pdf&version=1
-
-"
-187," What is the purpose of the LBNF/DUNE Project Management Plan Appendix B?  
-"," The purpose of the LBNF/DUNE Project Management Plan Appendix B is to describe the management of the Far Site Conventional Facilities Buildings and Site Infrastructure subproject, including planning and providing utilities and infrastructure to support the detectors.  
-"," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=117&filename=PMP-AppendixB-FSCF-BSI-SMP-20220830.docx&version=70
-
-"
-188," What is the role of the DUNE Coordination Office?  
-"," The DUNE Coordination Office oversees the execution of the DUNE Host Lab plan, coordinates with the LBNF/DUNE-US Project, the DUNE Collaboration, Fermilab management, SDSTA, and relevant entities of the Department of Energy.  
-"," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=117&filename=2025%2003%20PMP-AppendixD-FDC-SMP.docx&version=70
-
-"
-189," What is the purpose of the SURF Transport Logistics Plan?  
-"," The purpose of the SURF Transport Logistics Plan is to facilitate the discussion of logistics for the delivery of people, materials, and equipment to the 4850L, ensuring that all deliveries are planned in a ""just-in-time"" logistics chain.  
-", https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=139&filename=SURF%20Transport%20Logistics%20Plan-20180219.pdf&version=5
-190, What is the purpose of the LBNF/DUNE project at Fermilab and SURF? ," The purpose of the LBNF/DUNE project is to advance our understanding of the basic physics of elementary particles called neutrinos, which could help physicists discover whether neutrinos violate the fundamental matter-antimatter symmetry of the Universe. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=122&filename=LBNF-DUNE%20Final%20FONSI%20Signed%20092515.pdf&version=4.
-
-"
-191, What is the role of the South Dakota Science and Technology Authority (SDSTA) in the LBNF/DUNE project? ," The SDSTA oversees infrastructure, support, and access for all users of SURF, as well as access to the DOE-leased space at SURF for the LBNF/DUNE project. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=141&filename=Project%20Assumptions%20April%202025.pdf&version=37.
-
-"
-192, What is the significance of the Open Cut option for the LBNF/DUNE project? ," The Open Cut option was chosen for the disposal of excavated rock because it reduces the length of the conveyor system and minimizes the visual impact of the final stockpile, compared to other alternatives. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=122&filename=Excavated%20Rock%20Handling%20Proposed%20repository%20location%20change%20FINAL.docx&version=4.
-
-"
-193, How does the LBNF/DUNE project plan to manage the risk of construction activities impacting neighboring communities? ," The project plans to manage this risk through informational meetings with the community, developing construction contract requirements, and coordinating with community leaders to minimize impacts. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=114&filename=CFFS%204850L%20-%20007%20Mitigate%20Community%20Disruption%20-%20September%2015%2C%202015.docx&version=14.
-
-"
-194, What are the main components of the infrastructure cryogenic systems for the LBNF/DUNE project? ," The infrastructure cryogenic systems include surface cryogenic systems, Ross gas piping, utility cavern LN2 refrigeration, cavern LN2 Dewars, LN2 supply/return distribution piping, and cryogen vent headers. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=128&filename=130.07.05.02%20%20%28Cryogenics%20System%20Final%20Design%29%20BOE.docx&version=1.
-
-"
-195, What is the purpose of the risk management process in the LBNF/DUNE project? ," The risk management process is used to update risk assessments and mitigations, identify new risks, and improve cost/schedule contingency models for the project. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=167&filename=Aug15RiskWorkshop-purpose%26objectives-20150831.pptx&version=1.
-
-"
-196, What is the expected lifetime of the Beamline Facility for the LBNF/DUNE project? ," The expected lifetime of the Beamline Facility, including the shielding, is assumed to be 30 years. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=151&filename=Beam%20Key%20Assumptions-102412.xlsx&version=1.
-
-"
-197, What are the main functions of the PANDORA software development kit in the LBNF/DUNE project? ," The PANDORA software development kit is used for pattern recognition, reconstructing 3D particle tracks and showers from 2D hits, and identifying the neutrino interaction vertex. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=185&filename=DUNE-annex-sim-and-reco.pdf&version=1.
-
-"
-198, What is the role of the Construction Manager/General Contractor (CM/GC) in the LBNF/DUNE project? ," The CM/GC helps plan and execute conventional facilities construction and is available for cryostat, cryogenic systems, and DUNE detector installation, coordination, and management. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=152&filename=LBNF%20Far%20Site%20Facilities%20Scope-%20Lundin.pptx&version=3.
-
-"
-199, What is the purpose of the LBNF/DUNE Environmental Assessment (EA)? ," The purpose of the EA is to evaluate the potential environmental impacts of the LBNF/DUNE project, including construction and operation phases, and to ensure compliance with environmental regulations. ", https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=122&filename=Environmental%20Review%20Form%20LBNF-DUNE%202016-003%2C%20%20Alternative%20Route%20for%20Excavated%20Rock%20Disposition%20.pdf&version=4.
-200, What is the purpose of the Far Detectors & Cryogenics (FDC) subproject at the LBNF Far Site facility? , The FDC subproject is responsible for the installation and readiness for physics of the Horizontal Drift and Vertical Drifts detectors and the related cryogenics at the LBNF Far Site facility. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=117&filename=2025%2003_FDC-I-I_org.pdf&version=70.
-
-"
-201, What is the role of the Services Manager in the FDC I&I organization? ," The Services Manager organizes services necessary for the installation work, including procurement of material handling equipment, PPE, and general consumables, and oversees the logistics team. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=117&filename=2025%2003_FDC-I-I_org.pdf&version=70.
-
-"
-202, What is the significance of the APA wire spacing in the DUNE Far Detector? ," The APA wire spacing is crucial for good tracking resolution and e-pi0 separation, with specific spacing requirements for the X, U, and V planes to ensure an integral number of readout cards on an APA. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=158&filename=ParametersAPAsOutsideNov17_2015.xlsx&version=2.
-
-"
-203, What is the expected cosmic ray rate on the detector module top in the DUNE experiment? , The expected cosmic ray rate on the detector module top is 1.920770516526875e-05 kHz. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=158&filename=ParametersAPAsOutsideNov17_2015.xlsx&version=2.
-
-"
-204, What is the purpose of the Interface Control Document (ICD) in the context of the DUNE project? ," The ICD provides complete information about the technical and programmatic interfaces between different entities involved in the DUNE project, ensuring proper configuration management and coordination. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=109&filename=Interface%20Control%20Document%20109.docx&version=5.
-
-"
-205, How does the DUNE project plan to manage unforeseen staffing needs for the cryogenics systems? , The DUNE project plans to augment resources in case of planned or unplanned needs exceeding current staffing by hiring locally in South Dakota and coordinating with Fermilab Human Resources to identify Fermilab employees willing to relocate. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=117&filename=Cryogenic_Systems_Management_Staffing_and_Contingency_Plan_Apr_17_2025-Rev_7.pdf&version=70.
-
-"
-206, What is the expected data rate for full-stream data acquisition in the DUNE Far Detector? , The expected data rate for full-stream data acquisition is 436 petabytes per year. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=187&filename=DUNE-annex-data-rate.pdf&version=1.
-
-"
-207, What is the role of the Engineering Manager in the FDC I&I organization? ," The Engineering Manager supports all I&I activities by providing engineering resources, managing CAD models, and ensuring as-built releases. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=117&filename=2025%2003_FDC-I-I_org.pdf&version=70.
-
-"
-208, What is the purpose of the APA electronics mounting fin in the DUNE Far Detector? ," The APA electronics mounting fin is part of the overall APA structure, contributing to the total height and facilitating the mounting of electronics. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=158&filename=ParametersAPAsOutsideNov17_2015.xlsx&version=2.
-
-"
-209, What is the significance of the cryogenic systems in the DUNE experiment? ," The cryogenic systems are crucial for maintaining the liquid argon at the required temperature and purity levels, enabling the proper functioning of the detectors. ", https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=117&filename=Cryogenic_Systems_Management_Staffing_and_Contingency_Plan_Apr_17_2025-Rev_7.pdf&version=70.
-210, What is the primary purpose of the LBNE Project as described in the document? ," The primary purpose of the LBNE Project is to design, construct, and install an intense neutrino beam at Fermilab in Batavia, IL, and a large neutrino detector located at the Homestake Mine site in Lead, SD, to measure and study neutrino behavior over a long distance, yielding fundamental knowledge about neutrino properties. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=143&filename=LBNE%20CD-1%20appr.pdf&version=1.
-
-"
-211, What is the risk associated with specialized construction labor for the DUNE project? ," The risk is that market conditions for specialized rock blasting work may create shortages in some specialized craft trades, which could affect cost, schedule, and quality of workmanship. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=114&filename=CFFS%204850L%20-%20010%20Specialized%20Labor%20Unavailable%20-%20September%2015%2C%202015.docx&version=14.
-
-"
-212, What is the purpose of the LBNF/DUNE Interface Control Document? ," The purpose of the LBNF/DUNE Interface Control Document is to provide complete information about the technical and programmatic interfaces between the two entities named, ensuring that all revisions require change control procedures before approval. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=196&filename=Interface%20Control%20Document%20196.pdf&version=4.
-
-"
-213, What is the main concern regarding water inundation at the Far Site for the DUNE project? ," The main concern is that water inundation to underground spaces at the Far Site could lead to a schedule impact of a 3-4 day effort to investigate and repair the area, with a cost impact estimated at $200K. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=114&filename=CFFS%204850L%20-%20203%20-%20Water%20inundation%20to%20underground%20spaces%20at%20Far%20Site%20-%20September%2015%2C%202015.docx&version=14.
-
-"
-214, What is the role of the NSCF+B Subproject Manager in the DUNE project? ," The NSCF+B Subproject Manager is responsible for managing the execution of the subproject to ensure it is completed within the approved performance baseline, leading the subproject team, and implementing necessary project management and control systems. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=117&filename=PMP-AppendixC-NSCFB-SMP-20220520.pdf&version=70.
-
-"
-215, What is the mitigation plan for the risk of spontaneous combustion of old timber at the Far Site? ," The mitigation plan includes continuous monitoring of carbon monoxide, controlled ventilation paths, and maintaining the water level above much of the lower levels to contribute to a low probability of spontaneous combustion. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=114&filename=CFFS%204850L%20-%20015%20Spontaneous%20Combustion%20-%20September%2015%2C%202015.docx&version=14.
-
-"
-216, What is the estimated cost impact if the LAr market risk materializes for the DUNE project? ," The estimated cost impact could be up to $36M if the Nitrogen/Oxygen market is depressed when filling is planned to begin, leading to delays or increased costs. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=153&filename=CR-103%20-%20LAr%20Market%20Risk.docx&version=2.
-
-"
-217, What is the purpose of the LBNF/DUNE Risk Workshop? ," The purpose of the LBNF/DUNE Risk Workshop is to update risk assessments and mitigations of existing risks, identify new risks, and improve cost/schedule contingency models for the project. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=167&filename=Aug15RiskWorkshop-purpose%26objectives-20150831.pdf&version=1.
-
-"
-218, What is the design life requirement for the LBNF/DUNE conventional facilities? ," The design life of the LBNF/DUNE conventional facilities, including excavations, shall be a minimum of 30 years, except as otherwise specified for radioactive environments. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=112&filename=Programmatic-requirements-20jan2017.xlsx&version=25.
-
-"
-219, What is the primary concern regarding blasting at the Far Site for the DUNE project? ," The primary concern is that blasting at the Far Site may cause damage or unacceptable distress to existing experiments or installations, potentially requiring adjustments to blasting limits and impacting the excavation schedule and costs. ", https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=114&filename=CFFS%204850L%20-%20024%20-%20Blasting%20Causes%20Damage%20or%20Unacceptable%20Distress%20-%20September%2015%2C%202015.docx&version=14.
-220, What is the purpose of the Interface Control Document (ICD) between the FSCF cavern and the Far Detector? ," The ICD provides complete information about the technical and programmatic interfaces between the FSCF cavern and the Far Detector, defining the scope of interfaces at the entry doors to detector caverns and including the North and South Drifts in the cavern interface. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=201&filename=ICD-FSCF_caverns-FD_201_19DEC2018.docx&version=10
-
-"
-221, What is the main focus of the photon detector system development for the DUNE Liquid Argon TPC Detector at Caltech? ," The main focus is on setting up infrastructure for the evaluation, characterization, and long-term performance of Silicon Photomultipliers (SiPMs) in a cryogenic environment, studying SiPM parameters and performance in warm and cold conditions, and developing acceptance tests for commercially produced SiPMs. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=121&filename=Caltech_SOW_FY2016.docx&version=2
-
-"
-222, What is the role of the NSCF+B Subproject Manager within the LBNF/DUNE Project? ," The NSCF+B Subproject Manager is responsible for managing the execution of the subproject to ensure it is completed within the approved performance baseline, leading the subproject team, communicating resource needs, implementing project management systems, and serving as the primary point of contact for the subproject. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=117&filename=PMP-AppendixC-NSCFB-SMP-draft-20220520.docx&version=70
-
-"
-223, What are the responsibilities of the NSCF Design Manager in the LBNF/DUNE Project? ," The NSCF Design Manager is responsible for design management, administering the technical terms of design subcontracts, coordinating design with existing Fermilab facilities and Near Detector requirements, and managing the efforts of the A/E firm to perform design and construction-phase services. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=117&filename=PMP-AppendixC-NSCFB-SMP-draft-20220520.docx&version=70
-
-"
-224, What is the primary goal of the DUNE Far Detector in terms of neutrino event identification? ," The primary goal is to identify electron neutrino and anti-neutrino charged current beam events with high efficiency within the fiducial volume of the detector, allowing for scientifically competitive measurements of the CP violating phase and the mass ordering. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=112&filename=Global_Science_Requirements-2015.xlsx&version=25
-
-"
-225, What is the significance of the baseline length in the LBNF/DUNE Project? ," The baseline length is significant because it must be sufficient to allow the separation of the effects of neutrino mass hierarchy from the CP phase, enabling the unique determination of the CP phase. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=112&filename=Global_Science_Requirements-2015.xlsx&version=25
-
-"
-226, What are the key components of the LBNF/DUNE Project as described in the Interface Control Document? ," The key components include the DUNE Far Detector Construction and the LBNF Far Site Conventional Facilities (Installation) – Cavern, with interfaces defined for technical and programmatic aspects. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=200&filename=Interface%20Control%20Document%20200.pdf&version=4
-
-"
-227, What is the purpose of the LBNF/DUNE Risk Supplement document? ," The purpose of the LBNF/DUNE Risk Supplement document is to document risk-related analyses in more detail than the LBNF/DUNE risk register accommodates, including risk impact, mitigation, and response analyses. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=114&filename=CFFS%204850L%20-%20012%20Sustainability%20-%20LEED%20-%20September%2015%2C%202015.docx&version=14
-
-"
-228, What is the role of the NSCF Construction Manager in the LBNF/DUNE Project? ," The NSCF Construction Manager is responsible for construction site leadership, coordination, and communication, administering the technical terms of construction subcontracts, and acting as the primary technical point of contact for the CMa and construction subcontractors. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=117&filename=PMP-AppendixC-NSCFB-SMP-draft-20220520.docx&version=70
-
-"
-229, What is the main objective of the DUNE Far Detector's capability to identify multiple tracks and electromagnetic showers? ," The main objective is to enable the collection of inclusive events for oscillation measurements, as well as to identify proton decay and atmospheric neutrinos by reconstructing multi-particle events with high granularity and pattern recognition capability. ", https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=112&filename=Global_Science_Requirements-2015.xlsx&version=25
-230, What is the primary mitigation measure to prevent rock falls impacting the cryostat in the LBNF/DUNE project? ," The primary mitigation measure to prevent rock falls is the ground support system, which includes rock bolts and wire mesh, providing an early warning system of potential rock movements. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=114&filename=CFFS%204850L%20-%20204%20-%20Rock%20Falls%20-%20November%203%202015.docx&version=14.
-
-"
-231, What is the purpose of the Far Detector in the DUNE experiment? ," The Far Detector in the DUNE experiment is designed to determine the CP phase of neutrino mixing and the neutrino mass-hierarchy, while exploring other interesting questions of physics, such as proton decay and supernova neutrinos. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=121&filename=Syracuse%20BNL-SOW_FY16_SU.pdf&version=2.
-
-"
-232, What is the estimated cost impact if the Oro Hondo shaft ventilation path is blocked? ," The estimated maximum cost impact if the Oro Hondo shaft ventilation path is blocked is $50 million, which is the approximate cost of a new shaft. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=114&filename=CFFS%204850L%20-%20202%20-%20Oro%20Hondo%20shaft%20ventilation%20path%20is%20blocked%20-%20September%2015%2C%202015.docx&version=14.
-
-"
-233, What is the role of the FSCF-EXC Subproject Manager in the LBNF/DUNE project? ," The FSCF-EXC Subproject Manager is responsible for managing the execution of the subproject to ensure it is completed within the approved performance baseline, leading the subproject team, and overseeing coordination with external requirements and stakeholders. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=117&filename=PMP-AppendixA-FSCF-EXC-SMP-20220519.pdf&version=70.
-
-"
-234, What is the purpose of the Interface Control Document (ICD) in the LBNF/DUNE project? ," The Interface Control Document (ICD) provides complete information about the technical and programmatic interfaces between different entities involved in the LBNF/DUNE project, ensuring proper configuration management and change control. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=106&filename=Interface%20Control%20Document%20106.docx&version=2.
-
-"
-235, What is the estimated schedule impact if the LAr supply risk schedule is delayed? , The estimated schedule impact if the LAr supply risk schedule is delayed is a slip of around 20 months. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=153&filename=LAr%20supply%20risk%20schedule%20calcs.xlsx&version=2.
-
-"
-236, What is the main focus of the LBNF/DUNE Risk Supplement document? ," The LBNF/DUNE Risk Supplement document is intended to document risk-related analyses in more detail than the LBNF/DUNE risk register, including analyses of risks, mitigation strategies, and responses to events caused by these risks. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=173&filename=PM-007-Risk-Supplement-20150911.docx&version=2.
-
-"
-237, What is the primary purpose of the DUNE experiment's data acquisition system? , The primary purpose of the DUNE experiment's data acquisition system is to assemble data from all subsystems of the far detector so that offline software can reconstruct events associated with the FNAL neutrino beam as well as non-beam events. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=112&filename=FD-sci-eng-requirements-30NOV2017.xlsx&version=25.
-
-"
-238, What is the role of the Cryogenics Infrastructure Project Management team in the LBNF/DUNE project? ," The Cryogenics Infrastructure Project Management team is responsible for managing the design, engineering, procurement, construction, inspection, commissioning, and startup of the Cryogenics System for LBNF, including coordinating system requirements and safety issues. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=125&filename=130.07.08%20%20%28Cryogenics%20and%20Membrane%20Cryostat%20Management%29%20BOE.docx&version=1.
-
-"
-239, What is the estimated cost of the cryogenic systems for the LBNF/DUNE project? ," The estimated cost of the cryogenic systems for the LBNF/DUNE project is $16,584,746 per cryostat, based on the 2023 projection of $1133/ton of liquid argon. ", https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=134&filename=130.07.06%20%20%28Cryogenics%20Fluids%20Procurement%29%20BOE.docx&version=1.
-240, What is the purpose of the Interface Control Document (ICD) in the LBNF/DUNE project? ," The Interface Control Document (ICD) provides complete information about the technical and programmatic interfaces between two entities, ensuring configuration management and requiring change control procedures for revisions. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=230&filename=Interface%20Control%20Document%20230.docx&version=4
-
-"
-241, What is the main function of the LArTPC in the DUNE experiment? ," The Liquid Argon Time Projection Chamber (LArTPC) records 3D images of particle tracks along with the energy deposited by those tracks, allowing for detailed event reconstruction and differentiation between signal and background for neutrino physics measurements and proton decay. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=275&filename=Report%20on%20the%20Depth%20Requirements%20for%20a%20Massive%20Detector%20at%20Homestake-12-23-2008.pdf&version=1
-
-"
-242, What is the role of the Near Detector Task Force in the DUNE experiment? ," The Near Detector Task Force is responsible for simulations and studies related to the Near Detector, including flux simulations, cross-section and nuclear model evaluations, and constraints on uncertainties. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=113&filename=FlowChartv2.pdf&version=3
-
-"
-243, What are the main components of the cryogenic system maintenance crew for the DUNE Far Detector? ," The cryogenic system maintenance crew consists of a mechanical engineer, an electrical engineer, two mechanical technicians, and one electrical technician, who are permanently resident at SURF. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=226&filename=FDCOperations_Plan-Dec2021.docx&version=6
-
-"
-244, What is the purpose of the LBNF/DUNE Interface Control Document? ," The LBNF/DUNE Interface Control Document defines the technical and programmatic interfaces between entities involved in the project, ensuring proper configuration management and change control. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=217&filename=Interface%20Control%20Document%20217.pdf&version=2
-
-"
-245, What is the significance of the helium cooling system in the titanium alloy beam window design for LBNE? ," The helium cooling system is necessary for the titanium alloy beam window to maintain acceptable temperature levels and prevent overheating, especially in high-power beam scenarios. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=255&filename=LBNE_RAL_Final_Report_Target_and_Window_Material_design_study.pdf&version=1
-
-"
-246, What is the expected role of the cryogenic system in the DUNE Far Detector operations? ," The cryogenic system is responsible for maintaining the liquid argon at the required purity and temperature levels, with a dedicated crew for its operation and maintenance to ensure continuous functionality. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=226&filename=Life%20Cycle%20Costs%20Calculation%20Workbook-2022%20for%20preferred%20alternative.xlsx&version=6
-
-"
-247, What is the purpose of the LBNF Beamline Interface Control Document? ," The LBNF Beamline Interface Control Document defines the physical interfaces between subprojects, ensuring proper coordination and integration of components such as cable installations and horn power supplies. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=301&filename=Beamline%20Interface%20Matrix%20Chart%20Master_v2_Oct_27_23_10312023.xlsm&version=27
-
-"
-248, What is the main challenge addressed by the rock support design in the LBNF/DUNE project? ," The rock support design addresses the challenge of ensuring stability and safety in the underground excavations, using methods like rock bolts, wire mesh, and shotcrete to support the drifts and caverns. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=252&filename=DUSEL%20PDR-FinalRep_25Oct10.pdf&version=1
-
-"
-249, What is the role of the Interface Control Document in managing the LBNF/DUNE project? ," The Interface Control Document manages the technical and programmatic interfaces between project entities, ensuring that all changes are controlled and documented according to the Configuration Management Plan. ", https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=198&filename=Interface%20Control%20Document%20198.docx&version=4
-250, What is the significance of a 10-kton LAr detector sited at the 4850L at SURF for DUNE's physics goals? ," A 10-kton LAr detector sited at the 4850L at SURF would provide excellent opportunities for a diverse range of physics topics, including proton decay, atmospheric neutrinos, and supernova-burst neutrinos. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=278&filename=CDR-intro-volume-2012nov20-reduced.pdf&version=1
-
-"
-251, How does the DUNE experiment plan to handle the challenge of cosmic-ray-induced background in the LAr-FD? ," The DUNE experiment plans to reduce cosmic-ray-induced background by using a combination of simple kinematic and beam timing cuts, which can potentially reduce the background to a few events per year. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=278&filename=CDR-intro-volume-2012nov20.pdf&version=1
-
-"
-252, What are the main components of the LAr cryogenic system for the DUNE experiment? ," The main components of the LAr cryogenic system include the LAr cryostat construction, cryo plant refrigeration system, gas and liquid filtration systems, and condensers installation. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=226&filename=Life%20Cycle%20Costs%20Calculation%20Workbook-2012.updated2021-for%20Surface%20FD.xlsx&version=6
-
-"
-253, What is the purpose of the Interface Control Document (ICD) in the context of the DUNE project? ," The Interface Control Document (ICD) provides complete information about the technical and programmatic interfaces between different entities involved in the DUNE project, ensuring proper coordination and management of interfaces. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=216&filename=Interface%20Control%20Document%20216.pdf&version=3
-
-"
-254, How does the DUNE experiment plan to achieve precision measurements of the oscillation parameters in νμ → νx oscillations? ," The DUNE experiment plans to achieve precision measurements of the oscillation parameters by using the νμ-disappearance channel, which depends on the accuracy of the unoscillated spectrum estimated using measurements from the near detector complex and external measurements. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=278&filename=CDR-intro-volume-2012nov20.pdf&version=1
-
-"
-255, What is the role of the Construction Management (CM) Subcontractor in the DUNE project? ," The CM Subcontractor is responsible for managing the construction of facilities at SURF, including providing professional personnel, ensuring compliance with construction contract terms, and monitoring safety and quality control. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=293&filename=SDSTA%20CM%20RFI%209-29-2014.pdf&version=1
-
-"
-256, What are the expected challenges in selecting signal events over background at the surface for supernova-burst neutrinos in the DUNE experiment? ," Selecting signal events over background at the surface for supernova-burst neutrinos is expected to be a daunting task, with highly degraded information even in the best case, due to the low energy and short-timescale-burst nature of the signal. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=278&filename=CDR-intro-volume-2012nov20-reduced.pdf&version=1
-
-"
-257, What is the significance of the logistics plan for the DUNE project's construction and installation phases? ," The logistics plan is crucial for coordinating the parallel nature of construction and installation plans at the Far Site, ensuring efficient use of infrastructure and resources, and minimizing impacts on other experiments at SURF. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=233&filename=Construction%20Procurement%20%26%20Management%20Plan%20-%20Headley.pptx&version=2
-
-"
-258, How does the DUNE experiment plan to utilize atmospheric neutrinos for studying the mass hierarchy? ," The DUNE experiment plans to use atmospheric neutrinos, which are very sensitive to the mass hierarchy due to their oscillation phenomenology over several decades in energy and path length, providing good sensitivity to alternative explanations or subdominant new physics effects. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=278&filename=CDR-intro-volume-2012nov20-reduced.pdf&version=1
-
-"
-259, What are the key components of the DUNE Near Detector Systems (NDS) and their integration with LBNF Conventional Facilities? ," The key components of the DUNE Near Detector Systems include conventional power, water, access, life safety, communications, and location, which require careful integration with LBNF Conventional Facilities to ensure proper functionality and safety. ", https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=219&filename=DUNE%20NDS%20and%20LBNF%20BoissevainMauger.pdf&version=1
-260, What is the primary purpose of the LBNF/DUNE project as outlined in the P5 mandate? ," The primary purpose of the LBNF/DUNE project is to achieve a mean sensitivity to CP violation of better than 3σ over more than 75% of the range of possible values of the unknown CP-violating phase δCP, with a wideband neutrino beam produced by a proton beam with power of 1.2 MW, implying a far detector with fiducial mass of more than 40 kilotons of liquid argon and a suitable near detector. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=287&filename=LBNC-LBNFDUNEOverview-20150903.pdf&version=1
-
-"
-261, What are the main components of the LBNF Near Site Facilities? ," The main components of the LBNF Near Site Facilities include the primary proton beam extracted from the Main Injector, initial 1.2 MW beam power upgradable to 2.4 MW, an embankment for the target complex, a decay region followed by an absorber, four surface support buildings, and a Near Detector facility. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=287&filename=LBNC-LBNFDUNEOverview-20150903.pdf&version=1
-
-"
-262, What is the role of the LBNF Far Site Facilities at the Sanford Underground Research Facility? ," The LBNF Far Site Facilities at the Sanford Underground Research Facility involve the excavation of caverns and drifts for 4-10kt fiducial mass detectors, a central utility cavern for conventional facilities and cryogenic equipment, an LN2 refrigeration system for cooling and compressing gaseous argon, LAr systems for purification and recirculation, four membrane cryostats supported by steel frames, and surface and shaft infrastructure. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=287&filename=LBNC-LBNFDUNEOverview-20150903.pdf&version=1
-
-"
-263, What is the significance of the lease agreement between DOE and SDSTA for the LBNF project? ," The lease agreement between DOE and SDSTA is significant because it allows DOE to construct a capital asset at a non-DOE site by leasing the necessary space at SURF for $1/yr, putting this space under DOE control, which is required for the LBNF project. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=287&filename=LBNC-LBNFDUNEOverview-20150903.pdf&version=1
-
-"
-264, What are the main components of the DUNE Far Detector? ," The main components of the DUNE Far Detector include four 10-kton detector modules, which are modular in design to facilitate underground transport and installation, and are based on Liquid Argon Time Projection Chamber (TPC) technology. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=287&filename=LBNC-LBNFDUNEOverview-20150903.pdf&version=1
-
-"
-265, What is the purpose of the LBNF/DUNE risk register? ," The purpose of the LBNF/DUNE risk register is to document and manage risks associated with the project, ensuring that potential issues are identified, assessed, and mitigated to prevent impacts on the project's cost, schedule, and performance. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=287&filename=LBNC-LBNFDUNEOverview-20150903.pdf&version=1
-
-"
-266, How does the LBNF/DUNE project plan to manage logistics at the Far Site? ," The LBNF/DUNE project plans to manage logistics at the Far Site by coordinating through a single entity, the FSF manager, to ensure efficient use of shaft usage and minimize impacts on non-DUNE experiments, with a detailed plan for simultaneous CF, cryostat, and cryo systems installations underground. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=287&filename=LBNC-LBNFDUNEOverview-20150903.pdf&version=1
-
-"
-267, What is the expected role of CERN in the LBNF/DUNE project? ," CERN is expected to be a major partner in the LBNF/DUNE project, contributing to facility infrastructure at both Fermilab and SURF, such as cryostats, and facilitating European engagement in the project. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=287&filename=LBNC-LBNFDUNEOverview-20150903.pdf&version=1
-
-"
-268, What are the key milestones in the LBNF/DUNE project schedule? ," Key milestones in the LBNF/DUNE project schedule include CD-1 Refresh Approval, CD-3a Approval, CD-3b Approval, CD-2/3c Project Baseline/Construction Approval, and CD-4 (early completion), with activities such as excavation, cryostat construction, and detector installation and commissioning. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=287&filename=LBNC-LBNFDUNEOverview-20150903.pdf&version=1
-
-"
-269, What is the significance of the P5 plan for the LBNF/DUNE project? ," The P5 plan is significant for the LBNF/DUNE project as it provides a strategic plan for U.S. particle physics, prioritizing neutrino physics and setting goals for the project, such as achieving a mean sensitivity to CP violation and establishing the scope of the LBNF/DUNE project. ", https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=287&filename=LBNC-LBNFDUNEOverview-20150903.pdf&version=1
-270, What is the primary function of the LN2 refrigeration system in the LBNF project? ," The LN2 refrigeration system primarily serves as the refrigerant supply for the argon condenser subsystem, which reliquefies argon boil off from the cryostat. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=259&filename=LBNF_LN2%20Cryogenic%20Process%20Control%20Conceptual%20Design%20v2.2%20Aug%203%202016.pdf&version=15.
-
-"
-271, What is the estimated electron lifetime achieved in the Argoneut experiment? , The maximum electron lifetime achieved in the Argoneut experiment was about 750 microseconds (0.75 ms). ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=246&filename=Purification%20comparison%20table%20FNAL%20references.pdf&version=1.
-
-"
-272, What is the purpose of the Interface Control Document (ICD) in the LBNF/DUNE project? , The Interface Control Document (ICD) provides complete information about the technical and programmatic interfaces between different entities involved in the LBNF/DUNE project. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=202&filename=ICD-SURF-Infrastructure-External_Cryogenics-202-31July2017.docx&version=4.
-
-"
-273, What is the expected impact of nuclear effects on neutrino interactions in argon compared to oxygen? , Nuclear effects and their kinematic distortions are generally larger in a heavier nucleus such as argon compared to oxygen. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=274&filename=water-argon-nucleareffects.pdf&version=1.
-
-"
-274, What is the estimated refrigeration load during nominal purity maintenance for a DUNE detector? , The estimated refrigeration load during nominal purity maintenance for a DUNE detector is 79.2 kW. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=251&filename=ParametersCryoOnlyAug11_2015.pdf&version=1.
-
-"
-275, What is the purpose of the LBNF/DUNE Risk Management process? ," The purpose of the LBNF/DUNE Risk Management process is to identify, analyze, and manage risks to ensure the project's objectives are met effectively. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=282&filename=2015-07-01-LBNF-DUNE-Risk-Analysis-CD1-Refresh-DOE-Review-LT.pptx&version=1.
-
-"
-276, What is the role of the LBNF Cryostat and Cryogenic Parameters Spreadsheet? , The LBNF Cryostat and Cryogenic Parameters Spreadsheet provides detailed specifications and parameters for the cryostat and cryogenic systems used in the LBNF project. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=251&filename=ParametersCryoOnlyAug11_2015.pdf&version=1.
-
-"
-277, What is the significance of the LBNF/DUNE Grounding document? , The LBNF/DUNE Grounding document outlines the grounding requirements and specifications for the LBNF/DUNE project to ensure electrical safety and system reliability. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=285&filename=LBNF-DUNE%20Grounding%203D.pdf&version=11.
-
-"
-278, What is the estimated cost of an ELM 3000 liquefier unit for the LBNF project? , The estimated cost of an ELM 3000 liquefier unit for the LBNF project is about USD 4.5 million. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=259&filename=email%20Cosmodyne%20budget%20numbers%20email%202014-04-28.pdf&version=15.
-
-"
-279, What is the purpose of the LBNF Long-Baseline Neutrino Facility Conventional Facilities cost and schedule basis document? ," The purpose of the document is to provide a detailed basis for the cost and schedule estimates for the conventional facilities of the LBNF project, including comparisons and reconciliations with independent estimates. ", https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=298&filename=CF_Cost%20Schedule%20Basis%20and%20Comparison%20slides.pdf&version=8.
-280, What is the primary purpose of the LBNF/DUNE project as outlined in the P5 mandate? ," The primary purpose of the LBNF/DUNE project is to form a new international collaboration to design and execute a highly capable Long-Baseline Neutrino Facility (LBNF) hosted by the U.S., with the goal of achieving a mean sensitivity to CP violation of better than 3σ over more than 75% of the range of possible values of the unknown CP-violating phase δCP. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=253&filename=FSCFReqmt-Intrfc-Rev-LBNFDUNEOverview-20150902.pdf&version=2
-
-"
-281, What are the main components of the LBNF Near Site Facilities? ," The main components of the LBNF Near Site Facilities include the primary proton beam extracted from the Main Injector, an embankment for the target complex, a decay region followed by an absorber, four surface support buildings, and a Near Detector facility. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=253&filename=FSCFReqmt-Intrfc-Rev-LBNFDUNEOverview-20150902.pdf&version=2
-
-"
-282, What is the role of the LBNF Far Site Facilities in the DUNE project? ," The LBNF Far Site Facilities are responsible for the excavation of caverns and drifts for the detectors, the construction of a central utility cavern for CF and cryogenic equipment, the installation of a LN2 refrigeration system, and the provision of LAr systems for purification and recirculation. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=253&filename=FSCFReqmt-Intrfc-Rev-LBNFDUNEOverview-20150902.pdf&version=2
-
-"
-283, What is the significance of the Ross Shaft refurbishment in the LBNF project? ," The Ross Shaft refurbishment is significant because it is needed to support the hoisting of approximately 800,000 tons of excavated rock and the transport of personnel and materials for LBNF construction. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=261&filename=SURF%20Infrastructure%20Work%20%20-%20Risk%20Reduction%20Pre-Construction%20Start%20-%20Headley.pptx&version=4
-
-"
-284," What are the expected challenges in transporting liquid argon to the LBNF/DUNE site in Lead, SD? "," The expected challenges in transporting liquid argon to the LBNF/DUNE site include difficulties with primary LAR supply by rail, the need for an intermediate railhead transfill facility, and the high costs and risks associated with tanker delivery, especially during bad weather. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=228&filename=1-VendorSummaryBrief_2617%20Rev%203.pdf&version=2
-
-"
-285, What is the purpose of the Interface Control Document (ICD) in the LBNF/DUNE project? ," The purpose of the Interface Control Document (ICD) is to provide complete information about the technical and programmatic interfaces between different entities involved in the LBNF/DUNE project, ensuring proper configuration management and coordination. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=231&filename=Interface%20Control%20Document%20231.pdf&version=6
-
-"
-286," How does the LBNF/DUNE project plan to manage the environmental, safety, and health aspects of its operations? "," The LBNF/DUNE project plans to manage environmental, safety, and health aspects by implementing the Fermilab ES&H Management System, which includes an Integrated Safety Management System consistent with DOE Policy 450.4A, ensuring compliance with applicable regulatory requirements. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=291&filename=LBNFDUNE_IESHM_v6.docx&version=12
-
-"
-287, What are the main components of the LBNF Kicker Capacitor Specification? ," The main components of the LBNF Kicker Capacitor Specification include electrical requirements such as voltage and current ratings, repetition rate, lifetime requirement, inductance, dielectric material, and mechanical requirements like case size and environmental conditions. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=205&filename=LBNF_KickerMagnetCaps_Spec_6.2.pdf&version=5
-
-"
-288," What is the role of the LBNF/DUNE Integrated Environment, Safety, and Health Management Plan? "," The role of the LBNF/DUNE Integrated Environment, Safety, and Health Management Plan is to establish the framework and expectations for the ES&H program, ensuring a safe work environment and compliance with regulatory requirements for the successful completion of the project. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=291&filename=LBNFDUNE_IESHM_v6.docx&version=12
-
-"
-289, What is the significance of the LBNF/DUNE project's collaboration with international partners? ," The significance of the LBNF/DUNE project's collaboration with international partners lies in the strong domestic and international scientific and funding partnerships, which are key to the project's success, with major contributions from CERN, UK, Switzerland, Italy, India, and other countries. ", https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=253&filename=FSCFReqmt-Intrfc-Rev-LBNFDUNEOverview-20150902.pdf&version=2
-290, What is the primary goal of the LBNF/DUNE project as outlined in the P5 mandate? ," The primary goal of the LBNF/DUNE project is to form a new international collaboration to design and execute a highly capable Long-Baseline Neutrino Facility (LBNF) hosted by the U.S., with the aim of achieving a mean sensitivity to CP violation of better than 3σ over more than 75% of the range of possible values of the unknown CP-violating phase δCP. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=253&filename=FSCFReqmt-Intrfc-Rev-LBNFDUNEOverview-20150902.pptx&version=2
-
-"
-291, What are the two main components of the LBNF/DUNE project? ," The two main components of the LBNF/DUNE project are the facility, LBNF, which is treated as a separate project from the experiment, DUNE. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=253&filename=FSCFReqmt-Intrfc-Rev-LBNFDUNEOverview-20150902.pptx&version=2
-
-"
-292, What is the purpose of the LBNF Far Site Facilities? , The purpose of the LBNF Far Site Facilities is to provide infrastructure at the Sanford Underground Research Facility (SURF) to support the installation of cryostats and cryogenic systems needed for the DUNE Far Detector. ," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=277&filename=LBNF%20CD-3a%20Request-20160726.pdf&version=17
-
-"
-293, What is the significance of the cryogenic plant in the T600 experiment? ," The cryogenic plant in the T600 experiment is significant because it is based on high modularity and redundancy to enhance safety, continuous operation, stability, and reliability, ensuring no dead time caused to the detector over the 3 years of LNGS run. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=246&filename=Vignoli%20-Cryogenic%20Plant.pdf&version=1
-
-"
-294, What is the role of the LBNF/DUNE Interface Control Document? ," The role of the LBNF/DUNE Interface Control Document is to provide complete information about the technical and programmatic interfaces between different entities involved in the project, ensuring proper configuration management and change control procedures. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=230&filename=Interface%20Control%20Document%20230.pdf&version=4
-
-"
-295, What is the expected outcome of the LBNF/DUNE project in terms of neutrino science? ," The expected outcome of the LBNF/DUNE project is to determine if neutrinos violate leptonic CP and by how much, extract multiple detailed properties of neutrinos to test the current 3-flavor paradigm, search for nucleon decay, detect neutrinos from galactic supernova explosions, and more. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=253&filename=FSCFReqmt-Intrfc-Rev-LBNFDUNEOverview-20150902.pptx&version=2
-
-"
-296, What is the purpose of the LBNF Near Site Facilities? ," The purpose of the LBNF Near Site Facilities is to provide the necessary infrastructure at Fermilab, including a primary proton beam, target complex, decay region, absorber, and near detector facility, to support the DUNE experiment. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=253&filename=FSCFReqmt-Intrfc-Rev-LBNFDUNEOverview-20150902.pptx&version=2
-
-"
-297, How does the LBNF/DUNE project plan to manage risks? ," The LBNF/DUNE project plans to manage risks by following the Fermilab Risk Procedure for Projects, using an online risk management tool, and conducting risk workshops to update and analyze risks, including cost and schedule impacts. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=288&filename=LBNC-LBNF%20Risks-20150903.pdf&version=1
-
-"
-298, What is the significance of the cryogenic liquid argon pumps for the DUNE detectors? ," The cryogenic liquid argon pumps for the DUNE detectors are significant because they are designed to operate efficiently under specific conditions, ensuring stable pump operation and preventing cavitation, which is crucial for the detector's performance. "," https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=267&filename=Argon%20Pumps%20for%20DUNE%20-%20Barber-Nichols%2020-Oct-17.pdf&version=1
-
-"
-299, What are the main components of the LBNF/DUNE life cycle costs? ," The main components of the LBNF/DUNE life cycle costs include the Total Project Cost (TPC), Operating Costs during the experiment's lifetime, and Decontamination, Decommissioning, and Demolition Costs. ", https://docs.dunescience.org/cgi-bin/private/RetrieveFile?docid=226&filename=LBNF-DUNE%20Life%20Cycle%20Costs-2022.docx&version=6

@@ -6,12 +6,12 @@ import json
 from config import ( ARGO_API_USERNAME, ARGO_API_KEY, 
     DEFAULT_TOP_K, STORE, QA_PATH
 )
+import time
 import logging
 import pandas as pd
 from config import FERMILAB_SESSION_SECRET
-from src.indexing.faiss_manager_langchain import FAISSManager
 from src.indexing.chroma_manager import ChromaManager
-from src.api.argo_client import ArgoAPIClient
+from src.api.fermilab_client import FermilabAPIClient
 from src.auth.fermilab_auth import fermilab_auth
 from src.utils.logger import get_logger
 
@@ -21,14 +21,16 @@ import re
 import json
 import os
 from find_port import find_port
-argo_client= ArgoAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
+argo_client= FermilabAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
 from src.extractors.indico_extractor_multithreaded import IndicoExtractor
 from src.extractors.docdb_extractor_multithreaded import DocDBExtractor
 
 def normalize(s):
     # Remove all whitespace characters like \n, \t, spaces, etc.
-    return re.sub(r'\s+', '', s)
-
+    expected = re.sub(r'\s+', '', s)
+    if expected[-1] == '.': 
+        return expected[:-1]
+    return expected
 
 indico_session=IndicoExtractor()
 docdb_session=DocDBExtractor()
@@ -58,7 +60,7 @@ def relevant_refs(outputs:dict, expectations:dict):
                 results += 0
                 continue
             
-            resp=argo_client.chat_completion(question=prompt, context=document_text)
+            resp=argo_client.chat_completion(question=prompt, context=document_text, model='nomic-embed-text:latest') # base_url='https://vllm.fnal.gov/v1/chat/completions')
             print(resp)
             clean_str = re.sub(r'^```json\s*|```$', '', resp, flags=re.MULTILINE).strip()
             # Parse JSON
@@ -73,16 +75,27 @@ def relevant_refs(outputs:dict, expectations:dict):
     print(results)
     return results / length
 
-
+@scorer
+def latency(latency):
+    print("latency")#, kwargs)
+    try:
+        outputs = outputs.get("latency", float("inf"))
+        logger.info("in run")
+        expectations = expectations.get("time", float("inf"))
+    except Exception as e:
+        print(e)
+    print(outputs)
+    return outputs
 @scorer
 def correctness(outputs: dict, expectations: dict= None) -> int:
     outputs = outputs.get("generated_response", "")
     expectations = expectations.get("expected_response", "")
     try:
-        question="Using the expected output as the ground truth answer, determine if the generated output is correct .Return a float value between 0 and 1 in the format of a json with the only permitted key being 'score'. You will evaluate correctness like this: Get the main points from the expected output and the generated output. Then evaluate how closely aligned these points are. The words do not need to match exactly. Even if the generated output is phrased differently, as long as the general idea behind the generated output is the same as that behind the expected out, give the generated output a score close to 1. However, if the generated output does not address the same points or convey the same ideas as that of the expected output, then give a value close to 0."
+        if '[ERROR]' in outputs:
+            return 0.0
+        question="Using the expected output as the ground truth answer, determine if the generated output is correct .Return a float value between 0 and 1 in the format of a json with the only permitted key being 'score'. Your float value must not contain any letters, they must strictly be comprised of numerical values and decimals. You will evaluate correctness like this: Get the main points from the expected output and the generated output. Then evaluate how closely aligned these points are. The words do not need to match exactly. Even if the generated output is phrased differently, as long as the general idea behind the generated output is the same as that behind the expected out, give the generated output a score close to 1. However, if the generated output does not address the same points or convey the same ideas as that of the expected output, then give a value close to 0."
         context = f"Generated output: {outputs}\nExpected out: {expectations}"
-        print(context)
-        resp = argo_client.chat_completion(question=question, context=context)
+        resp = argo_client.chat_completion(question=question, context=context, model = 'nomic-embed-text:latest')# base_url='https://vllm.fnal.gov/v1/chat/completions')
         clean_str = re.sub(r'^```json\s*|```$', '', resp, flags=re.MULTILINE).strip()
         # Parse JSON
         data = json.loads(clean_str)
@@ -90,9 +103,7 @@ def correctness(outputs: dict, expectations: dict= None) -> int:
         
         results = float(data.get("score", 0))
     except Exception as e:
-        print(e)
         return e
-    print(results)
     return results
 
 
@@ -105,12 +116,13 @@ def extract_https_url(text):
     return None
 
 class Evalutation():
-    def __init__(self, port, experiment_name, data_path):
+    def __init__(self, port, experiment_name, data_path,model):
 
         #self.faiss_manager = FAISSManager(data_path) 
         self.faiss_manager = ChromaManager(data_path)#FAISSManager(data_path)
         print(f"connecting to client")
-        self.argo_client = ArgoAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
+        self.model=model
+        self.argo_client = FermilabAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
         print("Conntected to client")
         #mlflow.tracing.disable()
         mlflow.set_tracking_uri("./my_mlruns")
@@ -150,12 +162,23 @@ class Evalutation():
             except:
                 continue
         self.ref_dataset = refs
+    def create_latency_dataset(self):
 
+
+        latency_dataset=pd.read_csv(QA_PATH)
+        latency=[]
+        for row in latency_dataset.iterrows():
+            dictionary={}
+            dictionary['inputs'] = {'question': row[1]['question']}
+            dictionary['expectations'] = {'expected_response': 0}
+            latency.append(dictionary)
+        print("made latenvy ds")
+        self.latency_dataset = latency
     def llm_qa_response(self, question):
         context_snippets, references = self.faiss_manager.search(question, top_k=DEFAULT_TOP_K)
         context = "\n\n".join(context_snippets)
         # Get answer from Argo API
-        answer = self.argo_client.chat_completion(question, context)
+        answer = self.argo_client.chat_completion(question, context,model=self.model)
         assert answer
         return {"generated_response": answer}
     def llm_references(self,question):
@@ -168,12 +191,22 @@ class Evalutation():
         }
 
         return json.dumps(data) #f"question \ {question} \ {','.join(references)} \{json.dumps(context_snippets)}"
+    def latency_collector(self, question):
+        start = time.time()
+        context_snippets, references = self.faiss_manager.search(question, top_k=DEFAULT_TOP_K)
+        context = "\n\n".join(context_snippets)
+        # Get answer from Argo API
+        answer = self.argo_client.chat_completion(question, context)
+        end = time.time()
+        print("time = ", end-start)
+        return json.dumps({'latency' :end-start})
+
 
     #@mlflow.trace
     def evaluate(self,method):
         self.create_validation_dataset()
         print("in evaluate fn")
-        print(f"Starting eval")
+        print(f"Starting eval: {method}")
         with mlflow.start_run():
             if method == 'correctness':
                 self.create_validation_dataset()
@@ -182,12 +215,20 @@ class Evalutation():
                     predict_fn=self.llm_qa_response,
                     scorers=[correctness],
                 )
-            else:
+            elif method == 'relevent_refs':
                 self.create_refs_dataset()
                 results = mlflow.genai.evaluate(
                     data=self.ref_dataset,
                     predict_fn=self.llm_references,
                     scorers=[relevant_refs],
+                )
+            elif method=='latency':
+               self.create_latency_dataset()
+               self.create_refs_dataset()
+               results = mlflow.genai.evaluate(
+                    data=self.latency_dataset,
+                    predict_fn=self.latency_collector,
+                    scorers=[latency],
                 )
         print(results)
         return results  
@@ -200,6 +241,7 @@ parser.add_argument('--experiment_name', type=str, default=None)
 parser.add_argument('--method', type=str, default='correctness')
 parser.add_argument('--data_path', type=str)
 parser.add_argument('--savedir', type=str)
+parser.add_argument('--model', type=str)
 args = parser.parse_args()
 
 
@@ -222,7 +264,7 @@ def init_logger(name=__name__, level=logging.INFO):
 logger = init_logger('benchmarking_logger')
 
 
-val = Evalutation(args.port, args.experiment_name, args.data_path)
+val = Evalutation(args.port, args.experiment_name, args.data_path, args.model)
 results = val.evaluate(args.method)
 
 print(results.metrics.keys())

@@ -26,14 +26,14 @@ elif STORE == 'chroma':
     db_manager: Optional[ChromaManager] = None
 else:
     raise Exception(f"DUNE-GPT requires Faiss or Chroma. Got {STORE}")
-from src.api.argo_client import ArgoAPIClient
+from src.api.fermilab_client import FermilabAPIClient
 from src.auth.fermilab_auth import fermilab_auth
 from src.utils.logger import get_logger
-
+print("ALL IMPORTS IMPORTED")
 logger = get_logger(__name__)
 
 # Global variables
-argo_client: Optional[ArgoAPIClient] = None
+argo_client: Optional[FermilabAPIClient] = None
 print(STORE, CHROMA_PATH)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -55,7 +55,7 @@ async def lifespan(app: FastAPI):
     else:
         raise Exception(f"Requires Faiss or Chroma. Got {STORE}")
     
-    argo_client = ArgoAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
+    argo_client = FermilabAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
     
     # Check if index is empty
     stats = db_manager.get_stats()
@@ -243,6 +243,7 @@ async def get_stats():
 def main():
     """Main entry point"""
     logger.info(f"Starting DUNE-GPT server on {HOST}:{PORT}")
+    print(f"Starting DUNE-GPT server on {HOST}:{PORT}")
     uvicorn.run(
         "main:app",
         host=HOST,
@@ -252,4 +253,5 @@ def main():
     )
 
 if __name__ == "__main__":
+    print("Calling main")
     main() 

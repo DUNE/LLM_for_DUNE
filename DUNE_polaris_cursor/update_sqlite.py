@@ -14,6 +14,7 @@ def patch_chromadb(venv_path):
 
     # Walk through the venv's site-packages to find chromadb
     for root, dirs, files in os.walk(venv_path):
+        print(root, dirs)
         for d in dirs:
             if d == 'chromadb':
                 chromadb_path = os.path.join(root, d)

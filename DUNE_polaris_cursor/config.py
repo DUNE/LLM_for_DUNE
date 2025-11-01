@@ -8,9 +8,10 @@ load_dotenv()
 ARGO_API_USERNAME = os.getenv("ARGO_API_USERNAME")
 ARGO_API_KEY = os.getenv("ARGO_API_KEY")
 ARGO_API_URL = os.getenv("ARGO_API_URL", "https://apps.inside.anl.gov/argoapi/api/v1/resource/chat/")
+FERMILAB_API_URL=os.getenv("FERMILAB_API_URL","")
 
-
-QA_PATH = './benchmarking/QuestionAnswer/Cleaned_questions2.csv'
+QA_PATH = './benchmarking/QuestionAnswer/QA.csv'
+#'./benchmarking/QuestionAnswer/Cleaned_questions2.csv'
 
 # Database Configuration
 DUNE_DOCDB_USERNAME = os.getenv("DUNE_DOCDB_USERNAME")
