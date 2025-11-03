@@ -363,13 +363,14 @@ class ChromaManager:
     def get_links(self, reranked_docids):
         return [self.metadata[id_[0]]['event_url'] for id_ in reranked_docids]
     def get_content(self, reranked_docids):
+        print(f"Looking at ids: {[id_[0] for id_ in reranked_docids]}")
         return [self.documents[id_[0]] for id_ in reranked_docids]
 
     def search(self, query: str, top_k: int = 3) -> Tuple[List[str], List[str]]:
         """
             Finds the docID_number associated with the retrieved text, then goes back to the docID to find header info
         """
-        keyword_doc_ids =self.keyword_search(query, top_k)
+        keyword_doc_ids = [] #self.keyword_search(query, top_k)
         semantic_doc_ids = self.semantic_search(query, 'document', top_k)
         semantic_doc_ids.extend(self.semantic_search(query, 'slides', top_k))
 
@@ -379,7 +380,7 @@ class ChromaManager:
 
         links = self.get_links(reranked_docids)
         content = self.get_content(reranked_docids)
-
+        logger.info(f"{len(content)} sources eaxc of len {len(content[0])}")
         return content, links
 
     def save_all(self):

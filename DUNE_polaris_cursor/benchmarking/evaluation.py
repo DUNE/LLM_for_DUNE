@@ -95,7 +95,7 @@ def correctness(outputs: dict, expectations: dict= None) -> int:
             return 0.0
         question="Using the expected output as the ground truth answer, determine if the generated output is correct .Return a float value between 0 and 1 in the format of a json with the only permitted key being 'score'. Your float value must not contain any letters, they must strictly be comprised of numerical values and decimals. You will evaluate correctness like this: Get the main points from the expected output and the generated output. Then evaluate how closely aligned these points are. The words do not need to match exactly. Even if the generated output is phrased differently, as long as the general idea behind the generated output is the same as that behind the expected out, give the generated output a score close to 1. However, if the generated output does not address the same points or convey the same ideas as that of the expected output, then give a value close to 0."
         context = f"Generated output: {outputs}\nExpected out: {expectations}"
-        resp = argo_client.chat_completion(question=question, context=context, model = 'nomic-embed-text:latest')# base_url='https://vllm.fnal.gov/v1/chat/completions')
+        resp = argo_client.chat_completion(question=question, context=context, model = 'qwen2.5vl:latest') #'nomic-embed-text:latest')# base_url='https://vllm.fnal.gov/v1/chat/completions')
         clean_str = re.sub(r'^```json\s*|```$', '', resp, flags=re.MULTILINE).strip()
         # Parse JSON
         data = json.loads(clean_str)
