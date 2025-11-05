@@ -27,9 +27,10 @@ class FermilabAPIClient:
         base_url: str = FERMILAB_API_URL
     ) -> str:
         """Send a chat completion request to Argo API"""
-        #print(context)
+        print(context.split()[:5])
+        print(f"Question is {question} and context length is {len(context.split())}")
         headers = {
-            "Authorization": f"Bearer {self.api_key}",
+            #"Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"
         }
         logger.info(f"Using model {model}")
@@ -38,7 +39,7 @@ class FermilabAPIClient:
             "messages": [
                 {
                     "role": "system", 
-                    "content": "You are a helpful assistant specialized in scientific documentation for the DUNE experiment."
+                    "content": "You are a helpful assistant specialized in scientific documentation for the DUNE experiment. Provide succinct answers. If you don't see an answer in the context, preceed your response with 'This answer does not reference Indico nor Dune DocDB."
                 },
                 {
                     "role": "user", 
@@ -67,7 +68,7 @@ class FermilabAPIClient:
 
             
         except requests.Timeout:
-            logger.error(f"Fermilab API request timed out")
+            logger.error(f"Fermilab API request timed out {question}, {len(context.split())}")
             return f"[ERROR] Request to Fermilab API timed out after {timeout} seconds. {context}"
         
         except requests.RequestException as e:

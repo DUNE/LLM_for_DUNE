@@ -6,7 +6,7 @@ cs=2000
 chatlas=("Faiss-chatlas" "Chroma-chatlas")
 multiqa=("data")  #("Faiss-multiqa", "Chroma-multiqa")
 for dir in "${multiqa[@]}"; do
-    for item in "$dir"/*; do
+    for item in "${multiqa[@]}"; do
         name=$(basename "$item")
         #save=metrics/gpt4o/${name}/correctness
         echo $item
@@ -14,7 +14,7 @@ for dir in "${multiqa[@]}"; do
         echo $save
 	
 	
-	models=("gpt-oss:20b" "qwen2.5vl:latest" "nomic-embed-text:latest" "mixtral:latest" "qwen2.5-coder:1.5b" "llama3.1:8b" "llama3.2:latest" "gemma3:latest" "Qwen3-coder:latest")
+	models=("gemma3:latest" "qwen2.5vl:latest" "nomic-embed-text:latest" "qwen2.5-coder:1.5b" "llama3.1:8b" "llama3.2:latest" "gemma3:latest")
 
         for model in "${models[@]}"; do
                 echo "Processing model: $model"

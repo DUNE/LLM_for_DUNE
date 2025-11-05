@@ -56,6 +56,7 @@ class ChromaManager:
         if self.chroma_ntotal == 0:
             logger.info(f"Initiating new DB named {CHROMA_DB_NAME}")
         else:
+            logger.info(f"Number of documents = {self.chroma_ntotal}")
             logger.info(f"Retrieving existing DB named {CHROMA_DB_NAME}")
 
         # Setup device & model
@@ -141,26 +142,25 @@ class ChromaManager:
         logger.info(f"up_ids = {up_ids}, mode={mode}")
         print(f"ids :{type(up_ids)}\ndocuments: {type(doc_texts)}\nmetadatas: {type(metadatas)}")
 
+        for i in range(0, len(up_ids), MAX_VARIABLE_NUMBER):
+            if mode == 'update':
+                self.chroma_collection.update(
+                    ids = up_ids[i:i+MAX_VARIABLE_NUMBER],
+                    documents = doc_texts[i:i+MAX_VARIABLE_NUMBER],
+                    metadatas = metadatas[i:i+MAX_VARIABLE_NUMBER],
+                )
 
-        if mode == 'update':
-            self.chroma_collection.update(
-                 ids = up_ids,
-                documents = doc_texts,
-                metadatas = metadatas,
-            )
-
-        elif mode == 'add':
-            self.chroma_collection.add(
-                ids = up_ids,
-                documents = doc_texts,
-                metadatas = metadatas,
-            )
-            self.chroma_ntotal += len(up_ids)
-        else:
-            logger.error(f"Invalid argument mode={mode}. Must be 'add' or 'update")
-            raise ValueError
-
-        logger.info(f"Added {len(up_ids)} to Chroma")
+            elif mode == 'add':
+                self.chroma_collection.add(
+                    ids = up_ids[i:i+MAX_VARIABLE_NUMBER],
+                    documents = doc_texts[i:i+MAX_VARIABLE_NUMBER],
+                    metadatas = metadatas[i:i+MAX_VARIABLE_NUMBER],
+                )
+                self.chroma_ntotal += len(up_ids[i:i+MAX_VARIABLE_NUMBER])
+            else:
+                logger.error(f"Invalid argument mode={mode}. Must be 'add' or 'update")
+                raise ValueError
+            logger.info(f"Added {len(up_ids[i: i+ MAX_VARIABLE_NUMBER])} to Chroma")
         return len(up_ids)
 
 
