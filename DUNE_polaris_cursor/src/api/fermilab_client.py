@@ -1,8 +1,10 @@
+import markdown
 import requests
+
 from typing import Optional
 from config import FERMILAB_API_URL,  LLM_TEMPERATURE, LLM_TOP_P, LLM_MODEL
 from src.utils.logger import get_logger
-
+import json
 logger = get_logger(__name__)
 
 class FermilabAPIClient:
@@ -48,24 +50,27 @@ class FermilabAPIClient:
             ]
         }
         if 'ollama' in base_url:
-            payload['stream'] = False
-        
+            payload['stream'] = True
+        response = []
         try:
             logger.info(f"Sending request to {base_url}")
-            response = requests.post(
-                base_url, 
-                headers=headers, 
-                json=payload, 
-                timeout=timeout
-            )
-            response.raise_for_status()
-            result = response.json()
-            logger.info("Received response from Fermilab API")
-            choices = result.get("choices", [])
-            if choices:
-                return choices[0].get("message", {"content": "None"}).get("content")
-            return result.get("message", {"content": "None"}).get("content")
-
+            with requests.post(base_url, json=payload, stream=True, timeout=300) as resp:
+                for line in resp.iter_lines():
+                    if line:
+                        try:
+                            data = json.loads(line.decode("utf-8"))
+                            token = ""
+                            if "message" in data and "content" in data["message"]:
+                                token = data["message"]["content"]
+                            elif "response" in data:
+                                token = data["response"]
+                            if token:
+                                #yield markdown.markdown(token)
+                                response.append(token)
+                        except Exception as e:
+                            logger.error(e)
+                            continue
+            return ' '.join(response)
             
         except requests.Timeout:
             logger.error(f"Fermilab API request timed out {question}, {len(context.split())}")

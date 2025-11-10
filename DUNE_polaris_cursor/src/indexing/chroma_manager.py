@@ -10,7 +10,7 @@ from src.embedder.embedding_wrappers import ChatlasEmbedder, OriginalEmbedder
 from sentence_transformers import CrossEncoder
 from config import (
     EMBEDDING_MODEL,
-    EMBEDDING_DIM,
+    MAX_VARIABLE_NUMBER,
     create_directories,
 )
 import re
@@ -366,11 +366,14 @@ class ChromaManager:
         print(f"Looking at ids: {[id_[0] for id_ in reranked_docids]}")
         return [self.documents[id_[0]] for id_ in reranked_docids]
 
-    def search(self, query: str, top_k: int = 3) -> Tuple[List[str], List[str]]:
+    def search(self, query: str, top_k: int = 3, keyword=True) -> Tuple[List[str], List[str]]:
         """
             Finds the docID_number associated with the retrieved text, then goes back to the docID to find header info
         """
-        keyword_doc_ids = [] #self.keyword_search(query, top_k)
+        if keyword:
+            keyword_doc_ids = self.keyword_search(query, top_k)
+        else:
+            keyword_doc_ids = []
         semantic_doc_ids = self.semantic_search(query, 'document', top_k)
         semantic_doc_ids.extend(self.semantic_search(query, 'slides', top_k))
 

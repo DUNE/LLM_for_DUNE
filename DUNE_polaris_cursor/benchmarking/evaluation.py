@@ -24,7 +24,7 @@ from find_port import find_port
 argo_client= FermilabAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
 from src.extractors.indico_extractor_multithreaded import IndicoExtractor
 from src.extractors.docdb_extractor_multithreaded import DocDBExtractor
-
+MODEL='gpt-oss:20b'
 def normalize(s):
     # Remove all whitespace characters like \n, \t, spaces, etc.
     expected = re.sub(r'\s+', '', s)
@@ -45,29 +45,28 @@ def relevant_refs(outputs:dict, expectations:dict):
     
     logger.info(f"num snipbfore  {len(contexts)}")
     expect = normalize(expectations['expected_response'])
-    results=0
     assert len(references)>0
     if expect in references:
         print("found")
         return 1
     else:
         prompt = f'Read this context and determine if it provides an answer to the question: {question}, if so, return a float value closer to 1 in the format of a json with the only permitted key being "score". If the content in the file is not related to the question at all or loosely relates to the question, give a score close to 0'
+        results = 0
         #look at the questoin, open the references and check if they relate to the quesiton
         for link, snippet in zip(references,contexts):
             if not link: continue
             document_text=snippet
             if not document_text:
-                results += 0
                 continue
             
-            resp=argo_client.chat_completion(question=prompt, context=document_text, model='nomic-embed-text:latest') # base_url='https://vllm.fnal.gov/v1/chat/completions')
-            print(resp)
-            clean_str = re.sub(r'^```json\s*|```$', '', resp, flags=re.MULTILINE).strip()
-            # Parse JSON
-            data = json.loads(clean_str)
-            # Return the "score" value as float
-            
-            results += float(data.get("score", 0))
+            resp=argo_client.chat_completion(question=prompt, context=document_text, model=MODEL) # base_url='https://vllm.fnal.gov/v1/chat/completions')
+            match = re.search(r'(\d[\d\s]*\.?[\d\s]*)', resp)
+
+            if match:
+                # Remove spaces to clean up
+                number_str = match.group(1).replace(" ", "")
+
+            results += float(number_str)
     length = 0
     for i in references:
         if i:
@@ -95,15 +94,17 @@ def correctness(outputs: dict, expectations: dict= None) -> int:
             return 0.0
         question="Using the expected output as the ground truth answer, determine if the generated output is correct .Return a float value between 0 and 1 in the format of a json with the only permitted key being 'score'. Your float value must not contain any letters, they must strictly be comprised of numerical values and decimals. You will evaluate correctness like this: Get the main points from the expected output and the generated output. Then evaluate how closely aligned these points are. The words do not need to match exactly. Even if the generated output is phrased differently, as long as the general idea behind the generated output is the same as that behind the expected out, give the generated output a score close to 1. However, if the generated output does not address the same points or convey the same ideas as that of the expected output, then give a value close to 0."
         context = f"Generated output: {outputs}\nExpected out: {expectations}"
-        resp = argo_client.chat_completion(question=question, context=context, model = 'qwen2.5vl:latest') #'nomic-embed-text:latest')# base_url='https://vllm.fnal.gov/v1/chat/completions')
-        clean_str = re.sub(r'^```json\s*|```$', '', resp, flags=re.MULTILINE).strip()
-        # Parse JSON
-        data = json.loads(clean_str)
-        # Return the "score" value as float
+        resp = argo_client.chat_completion(question=question, context=context, model = MODEL) #'nomic-embed-text:latest')# base_url='https://vllm.fnal.gov/v1/chat/completions')
+        match = re.search(r'(\d[\d\s]*\.?[\d\s]*)', resp)
+
+        if match:
+            # Remove spaces to clean up
+            number_str = match.group(1).replace(" ", "")
         
-        results = float(data.get("score", 0))
+        results = float(number_str)
     except Exception as e:
         return e
+    print(results)
     return results
 
 
@@ -116,7 +117,7 @@ def extract_https_url(text):
     return None
 
 class Evalutation():
-    def __init__(self, port, experiment_name, data_path,model):
+    def __init__(self, port, experiment_name, data_path,model, top_k, keyword):
 
         #self.faiss_manager = FAISSManager(data_path) 
         self.faiss_manager = ChromaManager(data_path)#FAISSManager(data_path)
@@ -124,6 +125,8 @@ class Evalutation():
         self.model=model
         self.argo_client = FermilabAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
         print("Conntected to client")
+        self.top_K=top_k
+        self.keyword=keyword
         #mlflow.tracing.disable()
         mlflow.set_tracking_uri("./my_mlruns")
         #mlflow.set_tracking_uri(f"http://127.0.0.1:{port}")
@@ -175,14 +178,15 @@ class Evalutation():
         print("made latenvy ds")
         self.latency_dataset = latency
     def llm_qa_response(self, question):
-        context_snippets, references = self.faiss_manager.search(question, top_k=DEFAULT_TOP_K)
+        context_snippets, references = self.faiss_manager.search(question, top_k=self.top_K, keyword=self.keyword)
         context = "\n\n".join(context_snippets)
         # Get answer from Argo API
         answer = self.argo_client.chat_completion(question, context,model=self.model)
+        print(answer)
         assert answer
         return {"generated_response": answer}
     def llm_references(self,question):
-        context_snippets, references = self.faiss_manager.search(question, top_k=DEFAULT_TOP_K)
+        context_snippets, references = self.faiss_manager.search(question, top_k=self.top_K, keyword=self.keyword)
         #logger.info(f"REFS {references}")
         data = {
             "question": question,
@@ -193,7 +197,7 @@ class Evalutation():
         return json.dumps(data) #f"question \ {question} \ {','.join(references)} \{json.dumps(context_snippets)}"
     def latency_collector(self, question):
         start = time.time()
-        context_snippets, references = self.faiss_manager.search(question, top_k=DEFAULT_TOP_K)
+        context_snippets, references = self.faiss_manager.search(question, top_k=top_K, keyword=self.keyword)
         context = "\n\n".join(context_snippets)
         # Get answer from Argo API
         answer = self.argo_client.chat_completion(question, context)
@@ -242,6 +246,8 @@ parser.add_argument('--method', type=str, default='correctness')
 parser.add_argument('--data_path', type=str)
 parser.add_argument('--savedir', type=str)
 parser.add_argument('--model', type=str)
+parser.add_argument('--top_k',type=int)
+parser.add_argument('--keyword', action='store_true')
 args = parser.parse_args()
 
 
@@ -264,7 +270,7 @@ def init_logger(name=__name__, level=logging.INFO):
 logger = init_logger('benchmarking_logger')
 
 
-val = Evalutation(args.port, args.experiment_name, args.data_path, args.model)
+val = Evalutation(args.port, args.experiment_name, args.data_path, args.model, args.top_k, args.keyword)
 results = val.evaluate(args.method)
 
 print(results.metrics.keys())

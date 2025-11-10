@@ -29,10 +29,10 @@ class BaseExtractor(ABC):
         
         chunks = []
         while start < len(text):
-            logger.info(f"Chunk size is {chunk_size} and chunk num words are {min(len(text), end)-start}")
-
             chunks.append(' '.join(text[start:end]))
             start=end
+            logger.info(f"Chunk size is {chunk_size} and chunk num words are {len(chunks[-1].split())}")
+
             end += chunk_size
         return chunks
 
@@ -133,6 +133,7 @@ class BaseExtractor(ABC):
 
     def get_raw_text(self, content_type, content):
         raw_text = ''
+        document_type=''
         if 'application/pdf' in content_type:
             logger.warning("Getting from pdf")
             raw_text, document_type = self.extract_text_from_pdf(content)
@@ -242,7 +243,7 @@ class BaseExtractor(ABC):
 
     def extract_text_from_image(self, image_content: bytes) -> str:
         """Extract text from images (JPEG/PNG) using OCR"""
-        return ''
+        return '', ''
         #follow up have this be an llm call to interpret the image in the form of text
         from PIL import Image
         import pytesseract

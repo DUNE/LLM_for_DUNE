@@ -4,7 +4,7 @@ DUNE-GPT: A RAG-based LLM application for DUNE scientific documentation
 """
 import fastapi
 from fastapi import FastAPI, Request, Form, HTTPException, Depends, status
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.responses import StreamingResponse, HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
@@ -163,6 +163,7 @@ async def form_post(request: Request, question: str = Form(...), user: Optional[
         
         assert references, "no refs"
         # Get answer from Argo API
+        #return StreamingResponse(argo_client.chat_completion(question, context), media_type="text/html")
         answer = argo_client.chat_completion(question, context)
         import markdown
         answer=markdown.markdown(answer)
