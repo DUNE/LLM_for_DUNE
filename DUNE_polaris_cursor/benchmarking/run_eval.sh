@@ -12,19 +12,25 @@ for dir in "${multiqa[@]}"; do
         echo $item
         echo $name
         echo $save
-	model="gpt-oss:20b"
+	model="gpt-oss:120b"
 	for k in 2 3 5 6 7 9; do
-		save="metrics/$model/keyword_top_k_${k}_${name}/relevant_refs"
+		save="metrics/$model/keyword_top_k_${k}_${name}/latency"
 		if [ ! -d "$save" ]; then
                         mkdir -p "$save"
                 fi
-		python3.11 -m benchmarking.evaluation --port 9 --model $model --experiment_name test --method relevent_refs --data_path "$item" --savedir $save --keyword --top_k $k
+                python3.11 -m benchmarking.evaluation --port 44059 --model $model --experiment_name test --method latency --data_path "$item" --savedir $save --keyword --top_k $k
+
+		#save="metrics/$model/keyword_top_k_${k}_${name}/relevant_refs"
+		#if [ ! -d "$save" ]; then
+                        #mkdir -p "$save"
+                #fi
+		#python3.11 -m benchmarking.evaluation --port 9 --model $model --experiment_name test --method relevent_refs --data_path "$item" --savedir $save --keyword --top_k $k
 	 	
-		save="metrics/$model/no_keyword_top_k_${k}_${name}/relevant_refs"
-		if [ ! -d "$save" ]; then
-                        mkdir -p "$save"
-                fi
-		python3.11 -m benchmarking.evaluation --port 9 --model $model --experiment_name test --method relevent_refs --data_path "$item" --savedir $save --top_k $k
+		#save="metrics/$model/no_keyword_top_k_${k}_${name}/relevant_refs"
+		#if [ ! -d "$save" ]; then
+                #        mkdir -p "$save"
+                #fi
+		#python3.11 -m benchmarking.evaluation --port 9 --model $model --experiment_name test --method relevent_refs --data_path "$item" --savedir $save --top_k $k
 	done
 	#models=("qwen2.5vl:latest" "nomic-embed-text:latest" "qwen2.5-coder:1.5b" "llama3.1:8b" "llama3.2:latest" "gemma3:latest")
 	#models=("qwen2.5vl:latest")

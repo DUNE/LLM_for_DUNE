@@ -24,7 +24,7 @@ from find_port import find_port
 argo_client= FermilabAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
 from src.extractors.indico_extractor_multithreaded import IndicoExtractor
 from src.extractors.docdb_extractor_multithreaded import DocDBExtractor
-MODEL='gpt-oss:20b'
+MODEL='gpt-oss:120b'
 def normalize(s):
     # Remove all whitespace characters like \n, \t, spaces, etc.
     expected = re.sub(r'\s+', '', s)
@@ -59,7 +59,7 @@ def relevant_refs(outputs:dict, expectations:dict):
             if not document_text:
                 continue
             
-            resp=argo_client.chat_completion(question=prompt, context=document_text, model=MODEL) # base_url='https://vllm.fnal.gov/v1/chat/completions')
+            resp=argo_client.chat_completion(question=prompt, context=document_text, model=MODEL, base_url='https://vllm.fnal.gov/v1/chat/completions')
             match = re.search(r'(\d[\d\s]*\.?[\d\s]*)', resp)
 
             if match:
@@ -75,8 +75,9 @@ def relevant_refs(outputs:dict, expectations:dict):
     return results / length
 
 @scorer
-def latency(latency):
-    print("latency")#, kwargs)
+def latency_func():
+    return 
+    print("====================latency")
     try:
         outputs = outputs.get("latency", float("inf"))
         logger.info("in run")
@@ -129,7 +130,7 @@ class Evalutation():
         self.keyword=keyword
         #mlflow.tracing.disable()
         mlflow.set_tracking_uri("./my_mlruns")
-        #mlflow.set_tracking_uri(f"http://127.0.0.1:{port}")
+        mlflow.set_tracking_uri(f"http://0.0.0.0:{port}")
         mlflow.set_experiment("experiment_name")
         
     def create_validation_dataset(self):
@@ -168,7 +169,7 @@ class Evalutation():
     def create_latency_dataset(self):
 
 
-        latency_dataset=pd.read_csv(QA_PATH)
+        latency_dataset=pd.read_csv(QA_PATH)[:2]
         latency=[]
         for row in latency_dataset.iterrows():
             dictionary={}
@@ -197,13 +198,14 @@ class Evalutation():
         return json.dumps(data) #f"question \ {question} \ {','.join(references)} \{json.dumps(context_snippets)}"
     def latency_collector(self, question):
         start = time.time()
-        context_snippets, references = self.faiss_manager.search(question, top_k=top_K, keyword=self.keyword)
+        context_snippets, references = self.faiss_manager.search(question, top_k=self.top_K, keyword=self.keyword)
         context = "\n\n".join(context_snippets)
         # Get answer from Argo API
         answer = self.argo_client.chat_completion(question, context)
         end = time.time()
+        mlflow.log_metric("latency", end-start) 
         print("time = ", end-start)
-        return json.dumps({'latency' :end-start})
+        return end-start #json.dumps({'latency' :end-start})
 
 
     #@mlflow.trace
@@ -228,11 +230,11 @@ class Evalutation():
                 )
             elif method=='latency':
                self.create_latency_dataset()
-               self.create_refs_dataset()
+               print(f"Created latency dataset")
                results = mlflow.genai.evaluate(
                     data=self.latency_dataset,
                     predict_fn=self.latency_collector,
-                    scorers=[latency],
+                    scorers=[latency_func],
                 )
         print(results)
         return results  
