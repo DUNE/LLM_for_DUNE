@@ -65,7 +65,7 @@ class FermilabAPIClient:
                             elif "response" in data:
                                 token = data["response"]
                             if token:
-                                #yield markdown.markdown(token)
+                                yield token #markdown.markdown(token)
                                 response.append(token)
                         except Exception as e:
                             logger.error(e)
@@ -97,4 +97,3 @@ class FermilabAPIClient:
         except Exception as e:
             logger.error(f"Argo API health check failed: {e}")
             return False 
-
