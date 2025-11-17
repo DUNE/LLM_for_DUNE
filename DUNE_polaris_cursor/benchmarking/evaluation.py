@@ -22,10 +22,14 @@ import re
 import json
 import os
 from find_port import find_port
-argo_client= ArgoAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
 from src.extractors.indico_extractor_multithreaded import IndicoExtractor
 from src.extractors.docdb_extractor_multithreaded import DocDBExtractor
-MODEL='gpt-oss:120b'
+
+
+fermi_client=FermilabAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
+MODEL='gpt-oss:20b'
+
+
 def normalize(s):
     # Remove all whitespace characters like \n, \t, spaces, etc.
     expected = re.sub(r'\s+', '', s)
@@ -60,7 +64,7 @@ def relevant_refs(outputs:dict, expectations:dict):
             if not document_text:
                 continue
             
-            resp=argo_client.chat_completion(question=prompt, context=document_text)#, model=MODEL, base_url='https://vllm.fnal.gov/v1/chat/completions')
+            resp=fermi_client.chat_completion(question=prompt, context=document_text)#, model=MODEL, base_url='https://vllm.fnal.gov/v1/chat/completions')
             match = re.search(r'(\d[\d\s]*\.?[\d\s]*)', resp)
 
             if match:
@@ -86,7 +90,7 @@ def correctness(outputs: dict, expectations: dict= None) -> float:
         question="Using the expected output as the ground truth answer, determine if the generated output is correct .Return a float value between 0 and 1 in the format of a json with the only permitted key being 'score'. Your float value must not contain any letters, they must strictly be comprised of numerical values and decimals. You will evaluate correctness like this: Get the main points from the expected output and the generated output. Then evaluate how closely aligned these points are. The words do not need to match exactly. Even if the generated output is phrased differently, as long as the general idea behind the generated output is the same as that behind the expected out, give the generated output a score close to 1. However, if the generated output does not address the same points or convey the same ideas as that of the expected output, then give a value close to 0."
                             
         context = f"Generated output: {outputs}\nExpected out: {expectations}"
-        resp = argo_client.chat_completion(question=question, context=context)# model = MODEL) #'nomic-embed-text:latest')# base_url='https://vllm.fnal.gov/v1/chat/completions')
+        resp = fermi_client.chat_completion(question=question, context=context, model =MODEL) #'nomic-embed-text:latest')# base_url='https://vllm.fnal.gov/v1/chat/completions')
         match = re.search(r'(\d[\d\s]*\.?[\d\s]*)', resp)
         if match:
             # Remove spaces to clean up
@@ -116,6 +120,7 @@ class Evalutation():
         print(f"connecting to client")
         self.model=model
         self.argo_client = ArgoAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
+        self.fermi_client=FermilabAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
         print("Conntected to client")
         self.top_K=top_k
         self.keyword=keyword
@@ -173,7 +178,7 @@ class Evalutation():
         context_snippets, references = self.faiss_manager.search(question, top_k=self.top_K, keyword=self.keyword)
         context = "\n\n".join(context_snippets)
         # Get answer from Argo API
-        answer = self.argo_client.chat_completion(question, context) #,model=self.model)
+        answer = self.fermi_client.chat_completion(question, context, model=self.model)
         
         assert answer
         return {"generated_response": answer}
@@ -187,17 +192,6 @@ class Evalutation():
         }
 
         return json.dumps(data) #f"question \ {question} \ {','.join(references)} \{json.dumps(context_snippets)}"
-    def latency_collector(self, question):
-        start = time.time()
-        context_snippets, references = self.faiss_manager.search(question, top_k=self.top_K, keyword=self.keyword)
-        context = "\n\n".join(context_snippets)
-        # Get answer from Argo API
-        answer = self.argo_client.chat_completion(question, context)
-        end = time.time()
-        mlflow.log_metric("latency", end-start) 
-        print("time = ", end-start)
-        return end-start #json.dumps({'latency' :end-start})
-
 
     #@mlflow.trace
     def evaluate(self,method):
@@ -212,7 +206,7 @@ class Evalutation():
                     predict_fn=self.llm_qa_response,
                     scorers=[correctness],
                 )
-            elif method == 'relevent_refs':
+            elif method == 'relevant_refs':
                 self.create_refs_dataset()
                 results = mlflow.genai.evaluate(
                     data=self.ref_dataset,

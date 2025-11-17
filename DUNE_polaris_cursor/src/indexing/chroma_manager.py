@@ -357,7 +357,7 @@ class ChromaManager:
         results = list(zip(merged_docids, ce_scores))
         results.sort(key=lambda x: x[1], reverse=True)
         
-        return results[:top_k]
+        return results[:3]
 
 
     def get_links(self, reranked_docids):
@@ -366,7 +366,7 @@ class ChromaManager:
         print(f"Looking at ids: {[id_[0] for id_ in reranked_docids]}")
         return [self.documents[id_[0]] for id_ in reranked_docids]
 
-    def search(self, query: str, top_k: int = 3, keyword=True) -> Tuple[List[str], List[str]]:
+    def search(self, query: str, top_k: int = 5, keyword=True) -> Tuple[List[str], List[str]]:
         """
             Finds the docID_number associated with the retrieved text, then goes back to the docID to find header info
         """
