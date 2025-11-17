@@ -175,7 +175,7 @@ class BaseExtractor(ABC):
     def extract_text_from_pdf(self, pdf_content: bytes) -> str: #docdb 126 failing check y  ERROR - Error extracting text from PDF: unsupported operand type(s) for *: 'PSLiteral' and 'float'
         """Extract text from PDF content"""
         import pdfplumber
-
+        document_type = ''
         text = ''
         try:
             with pdfplumber.open(BytesIO(pdf_content)) as pdf:
