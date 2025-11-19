@@ -5,6 +5,9 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).parent.absolute()
 load_dotenv() 
 # API Configuration
+MAX_VARIABLE_NUMBER=5461
+
+
 ARGO_API_USERNAME = os.getenv("ARGO_API_USERNAME")
 ARGO_API_KEY = os.getenv("ARGO_API_KEY")
 ARGO_API_URL = os.getenv("ARGO_API_URL", "https://apps.inside.anl.gov/argoapi/api/v1/resource/chat/")

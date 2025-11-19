@@ -498,7 +498,7 @@ class DocDBExtractor(BaseExtractor, Session):
                             
                         })
                         existing_ids[doc_id] = f"{root_id}_{child_id+1}"
-                        logger.info(f"Added chunk from {link} to documents")
+                        logger.info(f"Added chunk of size {len(chunk.split())} from {link} to documents")
                 
                     logger.info(f"Finished extracting from {link}")
                 except Exception as e:
@@ -546,7 +546,9 @@ class DocDBExtractor(BaseExtractor, Session):
                         'content_type': content_type,
                     })
 
-                    logger.info(f"Processed DocDB event: {doc['document_id']} -  Title: {metadata['title']}")
+                if cleaned_text:
+                    logger.info(f"Processed DocDB event: {doc['document_id']} -  Title: {metadata['title']} Chunk size: {len(doc['cleaned_text'].split())}")
+                
                 else:
                     logger.info(f"Not logging anything because metadata-only (no text) for DocDB {doc['document_id']} - {metadata['title']}")
 
