@@ -21,11 +21,12 @@ class DocumentProcessor:
         self.chunk_size=chunk_size
         logger.info("Initiated chroma")
         self.chroma_manager = chroma.ChromaManager(data) 
-       
+        logger.info("Succesfully created db")
  
         self.docdb_extractor = DocDBExtractor(self.chroma_manager)
+        logger.info("created ddb instance")
         self.indico_extractor = IndicoExtractor(self.chroma_manager)
-
+        logger.info("created indico instance")
     def process_all_documents(
         self,
         start_ddb=0,
@@ -52,6 +53,7 @@ class DocumentProcessor:
                 # 1) What versions (and thus IDs) do we already have?
                 indexed_versions = self.chroma_manager.get_docdb_versions()
                 #indexed_ids: Set[int] = set(indexed_versions.keys())
+                logger.info(f"existing ddb versions: {indexed_versions}")
                 indexed_ids: Set[int] = { int(did) for did in indexed_versions.keys() }
 
                 # 2) Fetch up to `docdb_limit` pages, skipping any IDs in indexed_ids

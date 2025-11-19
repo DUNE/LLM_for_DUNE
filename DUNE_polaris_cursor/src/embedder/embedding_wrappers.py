@@ -1,4 +1,3 @@
-#from chATLAS_Embed.EmbeddingModels import SentenceTransformerEmbedding
 from src.utils.logger import get_logger
 from sentence_transformers import SentenceTransformer
 logger = get_logger(__name__)
@@ -8,6 +7,7 @@ import torch
 import gc
 
 class ChatlasEmbedder:
+    from chATLAS_Embed.EmbeddingModels import SentenceTransformerEmbedding
     def __init__(self, model_name="sentence-transformers/all-MiniLM-L6-v2"):
         self.model = SentenceTransformerEmbedding(model_name)
         self.model_name = model_name  # Required by Chroma

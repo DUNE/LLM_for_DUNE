@@ -9,7 +9,7 @@ import time
 from datetime import datetime
 from typing import List, Dict, Any, Tuple, Optional, Set
 from urllib.parse import parse_qs, urlparse, urljoin
-
+import time
 import requests
 from bs4 import BeautifulSoup
 from requests.adapters import HTTPAdapter
@@ -344,7 +344,9 @@ class DocDBExtractor(BaseExtractor, Session):
         docid = start
         consecutive_missing = 0
         consecutive_seen_indexed = 0
-
+        assert isinstance(start,int), f"start is type {type(start)}"
+        assert isinstance(limit_pages, int), f"limit is type {type(docid)}"
+        assert isinstance(docid, int), f"doc is of type {type(docid)}"
         def should_continue() -> bool:
             if limit_pages == -1:
                 return (consecutive_missing < max_missing)
@@ -354,6 +356,8 @@ class DocDBExtractor(BaseExtractor, Session):
             )
 
         while should_continue():
+            if docid % 4 == 0:
+                tiem.sleep(3)
             status = self.check_document_page(docid)
             logger.warning(f"Status for {docid} = {status}")
             
@@ -361,7 +365,7 @@ class DocDBExtractor(BaseExtractor, Session):
             if status == "exists":
                 # reset missing counter
                 consecutive_missing = 0
-
+                
                 if docid in indexed_doc_ids:
                     # already indexed → skip
                     consecutive_seen_indexed += 1
@@ -519,32 +523,32 @@ class DocDBExtractor(BaseExtractor, Session):
                 unique_id = f"docdb_{doc['document_id']}_{metadata.get('filename','0')}"
                
                 #PUT IN DOCUMENTATION THAT THESE ARE THE FIELDS
-                dataset.append({
-                    'document_id': doc['document_id'],
-                    'vector_id': unique_id,
-                    'document_type':metadata['document_type'],
-                    'cleaned_text': cleaned_text,
-                    'event_url': metadata['url'],
-                    'title': metadata['title'],
-                    'author': metadata['author'],
-                    'submitted_by': metadata['submitted_by'],
-                    'updated_by': metadata['updated_by'],
-                    'content_last_modified_date': metadata['content_last_modified_date'],
-                    'metadata_last_modified_date': metadata['metadata_last_modified_date'],
-                    'abstract': metadata['abstract'],
-                    'topic': metadata['topic'],
-                    'keywords': metadata['keywords'],
-                    'created_date': metadata['created_date'],
-                    'source': metadata['source'],
-                    'docdb_version': metadata.get('docdb_version', ''),
-                    'filename': metadata.get('filename', ''),
-                    'content_type': content_type,
-                })
+                if cleaned_text:
+                    dataset.append({
+                        'document_id': doc['document_id'],
+                        'vector_id': unique_id,
+                        'document_type':metadata['document_type'],
+                        'cleaned_text': cleaned_text,
+                        'event_url': metadata['url'],
+                        'title': metadata['title'],
+                        'author': metadata['author'],
+                        'submitted_by': metadata['submitted_by'],
+                        'updated_by': metadata['updated_by'],
+                        'content_last_modified_date': metadata['content_last_modified_date'],
+                        'metadata_last_modified_date': metadata['metadata_last_modified_date'],
+                        'abstract': metadata['abstract'],
+                        'topic': metadata['topic'],
+                        'keywords': metadata['keywords'],
+                        'created_date': metadata['created_date'],
+                        'source': metadata['source'],
+                        'docdb_version': metadata.get('docdb_version', ''),
+                        'filename': metadata.get('filename', ''),
+                        'content_type': content_type,
+                    })
 
-                if raw_text:
                     logger.info(f"Processed DocDB event: {doc['document_id']} -  Title: {metadata['title']}")
                 else:
-                    logger.info(f"Added metadata-only (no text) for DocDB {doc['document_id']} - {metadata['title']}")
+                    logger.info(f"Not logging anything because metadata-only (no text) for DocDB {doc['document_id']} - {metadata['title']}")
 
                 # Log attachment details: doc_id, filename, version, title, URL
                 fname = metadata.get('filename', '<no filename>')

@@ -10,7 +10,7 @@ from src.embedder.embedding_wrappers import ChatlasEmbedder, OriginalEmbedder
 from sentence_transformers import CrossEncoder
 from config import (
     EMBEDDING_MODEL,
-    EMBEDDING_DIM,
+    MAX_VARIABLE_NUMBER,
     create_directories,
 )
 import re
@@ -56,6 +56,7 @@ class ChromaManager:
         if self.chroma_ntotal == 0:
             logger.info(f"Initiating new DB named {CHROMA_DB_NAME}")
         else:
+            logger.info(f"Number of documents = {self.chroma_ntotal}")
             logger.info(f"Retrieving existing DB named {CHROMA_DB_NAME}")
 
         # Setup device & model
@@ -141,26 +142,25 @@ class ChromaManager:
         logger.info(f"up_ids = {up_ids}, mode={mode}")
         print(f"ids :{type(up_ids)}\ndocuments: {type(doc_texts)}\nmetadatas: {type(metadatas)}")
 
+        for i in range(0, len(up_ids), MAX_VARIABLE_NUMBER):
+            if mode == 'update':
+                self.chroma_collection.update(
+                    ids = up_ids[i:i+MAX_VARIABLE_NUMBER],
+                    documents = doc_texts[i:i+MAX_VARIABLE_NUMBER],
+                    metadatas = metadatas[i:i+MAX_VARIABLE_NUMBER],
+                )
 
-        if mode == 'update':
-            self.chroma_collection.update(
-                 ids = up_ids,
-                documents = doc_texts,
-                metadatas = metadatas,
-            )
-
-        elif mode == 'add':
-            self.chroma_collection.add(
-                ids = up_ids,
-                documents = doc_texts,
-                metadatas = metadatas,
-            )
-            self.chroma_ntotal += len(up_ids)
-        else:
-            logger.error(f"Invalid argument mode={mode}. Must be 'add' or 'update")
-            raise ValueError
-
-        logger.info(f"Added {len(up_ids)} to Chroma")
+            elif mode == 'add':
+                self.chroma_collection.add(
+                    ids = up_ids[i:i+MAX_VARIABLE_NUMBER],
+                    documents = doc_texts[i:i+MAX_VARIABLE_NUMBER],
+                    metadatas = metadatas[i:i+MAX_VARIABLE_NUMBER],
+                )
+                self.chroma_ntotal += len(up_ids[i:i+MAX_VARIABLE_NUMBER])
+            else:
+                logger.error(f"Invalid argument mode={mode}. Must be 'add' or 'update")
+                raise ValueError
+            logger.info(f"Added {len(up_ids[i: i+ MAX_VARIABLE_NUMBER])} to Chroma")
         return len(up_ids)
 
 
@@ -357,7 +357,7 @@ class ChromaManager:
         results = list(zip(merged_docids, ce_scores))
         results.sort(key=lambda x: x[1], reverse=True)
         
-        return results[:top_k]
+        return results[:3]
 
 
     def get_links(self, reranked_docids):
@@ -366,11 +366,14 @@ class ChromaManager:
         print(f"Looking at ids: {[id_[0] for id_ in reranked_docids]}")
         return [self.documents[id_[0]] for id_ in reranked_docids]
 
-    def search(self, query: str, top_k: int = 3) -> Tuple[List[str], List[str]]:
+    def search(self, query: str, top_k: int = 5, keyword=True) -> Tuple[List[str], List[str]]:
         """
             Finds the docID_number associated with the retrieved text, then goes back to the docID to find header info
         """
-        keyword_doc_ids = [] #self.keyword_search(query, top_k)
+        if keyword:
+            keyword_doc_ids = self.keyword_search(query, top_k)
+        else:
+            keyword_doc_ids = []
         semantic_doc_ids = self.semantic_search(query, 'document', top_k)
         semantic_doc_ids.extend(self.semantic_search(query, 'slides', top_k))
 

@@ -42,12 +42,14 @@ print("\nState transitions:")
 job_times = defaultdict(dict)
 for ev in sorted(events, key=lambda e: (e.job_id, e.timestamp)):
     #print(f"Job {ev.job_id}: {ev.from_state} → {ev.to_state} @ {ev.timestamp}")
+    if ev.to_state == 'STAGED_IN':
+        print(f"{ev.job_id} staged at {ev.timestamp}")
     if ev.to_state == "RUNNING":
         job_times[ev.job_id]['start'] = ev.timestamp
         print(f"{ev.job_id} started running at {ev.timestamp}")
     elif ev.to_state == "RUN_DONE":
         job_times[ev.job_id]['end'] = ev.timestamp
-        print(f"{ev.job_id} started running at {ev.timestamp}")
+        print(f"{ev.job_id} finished running at {ev.timestamp}")
 
 # Compute durations and extract doc counts
 job_labels = []

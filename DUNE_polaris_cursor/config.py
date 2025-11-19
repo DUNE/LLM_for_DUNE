@@ -37,7 +37,7 @@ DOC_LIMIT_DOCDB = int(os.getenv("DOC_LIMIT_DOCDB", "50"))
 DOC_LIMIT_INDICO = int(os.getenv("DOC_LIMIT_INDICO", "50"))
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE",4000))
 
-STORE = os.getenv("VECTOR_STORE", 'faiss')
+STORE = os.getenv("VECTOR_STORE", 'chroma')
 # FAISS Configuration
 CHROMA_PATH=os.getenv('DB_PATH',None)
 FAISS_DIR = BASE_DIR / "data" / "faiss"

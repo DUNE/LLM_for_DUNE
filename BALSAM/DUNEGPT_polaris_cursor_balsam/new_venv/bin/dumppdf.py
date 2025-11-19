@@ -1,4 +1,4 @@
-#!/lus/flare/projects/LLM_for_DUNE/users/Rishika/BALSAM/DUNEGPT_polaris_cursor_balsam/new_venv/bin/python
+#!/lus/flare/projects/LLM_for_DUNE/users/Rishika/LLM_for_DUNE/BALSAM/DUNEGPT_polaris_cursor_balsam/new_venv/bin/python3.11
 """Extract pdf structure in XML format"""
 import logging
 import os.path
