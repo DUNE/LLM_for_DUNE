@@ -7,31 +7,139 @@
     <link rel="stylesheet" href="static/styles.css">
 
     <title>DUNE-GPT</title>
+
+
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
-            max-width: 800px;
         }
+        
+        .header-section {
+            max-width: 800px;
+            margin: 0 auto 30px auto;
+        }
+        
         form {
             margin-bottom: 20px;
         }
+        
         input[type="text"] {
             width: 100%;
             padding: 10px;
             font-size: 16px;
         }
+        
         button {
             padding: 8px 16px;
             font-size: 16px;
             margin-top: 10px;
         }
-        #response {
-            margin-top: 30px;
+        
+        /* Main content area with sources - BELOW the search */
+        .content-wrapper {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            max-width: 1400px;
+            margin: 0 auto;
         }
+        
+        #response {
+            flex: 1;
+            min-width: 0;
+            max-width: 800px;
+        }
+        
+        /* Sources sidebar */
+        .sources-sidebar {
+            width: 280px;
+            flex-shrink: 0;
+            order: 2;
+	    visibility: hidden;
+	}
+
+	.sources-sidebar.visible {
+		visibility: visible
+	}
+        
+        .sources-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #5f6368;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .source-card {
+            background: #f8f9fa;
+            border: 1px solid #e8eaed;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: block;
+            color: inherit;
+        }
+        
+        .source-card:hover {
+            background: #e8f0fe;
+            border-color: #1a73e8;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .source-thumbnail {
+            width: 100%;
+            height: 140px;
+            background: #e8eaed;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+        
+        .source-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .source-thumbnail-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 48px;
+            font-weight: bold;
+        }
+        
+        .source-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: #202124;
+            margin-bottom: 4px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .source-domain {
+            font-size: 11px;
+            color: #5f6368;
+        }
+        
         a {
             color: #0645AD;
         }
+        
         .loader {
             border: 6px solid #f3f3f3;
             border-top: 6px solid #555;
@@ -39,9 +147,10 @@
             width: 30px;
             height: 30px;
             animation: spin 1s linear infinite;
-             margin-top: 10px;
+            margin-top: 10px;
         }
-        #dune-logo {
+        
+        #logo {
             position: absolute;
             top: 20px;
             right: 20px;
@@ -49,12 +158,44 @@
             height: auto;
             z-index: 10;
         }
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .content-wrapper {
+                flex-direction: column;
+            }
+            
+            .sources-sidebar {
+                width: 100%;
+                position: static;
+		display: none;
+            }
+            
+            .source-card {
+                display: flex;
+                gap: 12px;
+                align-items: flex-start;
+            }
+            
+            .source-thumbnail {
+                width: 100px;
+                height: 80px;
+                margin-bottom: 0;
+                flex-shrink: 0;
+            }
+            
+            .source-info {
+                flex: 1;
+                min-width: 0;
+            }
+        }
     </style>
+
 </head>
 <body>
     <h1>DUNE-GPT</h1>
@@ -73,44 +214,118 @@
     {% endif %}
     
     {% if not auth_enabled or user %}
-    <form method="POST" action="/ui" onsubmit="showSpinner()">
-        <label for="question">Ask a question:</label><br>
-        <input type="text" id="question" name="question" required value="{{ question or '' }}" placeholder="Ask me about DUNE documents"><br>
-        <button type="submit">Submit</button>
-        <div id="spinner" style="display:none; margin-top: 10px;">
-            <strong>Processing...</strong> <br>
-            <div class="loader"></div>
-        </div>
+    <form>
+	<textarea id='input' placeholder="Ask a question:" cols="50"></textarea>
+	<button type="submit">Send</button>
     </form>
-    
-    <script>
-        function showSpinner() {
-            document.getElementById('spinner').style.display = 'block';
-        }
-    </script>
+    <div class="container">
+        <div class="content-wrapper">
+            <div class="main-content">
+                <div class="answer-text" id="answer">
+                    <!-- Answer content will be streamed here -->
+                </div>
+            </div>
 
-    <div id="response">
-        {% if answer %}
-            <h2>Answer:</h2>
-	    <!--<pre>{{ answer }}</pre>-->
-	    <div>{{ answer | safe }}</div>
-
-            {% if reference %}
-                <h3>References:</h3>
-                <!-- Debug: Print the raw reference to check its structure -->
-                <!--<p><strong>Raw Reference:</strong> {{ reference }}</p> -->
-                <ul>
-                    {% for ref in reference %}
-                        {% if 'http' in ref %}
-                            <li><a href="{{ ref }}" target="_blank">{{ ref }}</a></li>
-                        {% else %}
-                            <li>{{ ref }}</li>
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endif %}
+            <div class="sources-sidebar" id='sources-sidebar'>
+		<div class="sources-title">Sources</div>
+                <div id="sources-container">
+                    <!-- Sources will be added here -->
+                </div>
+            </div>
+        </div>
     </div>
+    <pre id="body"></pre>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        const body = document.getElementById('answer');
+        const submit_btn = document.querySelector('button');
+        const input = document.getElementById('input');
+	const sourcesContainer = document.getElementById('sources-container');
+        submit_btn.addEventListener("click", async (e) => {
+            e.preventDefault();
+	    console.log("Input value:");
+            const formData = new FormData();
+            formData.append('question', input.value);
+	    const response = await fetch("/ui", {
+                method: "POST",
+                body: formData
+            });
+
+            const reader = response.body.getReader();
+            let output = "";	
+	    console.log("Before while")
+            while (true) {
+                const { done, value } = await reader.read();
+                output += new TextDecoder().decode(value);
+                body.innerHTML = marked.parse(output);
+		if (output.includes('SOURCES: ')) {
+			console.log("Found references")
+         		const [answerText, sourcesJson] = output.split('SOURCES: ');
+            		body.innerHTML = marked.parse(answerText);
+
+            		try {
+
+                		sources = JSON.parse(sourcesJson);
+                		console.log("sources ", sources[0].url)
+				sources.forEach(source => {
+					console.log("callinga dd source with ", source.url);
+                    			addSource(source.url);
+                		});
+            		} catch (e) {
+                		console.error('Error parsing sources:', e);
+            		}
+			return;
+        	} else {
+			console.log("Couldnt find sources ")
+            		body.innerHTML = marked.parse(output);
+        	}
+	    
+                if (done) {
+                    return;
+
+		}
+            
+	    }
+            
+	})
+       
+    	function addSource(url, thumbnailUrl = null) {
+            console.log("in add source")
+	    const sourcesContainer = document.getElementById('sources-container');
+            const sourcesSidebar = document.getElementById('sources-sidebar');
+            
+            // Show sidebar when first source is added
+            sourcesSidebar.classList.add('visible');
+			    //sourcesSidebar.style.display = 'block';
+            console.log("sourcesContainer:", sourcesContainer); // DEBUG
+    console.log("sourcesSidebar:", sourcesSidebar);
+            try {
+                const domain = new URL(url).hostname.replace('www.', '');
+                
+                console.log("dmain ", domain)
+                const sourceCard = document.createElement('a');
+                sourceCard.className = 'source-card';
+                sourceCard.href = url;
+                sourceCard.target = '_blank';
+                
+                sourceCard.innerHTML = `
+                    <div class="source-thumbnail">
+                        ${thumbnailUrl 
+                            ? `<img src="${thumbnailUrl}">` 
+                            : `<div class="source-thumbnail-placeholder">${domain.charAt(0).toUpperCase()}</div>`
+                        }
+                    </div>
+                    <div class="source-info">
+                        <div class="source-domain">${domain}</div>
+                    </div>
+                `;
+                
+                sourcesContainer.appendChild(sourceCard);
+            } catch (e) {
+                console.error('Error adding source:', e);
+            }
+	} 
+    </script>
     {% endif %}
 </body>
 <img src="static/images/DUNElogo_color.png"
@@ -118,4 +333,3 @@
      id="dune-logo" 
      style="position: absolute; top: 20px; right: 20px; width: 200px; height: auto; z-index: 9999;">
 </html>
-
