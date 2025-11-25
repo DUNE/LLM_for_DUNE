@@ -40,16 +40,16 @@ version = "v0"
 """
 Functions
 """
-num_jobs=4
-num_nodes=2
+num_jobs=10
+num_nodes=9
 begin_index = 0 #0
 spill_size = num_nodes #4
 end_index = num_jobs #4
-wall_time_min = 180 #180
-doc_limit = 250 #if queue == 'prod' else 50
+wall_time_min = 360 #180
+doc_limit = 3000 if queue == 'prod' else 50 #-------16K for indico 37K for ddb
 def create_single_dependent_job(app_id, i, parent_ids, params, node_packing_count, start):
     params.update({"i": i})
-    Job.objects.create( app_id=app_id,
+    return Job.objects.create( app_id=app_id,
                         site_name=site_name,
                         workdir=f"workdir/{version}_{i}_{app_id}",
                         node_packing_count=node_packing_count,
@@ -83,17 +83,20 @@ if "embed" in runs or "all" in runs:
     #     )]
 
     #no parents for systematics
-    parent_job_ids = []
+    
+    #Creating Parent Job
     c=0
-    #GPU memory exceed error for embed single run therefore node packing = 1
-    for start in range(begin_index, end_index, num_nodes):
-        #print("start ",start)
-        for i in range(start, start + spill_size):
-            params={'ddb_start': doc_limit*c, 'ind_start': doc_limit*c}
-            c += 1
-            if i < end_index:
-                create_single_dependent_job("embed", c, parent_job_ids, params, gpu_packing_count, start)
+    params={'ddb_start': doc_limit*c, 'ind_start': doc_limit*c}
+    start = 0
+    initial_job = create_single_dependent_job("embed", c, [], params, gpu_packing_count, start=start)
+    parent_job_ids = [initial_job.id]
 
+    #Creating Respective Child Jobs
+    for _ in range(num_jobs - 1):
+        c += 1
+        params={'ddb_start': doc_limit*c, 'ind_start': doc_limit*c}
+        create_single_dependent_job("embed", c, parent_job_ids, params, gpu_packing_count, start=start)
+    print(f"Created {num_jobs-1} jobs with start= {start}")
     print("embed jobs created")
 
 
@@ -101,5 +104,5 @@ if "embed" in runs or "all" in runs:
 if "submit_all" in runs:
     # submit_all_jobs(num_nodes = spill_size//cpu_packing_count)
     # submit_all_jobs(num_nodes = min(spill_size//cpu_packing_count,max_nodes), wall_time_min = 60)
-    for start in range(begin_index, end_index, num_nodes):
-        submit_all_jobs(start=start, num_nodes=num_nodes, wall_time_min=wall_time_min)
+    #for start in range(begin_index, end_index, num_nodes):
+    submit_all_jobs(start=start, num_nodes=num_nodes, wall_time_min=wall_time_min)

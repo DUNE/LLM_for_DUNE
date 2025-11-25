@@ -26,7 +26,6 @@ class BaseExtractor(ABC):
         start = 0
         end=chunk_size
         logger.info(f"Chunk size is {chunk_size} and total num words are {len(text)}")
-        
         chunks = []
         while start < len(text):
             chunks.append(' '.join(text[start:end]))
@@ -99,6 +98,7 @@ class BaseExtractor(ABC):
 
             # Read content (cap if size unknown)
             if size and size <= max_file_bytes:
+                logger.info("Reading file")
                 content = resp.content
             else:
                 content = resp.raw.read(max_file_bytes + 1)
@@ -120,8 +120,8 @@ class BaseExtractor(ABC):
         # Convert first page ONLY
         try:
             images = convert_from_bytes(pdf_path, first_page=1, last_page=1, dpi=100)
-        except:
-            logger.error("COuldn't convert from bytes to images")
+        except Exception e:
+            logger.error(f"{e} : Couldn't convert from bytes to images")
         width,height = images[0].size
         ratio = width/height
         if ratio > 1.25 and ratio < 1.40 or ratio > 1.7 and ratio < 1.85:
@@ -175,7 +175,7 @@ class BaseExtractor(ABC):
     def extract_text_from_pdf(self, pdf_content: bytes) -> str: #docdb 126 failing check y  ERROR - Error extracting text from PDF: unsupported operand type(s) for *: 'PSLiteral' and 'float'
         """Extract text from PDF content"""
         import pdfplumber
-
+        document_type = ''
         text = ''
         try:
             with pdfplumber.open(BytesIO(pdf_content)) as pdf:
