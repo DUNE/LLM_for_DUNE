@@ -6,7 +6,7 @@ import torch
 from rank_bm25 import BM25Okapi
 from typing import List, Dict, Any, Tuple
 from sentence_transformers import SentenceTransformer
-from src.embedder.embedding_wrappers import ChatlasEmbedder, OriginalEmbedder
+from src.embedder.embedding_wrappers import OriginalEmbedder
 from sentence_transformers import CrossEncoder
 from config import (
     EMBEDDING_MODEL,
@@ -370,6 +370,8 @@ class ChromaManager:
         """
             Finds the docID_number associated with the retrieved text, then goes back to the docID to find header info
         """
+        top_k=5
+        assert top_k==5
         if keyword:
             keyword_doc_ids = self.keyword_search(query, top_k)
         else:
@@ -383,7 +385,7 @@ class ChromaManager:
 
         links = self.get_links(reranked_docids)
         content = self.get_content(reranked_docids)
-        logger.info(f"{len(content)} sources eaxc of len {len(content[0])}")
+        logger.info(f"Returning {len(content)} sources eaxc of len {len(content[0])}")
         return content, links
 
     def save_all(self):

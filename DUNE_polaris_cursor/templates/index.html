@@ -24,12 +24,18 @@
             margin-bottom: 20px;
         }
         
-        input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-        }
-        
+        textarea {
+    		width: 100%;
+    		padding: 10px;
+    		font-size: 16px;
+    		resize: none;
+    		overflow: hidden;
+    		min-height: 50px;
+   		border: 1px solid #ccc;
+    		border-radius: 4px;
+    		box-sizing: border-box;
+	}
+
         button {
             padding: 8px 16px;
             font-size: 16px;
@@ -37,7 +43,7 @@
         }
         
         /* Main content area with sources - BELOW the search */
-        .content-wrapper {
+        .veryoldcontent-wrapper {
             display: flex;
             gap: 30px;
             align-items: flex-start;
@@ -45,6 +51,15 @@
             margin: 0 auto;
         }
         
+	.content-wrapper {
+    		display: flex;
+    		gap: 30px;
+    		align-items: flex-start;
+    		width: 1080px;  /* Fixed: 800px (response) + 280px (sidebar) */
+    		max-width: 100%;  /* Responsive on smaller screens */
+    		margin: 0 auto;
+	}
+
         #response {
             flex: 1;
             min-width: 0;
@@ -240,10 +255,20 @@
         const body = document.getElementById('answer');
         const submit_btn = document.querySelector('button');
         const input = document.getElementById('input');
+	input.addEventListener('input', function() {
+   		this.style.height = 'auto';
+    		this.style.height = this.scrollHeight + 'px';
+	});
 	const sourcesContainer = document.getElementById('sources-container');
-        submit_btn.addEventListener("click", async (e) => {
-            e.preventDefault();
-	    console.log("Input value:");
+        const sourcesSidebar = document.getElementById('sources-sidebar');
+	submit_btn.addEventListener("click", async (e) => {
+	    e.preventDefault();
+	    
+	    console.log("Before clear - container children:", sourcesContainer.children.length);
+    	    body.innerHTML = '';
+            sourcesContainer.innerHTML = '';
+            console.log("After clear - container children:", sourcesContainer.children.length);
+	    sourcesSidebar.style.visibility = 'hidden';
             const formData = new FormData();
             formData.append('question', input.value);
 	    const response = await fetch("/ui", {
@@ -253,20 +278,18 @@
 
             const reader = response.body.getReader();
             let output = "";	
-	    console.log("Before while")
             while (true) {
                 const { done, value } = await reader.read();
                 output += new TextDecoder().decode(value);
                 body.innerHTML = marked.parse(output);
 		if (output.includes('SOURCES: ')) {
-			console.log("Found references")
          		const [answerText, sourcesJson] = output.split('SOURCES: ');
             		body.innerHTML = marked.parse(answerText);
 
             		try {
+			        sourcesSidebar.style.visibility = 'visible';
 
                 		sources = JSON.parse(sourcesJson);
-                		console.log("sources ", sources[0].url)
 				sources.forEach(source => {
 					console.log("callinga dd source with ", source.url);
                     			addSource(source.url);
@@ -276,7 +299,6 @@
             		}
 			return;
         	} else {
-			console.log("Couldnt find sources ")
             		body.innerHTML = marked.parse(output);
         	}
 	    
