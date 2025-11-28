@@ -13,7 +13,6 @@ from src.utils.logger import get_logger
 import src.indexing.chroma_manager as chroma
 logger = get_logger(__name__)
 
-
 class DocumentProcessor:
     """Orchestrates document extraction, processing, and indexing"""
 
@@ -21,12 +20,11 @@ class DocumentProcessor:
         self.chunk_size=chunk_size
         logger.info("Initiated chroma")
         self.chroma_manager = chroma.ChromaManager(data) 
-        logger.info("Succesfully created db")
+       
  
         self.docdb_extractor = DocDBExtractor(self.chroma_manager)
-        logger.info("created ddb instance")
         self.indico_extractor = IndicoExtractor(self.chroma_manager)
-        logger.info("created indico instance")
+
     def process_all_documents(
         self,
         start_ddb=0,
@@ -37,6 +35,8 @@ class DocumentProcessor:
     ) -> Dict[str, int]:
         logger.info("Starting document processing pipeline")
         results = {
+            "docdb_parsed":0,
+            "indico_parsed":0,
             "docdb_processed": 0,
             "indico_processed": 0,
             "total_embeddings_added": 0
@@ -53,36 +53,37 @@ class DocumentProcessor:
                 # 1) What versions (and thus IDs) do we already have?
                 indexed_versions = self.chroma_manager.get_docdb_versions()
                 #indexed_ids: Set[int] = set(indexed_versions.keys())
-                logger.info(f"existing ddb versions: {indexed_versions}")
                 indexed_ids: Set[int] = { int(did) for did in indexed_versions.keys() }
 
                 # 2) Fetch up to `docdb_limit` pages, skipping any IDs in indexed_ids
 
                 # 3) Optionally filter by version bump or force‐flag
                 
-                for docs_processed, raw_records in self.docdb_extractor.extract_documents(start=start_ddb, limit=docdb_limit,
+                for docs_processed, raw_records, docs_parsed in self.docdb_extractor.extract_documents(start=start_ddb, limit=docdb_limit,
                                                                     indexed_doc_ids=indexed_ids,
                                                                     mode="incremental",
                                                                     stop_after_seen=100,
                                                                     max_missing=1000,
-                                                                    chunk_size=self.chunk_size
+                                                                    chunk_size=self.chunk_size,
+                                                                    existing_versions=indexed_versions
                                                                 ):
                     
-                    log_to_db_docdb(raw_records, num=docs_processed)
+                    log_to_db_docdb(raw_records, num_processed=docs_processed, num_parsed=docs_parsed)
                     
-                
+                    print(docs_parsed , " parsed")           
             except Exception as e:
                 logger.error(f"Error in extracting documents from dune docdb {e}"  )
             return to_reindex
         
-        def log_to_db_docdb(to_reindex, num):
+        def log_to_db_docdb(to_reindex, num_processed, num_parsed):
             try:
                 with log_lock:
                     
                     logger.info(f"to_reindex is {len(to_reindex)}")
                     # 5) Add the new/updated docs
-                    added = self.chroma_manager.add_documents(to_reindex, num)
-                    results["docdb_processed"] += num
+                    added = self.chroma_manager.add_documents(to_reindex, num_processed)
+                    results['docdb_parsed']+=num_parsed
+                    results["docdb_processed"] += num_processed
                     results["total_embeddings_added"] += added
 
 
@@ -105,11 +106,11 @@ class DocumentProcessor:
                 
                 logger.info("Processing Indico documents")
 
-                for num_events, indico_records in self.indico_extractor.extract_documents(start=start_ind, limit=indico_limit, chunk_size=self.chunk_size):
+                for num_events, indico_records, docs_parsed in self.indico_extractor.extract_documents(start=start_ind, limit=indico_limit, chunk_size=self.chunk_size):
                     logger.info(f"Indico records returns {len(indico_records)} from {num_events} events")
                    
 
-                    log_to_db_indico(indico_records,num_events)
+                    log_to_db_indico(indico_records,num_events, docs_parsed)
                     
 
 
@@ -118,10 +119,10 @@ class DocumentProcessor:
             except Exception as e:
                 logger.error(f"Error processing Indico documents: {e}")
 
-        def log_to_db_indico(docs,num_events):
+        def log_to_db_indico(docs,num_events, num_parsed):
             with log_lock:
                 added = self.chroma_manager.add_documents(docs,num_events)
-                        
+                results['indico_parsed'] += num_parsed
                 results["indico_processed"] += num_events
                 
                 results["total_embeddings_added"] += added
@@ -146,6 +147,7 @@ class DocumentProcessor:
 
 
         return results
+
 
     def get_index_stats(self) -> Dict[str, int]:
         """Get current index statistics"""

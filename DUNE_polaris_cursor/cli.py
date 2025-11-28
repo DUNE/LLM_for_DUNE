@@ -110,6 +110,8 @@ def index(docdb_limit, indico_limit, start_idx_ddb, start_idx_ind, docdb_latest_
         click.echo(f"\n{'='*50}")
         click.echo("INDEXING RESULTS")
         click.echo(f"{'='*50}")
+        click.echo(f"DocDB Events parsed: {results['docdb_parsed']}")
+        click.echo(f"Indico Events parsed: {results['indico_parsed']}")
         click.echo(f"DocDB Events processed: {results['docdb_processed']}")
         click.echo(f"Indico Events processed: {results['indico_processed']}")
         click.echo(f"Total new events added: {results['indico_processed'] + results['docdb_processed']}")
