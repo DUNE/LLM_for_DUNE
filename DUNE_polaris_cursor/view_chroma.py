@@ -17,6 +17,14 @@ for doc, id_, md in zip(mcd['documents'], mcd['ids'], mcd['metadatas']):
     i = id_.split('_')[0]
     if '/' in i:
         i = i.split('/')[0]
+
+    if md.get('source', 'indico') == 'docdb':
+        min_id = min(min_id, int(i))
+        max_id = max(max_id, int(i))
+        avg_words += len(doc.split())
+        max_len = max(len(doc.split()), max_len)
+    else:
+        print(i)
     all_ids.add(i)
     if md.get('source', 'indico') == 'docdb':
         min_id = min(min_id, int(i))
