@@ -19,7 +19,7 @@ For example, if app/embed_dodb_indico.py specifies:
 
 **To Start the Jobs:**
 ```
-cd ../workflow 
+cd ../workflows 
 python3 embed_docdb_indico.py --c 0
 ```
 - This command initiates the jobs by creating 5 jobs running on 5 nodes. Whether they are 5 different nodes or some shared nodes depends on the job scheduler. The exact number of jobs and nodes can be adjusted by modifying:
@@ -36,22 +36,22 @@ python3 embed_docdb_indico.py --c 0
 
 **How to Decide Which Commands To Run**
 
-The argument c is used to tell the script which document number to start it. If the intent is to start at document 20,000 in docdb 
+The argument c is used to tell the script which document number to start with. If the intent is to start at document 20,000 in docdb 
     
-    --c 20
+    --c 20  # as one job is extracting 1000 docdb documents 
 To decide the value of c:
 
     D = docdb document to start from
-    L_D = number of docdb documents 1 job is extracting
+    L_D = number of docdb documents 1 job is extracting, or defined as "doc_limit" in "workflows/embed_docdb_indico.py"
     c = D / L_D
     
     OR
     
     I = indico category to start from
-    L_I = number of indico documents 1 job is extraaction
+    L_I = number of indico documents 1 job is extracting, or defined as "indico_limit" in "workflows/embed_docdb_indico.py"
     c = I / L_I
     
-It is 1 'c value' for both docdb and indico so if:
+The 'c value' is the same for both docdb and indico, so if:
     
     c = 20
     L_D = 1,000
