@@ -41,7 +41,7 @@ The argument c is used to tell the script which document number to start it. If 
     --c 20
 To decide the value of c:
 
-    D = document to start from
+    D = docdb document to start from
     L_D = number of docdb documents 1 job is extracting
     c = D / L_D
     
