@@ -160,10 +160,12 @@ async def form_post(request: Request, question: str = Form(...), user: Optional[
         # Search FAISS index
         context_snippets, references = db_manager.search(question, top_k=DEFAULT_TOP_K)
         context = "\n\n".join(context_snippets)
+        print("Got context")
         
         assert references, "no refs"
+        print("GETting streamed response")
         # Get answer from Argo API
-        #return StreamingResponse(argo_client.chat_completion(question, context), media_type="text/html")
+        return StreamingResponse(argo_client.chat_completion(question, context, links=references), media_type="text/html")
         answer = argo_client.chat_completion(question, context)
         import markdown
         answer=markdown.markdown(answer)

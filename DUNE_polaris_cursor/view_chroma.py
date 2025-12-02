@@ -29,7 +29,7 @@ for doc, id_, md in zip(mcd['documents'], mcd['ids'], mcd['metadatas']):
     if md.get('source', 'indico') == 'docdb':
         min_id = min(min_id, int(i))
         max_id = max(max_id, int(i))
-    avg_words += len(doc.split())
+    #avg_words += len(doc.split())
     max_len = max(len(doc.split()), max_len)
 
 print(f"Avg length of chunk ", avg_words/len(mcd['documents']))

@@ -263,7 +263,11 @@
         const sourcesSidebar = document.getElementById('sources-sidebar');
 	submit_btn.addEventListener("click", async (e) => {
 	    e.preventDefault();
-	    
+	    console.log("In evemt")
+	    const spinner = document.createElement('div');
+    	    spinner.id = 'status-spinner';
+    	    spinner.innerHTML = '<div class="spinner-icon"></div><div class="spinner-text">Searching documents...</div>';
+            body.appendChild(spinner);
 	    console.log("Before clear - container children:", sourcesContainer.children.length);
     	    body.innerHTML = '';
             sourcesContainer.innerHTML = '';
@@ -276,11 +280,33 @@
                 body: formData
             });
 
+	
+
             const reader = response.body.getReader();
+            console.log("Got a response")
             let output = "";	
+	    let isStreaming = false;
             while (true) {
+		console.log("True")
                 const { done, value } = await reader.read();
-                output += new TextDecoder().decode(value);
+		console.log("value ", value)
+                const chunk = new TextDecoder().decode(value);
+		if (chunk.includes('STATUS:SEARCHING')) {
+         		spinner.querySelector('.spinner-text').textContent = 'Searching documents...';
+            		continue;
+        	}
+
+        	if (chunk.includes('STATUS:PROCESSING')) {
+            		spinner.querySelector('.spinner-text').textContent = 'Processing response...';
+            		continue;
+       	 	}
+
+        	// Remove spinner on first real content
+        	if (!isStreaming && !chunk.startsWith('STATUS:')) {
+           		spinner.remove();
+            		isStreaming = true;
+        	}
+		output += chunk
                 body.innerHTML = marked.parse(output);
 		if (output.includes('SOURCES: ')) {
          		const [answerText, sourcesJson] = output.split('SOURCES: ');

@@ -5,7 +5,7 @@ data_dirs=("data")  #("Faiss-multiqa", "Chroma-multiqa")
 for dir in "${data_dirs[@]}"; do
     for item in "${data_dirs[@]}"; do
         name=$(basename "$item")
-	model='gpt4o_searchold_18' #"gpt-oss:20b"
+	model='gpt4o_newsearch_gneeral3' #"gpt-oss:20b"
 	for k in 3; do
 		save="metrics/$model/keyword_top_k_${k}_${name}/relevant_refs"
 		if [ ! -d "$save" ]; then
