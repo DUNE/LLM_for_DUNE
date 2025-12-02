@@ -9,7 +9,7 @@ import time
 from datetime import datetime
 from typing import List, Dict, Any, Tuple, Optional, Set
 from urllib.parse import parse_qs, urlparse, urljoin
-
+import time
 import requests
 from bs4 import BeautifulSoup
 from requests.adapters import HTTPAdapter
@@ -344,24 +344,29 @@ class DocDBExtractor(BaseExtractor, Session):
         docid = start
         consecutive_missing = 0
         consecutive_seen_indexed = 0
-
+        assert isinstance(start,int), f"start is type {type(start)}"
+        assert isinstance(limit_pages, int), f"limit is type {type(docid)}"
+        assert isinstance(docid, int), f"doc is of type {type(docid)}"
         def should_continue() -> bool:
             if limit_pages == -1:
                 return (consecutive_missing < max_missing)
             return (
-                docid <= limit_pages + start
+                docid < limit_pages + start
                 and consecutive_missing < max_missing
             )
-
+        parsed = 0
         while should_continue():
+            if docid % 4 == 0:
+                time.sleep(3)
             status = self.check_document_page(docid)
             logger.warning(f"Status for {docid} = {status}")
             
 
             if status == "exists":
                 # reset missing counter
+                parsed += 1
                 consecutive_missing = 0
-
+                
                 if docid in indexed_doc_ids:
                     # already indexed → skip
                     consecutive_seen_indexed += 1
@@ -409,7 +414,7 @@ class DocDBExtractor(BaseExtractor, Session):
             docid += 1
 
         logger.info(f"Found {len(existing_pages)} DocDB pages with attachments to process")
-        return existing_pages
+        return existing_pages, parsed
 
     
     
@@ -423,9 +428,10 @@ class DocDBExtractor(BaseExtractor, Session):
         max_missing: int = 1000,
         latest_hint: Optional[int] = None,  # NEW: optional manual starting hint (e.g., 34626)
         chunk_size:int=None,
+        existing_versions={}
     ) -> List[Dict[str, Any]]:
         logger.info(f"Extracting events from DocDB (mode: {mode}, limit: {limit}, latest_hint={latest_hint})")
-        pages = self._enumerate_pages_latest_first(
+        pages, parsed = self._enumerate_pages_latest_first(
             start=start,
             limit_pages=limit,
             indexed_doc_ids=indexed_doc_ids,
@@ -444,13 +450,23 @@ class DocDBExtractor(BaseExtractor, Session):
             for fut in as_completed(future_to_page):
                 
                 page_url = future_to_page[fut]
-                
+
                 try:
                     links, metadata = fut.result()
+                    to_update_links=[]
+                    to_update_metadata=[]
+                    for l,m in zip(links, metadata):
+                        print(existing_versions)
+                        logger.info(f"current version: {m.get('docdb_version')}\nexisitng verison for {m.get('doc_id')}: {existing_versions.get(m.get('doc_id'))}")
+                        if int(m.get('docdb_version')) <= int(existing_versions.get(m.get('doc_id'), -1)):
+                            logger.info(f"Skipping {m.get('docdb_version')}")
+                            continue
+                        to_update_links.append(l)
+                        to_update_metadata.append(m)
 
-                    all_links.extend(links)
-                    all_metadata.extend(metadata)
-                    documents_processed[page_url].extend(links)
+                    all_links.extend(to_update_links)
+                    all_metadata.extend(to_update_metadata)
+                    documents_processed[page_url].extend(to_update_links)
                 except Exception as e:
                     logger.error(f"Error processing page {page_url}: {e}")
                 
@@ -464,7 +480,8 @@ class DocDBExtractor(BaseExtractor, Session):
             logger.info(f"Downloaded {len(futures)} links")
             for fut in as_completed(futures):
                 link, metadata = futures[fut]
-            
+                
+
                 try:
                     result = fut.result()
                     if not result:
@@ -485,6 +502,7 @@ class DocDBExtractor(BaseExtractor, Session):
                         root_id = doc_id
                         
                         child_id = int(existing_ids.get(doc_id,'0_0').split("_")[-1])
+                        
                         metadata['document_type'] = document_type
                         documents.append({
                             'document_id': f"{root_id}_{child_id+1}",
@@ -493,6 +511,7 @@ class DocDBExtractor(BaseExtractor, Session):
                             'metadata': metadata,
                             
                         })
+
                         existing_ids[doc_id] = f"{root_id}_{child_id+1}"
                         logger.info(f"Added chunk of size {len(chunk.split())} from {link} to documents")
                 
@@ -519,33 +538,34 @@ class DocDBExtractor(BaseExtractor, Session):
                 unique_id = f"docdb_{doc['document_id']}_{metadata.get('filename','0')}"
                
                 #PUT IN DOCUMENTATION THAT THESE ARE THE FIELDS
-                dataset.append({
-                    'document_id': doc['document_id'],
-                    'vector_id': unique_id,
-                    'document_type':metadata['document_type'],
-                    'cleaned_text': cleaned_text,
-                    'event_url': metadata['url'],
-                    'title': metadata['title'],
-                    'author': metadata['author'],
-                    'submitted_by': metadata['submitted_by'],
-                    'updated_by': metadata['updated_by'],
-                    'content_last_modified_date': metadata['content_last_modified_date'],
-                    'metadata_last_modified_date': metadata['metadata_last_modified_date'],
-                    'abstract': metadata['abstract'],
-                    'topic': metadata['topic'],
-                    'keywords': metadata['keywords'],
-                    'created_date': metadata['created_date'],
-                    'source': metadata['source'],
-                    'docdb_version': metadata.get('docdb_version', ''),
-                    'filename': metadata.get('filename', ''),
-                    'content_type': content_type,
-                })
+                if cleaned_text:
+                    dataset.append({
+                        'document_id': doc['document_id'],
+                        'vector_id': unique_id,
+                        'document_type':metadata['document_type'],
+                        'cleaned_text': cleaned_text,
+                        'event_url': metadata['url'],
+                        'title': metadata['title'],
+                        'author': metadata['author'],
+                        'submitted_by': metadata['submitted_by'],
+                        'updated_by': metadata['updated_by'],
+                        'content_last_modified_date': metadata['content_last_modified_date'],
+                        'metadata_last_modified_date': metadata['metadata_last_modified_date'],
+                        'abstract': metadata['abstract'],
+                        'topic': metadata['topic'],
+                        'keywords': metadata['keywords'],
+                        'created_date': metadata['created_date'],
+                        'source': metadata['source'],
+                        'docdb_version': metadata.get('docdb_version', ''),
+                        'filename': metadata.get('filename', ''),
+                        'content_type': content_type,
+                    })
 
                 if cleaned_text:
                     logger.info(f"Processed DocDB event: {doc['document_id']} -  Title: {metadata['title']} Chunk size: {len(doc['cleaned_text'].split())}")
                 
                 else:
-                    logger.info(f"Added metadata-only (no text) for DocDB {doc['document_id']} - {metadata['title']}")
+                    logger.info(f"Not logging anything because metadata-only (no text) for DocDB {doc['document_id']} - {metadata['title']}")
 
                 # Log attachment details: doc_id, filename, version, title, URL
                 fname = metadata.get('filename', '<no filename>')
@@ -566,7 +586,7 @@ class DocDBExtractor(BaseExtractor, Session):
                         f"    URL={url}"
                     )
                 if time.time() - self.start_time % 1800 == 0 and ct > 0:
-                    yield dataset
+                    yield len(existing_ids), dataset, parsed
                     dataset.clear()
 
 
@@ -577,4 +597,4 @@ class DocDBExtractor(BaseExtractor, Session):
         logger.info(f"Extracted {len(dataset)} DocDB attachments")
 
         
-        yield len(existing_ids), dataset
+        yield len(existing_ids), dataset, parsed

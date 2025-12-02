@@ -15,7 +15,7 @@ load_dotenv()
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
 
-from config import STORE, validate_config, create_directories, DOC_LIMIT_DOCDB, DOC_LIMIT_INDICO
+from config import STORE, validate_config, create_directories, DOC_LIMIT_DOCDB, DOC_LIMIT_INDICO, CHROMA_PATH, CHUNK_SIZE
 if STORE == 'faiss':
     from src.core.document_processor_multithread import DocumentProcessor
 elif STORE == 'chroma':
@@ -75,26 +75,28 @@ def cli():
     default='data',
 )
 
-@click.option(
-    '--chunk-size',
-    type=int,
-    default=7000000000000,
-)
 @click.option('--force', is_flag=True, help='Force reprocessing of existing documents')
-def index(docdb_limit, indico_limit, start_idx_ddb, start_idx_ind, docdb_latest_hint, chunk_size, data_path, force):
+def index(docdb_limit, indico_limit, start_idx_ddb, start_idx_ind, docdb_latest_hint,  data_path, force):
     """Extract, embed, and index documents from DocDB and Indico"""
     start=time.time()
     try:
         logger.info("Starting document indexing process")
-        logger.info(f"chunk size is {chunk_size}")
+        logger.info(f"chunk size is {CHUNK_SIZE}")
 
         # Validate configuration
         validate_config()
         create_directories(data_path)
+        
+        start_idx_ddb = int(os.getenv('DDB_START_IDX', start_idx_ddb))
+        start_idx_ind = int(os.getenv('IND_START_IDX', start_idx_ind))
+        docdb_limit = int(os.getenv('DOCUMENT_LIMIT', docdb_limit))
+        indico_limit = int(os.getenv('DOCUMENT_LIMIT', indico_limit))
+        data_path = os.getenv("DB_PATH", data_path)
 
         # Initialize document processor
-        processor = DocumentProcessor(data_path, chunk_size)
-
+        logger.info("Init processor")
+        processor = DocumentProcessor(data_path, int(CHUNK_SIZE))
+        logger.info("Processing all docs")
         # Process documents; pass the new latest_hint through
         results = processor.process_all_documents(
             start_ddb=start_idx_ddb,
@@ -108,6 +110,8 @@ def index(docdb_limit, indico_limit, start_idx_ddb, start_idx_ind, docdb_latest_
         click.echo(f"\n{'='*50}")
         click.echo("INDEXING RESULTS")
         click.echo(f"{'='*50}")
+        click.echo(f"DocDB Events parsed: {results['docdb_parsed']}")
+        click.echo(f"Indico Events parsed: {results['indico_parsed']}")
         click.echo(f"DocDB Events processed: {results['docdb_processed']}")
         click.echo(f"Indico Events processed: {results['indico_processed']}")
         click.echo(f"Total new events added: {results['indico_processed'] + results['docdb_processed']}")

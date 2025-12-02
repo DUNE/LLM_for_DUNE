@@ -26,7 +26,6 @@ class BaseExtractor(ABC):
         start = 0
         end=chunk_size
         logger.info(f"Chunk size is {chunk_size} and total num words are {len(text)}")
-        
         chunks = []
         while start < len(text):
             chunks.append(' '.join(text[start:end]))
@@ -99,6 +98,7 @@ class BaseExtractor(ABC):
 
             # Read content (cap if size unknown)
             if size and size <= max_file_bytes:
+                logger.info("Reading file")
                 content = resp.content
             else:
                 content = resp.raw.read(max_file_bytes + 1)
@@ -120,7 +120,7 @@ class BaseExtractor(ABC):
         # Convert first page ONLY
         try:
             images = convert_from_bytes(pdf_path, first_page=1, last_page=1, dpi=100)
-        except Exception e:
+        except Exception as e:
             logger.error(f"{e} : Couldn't convert from bytes to images")
         width,height = images[0].size
         ratio = width/height

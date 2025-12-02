@@ -26,7 +26,8 @@ class FermilabAPIClient:
         top_p: float = LLM_TOP_P,
         model: str = LLM_MODEL,
         timeout: int = 60,
-        base_url: str = FERMILAB_API_URL
+        base_url: str = FERMILAB_API_URL,
+        links:list[str]=None,
     ) -> str:
         """Send a chat completion request to Argo API"""
         print(context.split()[:5])
@@ -65,11 +66,17 @@ class FermilabAPIClient:
                             elif "response" in data:
                                 token = data["response"]
                             if token:
-                                #yield token #markdown.markdown(token)
+                                yield token #markdown.markdown(token)
                                 response.append(token)
                         except Exception as e:
                             logger.error(e)
                             continue
+            if links:
+                sources = [{'url': url} for url in links]
+                print("Retruning links")
+                yield f'SOURCES: ' + json.dumps(sources)
+            else:
+                print("FOund no links")
             return ' '.join(response)
             
         except requests.Timeout:

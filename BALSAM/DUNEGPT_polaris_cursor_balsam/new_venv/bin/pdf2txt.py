@@ -1,4 +1,4 @@
-#!/lus/flare/projects/LLM_for_DUNE/users/Rishika/BALSAM/DUNEGPT_polaris_cursor_balsam/new_venv/bin/python
+#!/lus/flare/projects/LLM_for_DUNE/users/Rishika/LLM_for_DUNE/BALSAM/DUNEGPT_polaris_cursor_balsam/new_venv/bin/python3.11
 """A command line tool for extracting text and images from PDF and
 output it to plain text, html, xml or tags."""
 import argparse

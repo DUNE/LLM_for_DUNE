@@ -6,7 +6,7 @@ import torch
 from rank_bm25 import BM25Okapi
 from typing import List, Dict, Any, Tuple
 from sentence_transformers import SentenceTransformer
-from src.embedder.embedding_wrappers import ChatlasEmbedder, OriginalEmbedder
+from src.embedder.embedding_wrappers import OriginalEmbedder
 from sentence_transformers import CrossEncoder
 from config import (
     EMBEDDING_MODEL,
@@ -83,10 +83,10 @@ class ChromaManager:
         results = self.chroma_collection.get(include=["documents", "metadatas", "uris"])
         for id, md, doc in zip(results['ids'], results['metadatas'],results['documents'] ):
             if md.get('source') == 'indico':
-                self.indico_ids[id]=True
+                self.indico_ids[id.split('_')[0].split("/")[0]]=True
             elif md.get('source') == 'docdb':
                 try:
-                    self.docdb_versions[id] = md['docdb_version']
+                    self.docdb_versions[id.split('_')[0].split("/")[0]] = md['docdb_version']
                     self.docdb_content_modified[id]  = md['content_last_modified_date']
                     self.docdb_metadata_modified[id] = md['metadata_last_modified_date']
                 except:
@@ -138,9 +138,7 @@ class ChromaManager:
         logger.info(f'Storing document of length {length} in chunks')
 
         if length == 0: return 0
-        logger.info(f"Length = {length}")
-        logger.info(f"up_ids = {up_ids}, mode={mode}")
-        print(f"ids :{type(up_ids)}\ndocuments: {type(doc_texts)}\nmetadatas: {type(metadatas)}")
+        
 
         for i in range(0, len(up_ids), MAX_VARIABLE_NUMBER):
             if mode == 'update':
@@ -160,7 +158,8 @@ class ChromaManager:
             else:
                 logger.error(f"Invalid argument mode={mode}. Must be 'add' or 'update")
                 raise ValueError
-            logger.info(f"Added {len(up_ids[i: i+ MAX_VARIABLE_NUMBER])} to Chroma")
+
+        logger.info(f"Added {len(up_ids)} to Chroma")
         return len(up_ids)
 
 
@@ -170,12 +169,12 @@ class ChromaManager:
                 source = doc.get("source", '')
                 did = doc['document_id']
                 if source == 'docdb':
-                    self.docdb_versions[did] = doc['docdb_version']
+                    self.docdb_versions[did.split('_')[0].split("/")[0]] = doc['docdb_version']
                     self.docdb_content_modified[did] = doc.get('content_last_modified_date', 'Unknown Content Date')
                     self.docdb_metadata_modified[did] = doc.get('metadata_last_modified_date', 'Unknown Metadata Date')
 
                 elif source == 'indico':
-                    self.indico_ids[did]=True
+                    self.indico_ids[did.split("_")[0].split("/")[0]]=True
                 #self.doc_ids.add(did)
         except Exception as e:
             logger.error(f"Error in updating list of doc_ids with Indico/DocDB: {e}")
@@ -370,6 +369,8 @@ class ChromaManager:
         """
             Finds the docID_number associated with the retrieved text, then goes back to the docID to find header info
         """
+        top_k=5
+        assert top_k==5
         if keyword:
             keyword_doc_ids = self.keyword_search(query, top_k)
         else:
@@ -383,7 +384,7 @@ class ChromaManager:
 
         links = self.get_links(reranked_docids)
         content = self.get_content(reranked_docids)
-        logger.info(f"{len(content)} sources eaxc of len {len(content[0])}")
+        logger.info(f"Returning {len(content)} sources eaxc of len {len(content[0])}")
         return content, links
 
     def save_all(self):
