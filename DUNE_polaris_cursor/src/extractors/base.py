@@ -120,7 +120,7 @@ class BaseExtractor(ABC):
         # Convert first page ONLY
         try:
             images = convert_from_bytes(pdf_path, first_page=1, last_page=1, dpi=100)
-        except Exception e:
+        except Exception as e:
             logger.error(f"{e} : Couldn't convert from bytes to images")
         width,height = images[0].size
         ratio = width/height

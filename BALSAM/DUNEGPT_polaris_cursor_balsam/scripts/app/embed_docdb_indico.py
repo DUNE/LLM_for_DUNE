@@ -54,10 +54,11 @@ class embed(ApplicationDefinition):
 
 
         export INDEX={self.job.data["i"]}
-        export DOCUMENT_LIMIT={self.job.tags["document_limit"]}
+        export DDB_DOCUMENT_LIMIT={self.job.tags["ddb_document_limit"]}
+        export IND_DOCUMENT_LIMIT={self.job.tags["ind_document_limit"]}
         export DDB_START_IDX={self.job.data["ddb_start"]}
         export IND_START_IDX={self.job.data["ind_start"]}
-
+        export DB_PATH=data/{self.job.data['data_dir']}
         module load autoconf cmake
         module load frameworks
         module load cmake
