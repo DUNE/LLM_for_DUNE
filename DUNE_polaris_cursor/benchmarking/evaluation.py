@@ -26,7 +26,7 @@ from src.extractors.indico_extractor_multithreaded import IndicoExtractor
 from src.extractors.docdb_extractor_multithreaded import DocDBExtractor
 
 
-fermi_client=ArgoAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
+fermi_client=FermilabAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
 MODEL='gpt-oss:20b'
 rel=0
 
@@ -178,8 +178,8 @@ class Evalutation():
                 for dictionary in self.eval_dataset:
                     question = dictionary['inputs']['question']
                     expected = dictionary['expectations']['expected_response']
-                    contexts, references = self.faiss_manager.search(question)
-                    answer = self.fermi_client.chat_completion(question, "\n\n".join(context))
+                    contexts, references = self.faiss_manager.search(question, top_k = self.top_K)
+                    answer = self.fermi_client.chat_completion(question, " ".join(contexts))
                     score_temp = correctness(expected, answer)
                     df.append({'question': question, 'expected_response': expected, 'score': score_temp, 'true response': answer, 'contexts': contexts})
                     score += score_temp
