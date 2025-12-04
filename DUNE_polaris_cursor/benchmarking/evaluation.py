@@ -52,41 +52,34 @@ def relevant_refs(question, expected, contexts, references):
         prompt = f'Read this context and determine if it provides an answer to the question: {question}, if so, return a float value closer to 1 in the format of a json with the only permitted key being "score". If the content in the file is not related to the question at all or loosely relates to the question, give a score close to 0'
         results = 0
         #look at the questoin, open the references and check if they relate to the quesiton
-        for link, snippet in zip(references,contexts):
-            if not link: continue
-            document_text=snippet
-            if not document_text:
-                continue
             
-            resp=fermi_client.chat_completion(question=prompt, context=document_text,  model=MODEL) #base_url='https://vllm.fnal.gov/v1/chat/completions')
-            match = re.search(r'(\d[\d\s]*\.?[\d\s]*)', resp)
+        resp=fermi_client.chat_completion(question=prompt, context=' '.join(contexts),  model=MODEL) #base_url='https://vllm.fnal.gov/v1/chat/completions')
+        match = re.search(r'(\d[\d\s]*\.?[\d\s]*)', resp)
 
-            if match:
+        if match:
                 # Remove spaces to clean up
-                number_str = match.group(1).replace(" ", "")
+            number_str = match.group(1).replace(" ", "")
 
-            results += float(number_str)
-    length = 0
-    for i in references:
-        if i:
-            length += 1
-    return results / length
+        results += float(number_str)
+    return results
 
-def correctness(expectation, output) -> float:
+def correctness(main_question, expectation, output) -> float:
     results = 0
 
     try:
         if '[ERROR]' in output:
+            print(output)
             return 0.0
-        question="Using the expected output as the ground truth answer, determine if the generated output is correct .Return a float value between 0 and 1 in the format of a json with the only permitted key being 'score'. Your float value must not contain any letters, they must strictly be comprised of numerical values and decimals. You will evaluate correctness like this: Get the main points from the expected output and the generated output. Then evaluate how closely aligned these points are. The words do not need to match exactly. Even if the generated output is phrased differently, as long as the general idea behind the generated output is the same as that behind the expected out, give the generated output a score close to 1. However, if the generated output does not address the same points or convey the same ideas as that of the expected output, then give a value close to 0."
+        question=f"Determine if the generated output is correct. Return a float value between 0 and 1 in the format of a json with the only permitted key being 'score'. Your float value must not contain any letters, they must strictly be comprised of numerical values and decimals. You will evaluate correctness like this:  Use the expected response as the ground truth however if the generated response is factually correct and provides a well formed answer to the question {main_question} return a score closer to 1. If the response is not well formed or factually correct return a score closer to 0. Use the expected response as a guide to evaluate the generated response."
                             
-        context = f"Generated output: {outputs}\nExpected out: {expectations}"
+        context = f"Generated output: {output}\nExpected out: {expectation}"
         resp = fermi_client.chat_completion(question=question, context=context, model =MODEL) #'nomic-embed-text:latest')# base_url='https://vllm.fnal.gov/v1/chat/completions')
         match = re.search(r'(\d[\d\s]*\.?[\d\s]*)', resp)
         if match:
             # Remove spaces to clean up
             number_str = match.group(1).replace(" ", "")
-        
+        else:
+            number_str = 0.0
         results += float(number_str)
     except Exception as e:
         print("Excpetion ", e)
@@ -115,6 +108,7 @@ class Evalutation():
         print("Conntected to client")
         self.top_K=top_k
         self.keyword=keyword
+
         
     def create_validation_dataset(self):
         
@@ -128,6 +122,7 @@ class Evalutation():
             dictionary['inputs'] = {'question': row[1]['question']}
 
             dictionary['expectations'] = {'expected_response': row[1]['answer']}
+           
             qas.append(dictionary)
         self.eval_dataset = qas
     
@@ -179,8 +174,8 @@ class Evalutation():
                     question = dictionary['inputs']['question']
                     expected = dictionary['expectations']['expected_response']
                     contexts, references = self.faiss_manager.search(question, top_k = self.top_K)
-                    answer = self.fermi_client.chat_completion(question, " ".join(contexts))
-                    score_temp = correctness(expected, answer)
+                    answer = self.fermi_client.chat_completion(question, " ".join(contexts), model=self.model)
+                    score_temp = correctness(question, expected, answer)
                     df.append({'question': question, 'expected_response': expected, 'score': score_temp, 'true response': answer, 'contexts': contexts})
                     score += score_temp
                 return df, [{'score' : score/len(self.eval_dataset)}]
@@ -214,7 +209,7 @@ class Evalutation():
                     question = q[1]['question']
                     start=time.time()
                     context,links=self.faiss_manager.search(question, top_k=self.top_K, keyword=self.keyword)
-                    resp=self.argo_client.chat_completion(question, ' '.join(context))
+                    resp=self.fermi_client.chat_completion(question, ' '.join(context), model=self.model)
                     end=time.time()
                     df.append({'question': q, 'latency' : end-start})
                     duration += (end-start)
