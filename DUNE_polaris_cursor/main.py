@@ -156,7 +156,6 @@ async def form_post(request: Request, question: str = Form(...), user: Optional[
     """Handle form submission and return results"""
     try:
         logger.info(f"Question received from {user.get('email', 'anonymous') if user else 'anonymous'}: {question}")
-        
         # Search FAISS index
         context_snippets, references = db_manager.search(question, top_k=DEFAULT_TOP_K)
         context = "\n\n".join(context_snippets)

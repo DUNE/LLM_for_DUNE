@@ -456,10 +456,7 @@ class DocDBExtractor(BaseExtractor, Session):
                     to_update_links=[]
                     to_update_metadata=[]
                     for l,m in zip(links, metadata):
-                        print(existing_versions)
-                        logger.info(f"current version: {m.get('docdb_version')}\nexisitng verison for {m.get('doc_id')}: {existing_versions.get(m.get('doc_id'))}")
                         if int(m.get('docdb_version')) <= int(existing_versions.get(m.get('doc_id'), -1)):
-                            logger.info(f"Skipping {m.get('docdb_version')}")
                             continue
                         to_update_links.append(l)
                         to_update_metadata.append(m)
@@ -594,7 +591,7 @@ class DocDBExtractor(BaseExtractor, Session):
             except Exception as e:
                 logger.error(f"Error processing document {doc.get('document_id','unknown')}: {e}")
 
-        logger.info(f"Extracted {len(dataset)} DocDB attachments")
+        logger.info(f"Extracted {len(dataset)} DocDB embeddings")
 
         
         yield len(existing_ids), dataset, parsed

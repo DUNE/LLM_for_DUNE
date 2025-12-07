@@ -144,21 +144,19 @@ def create_vectordb_vs_embedder_plot(metric, title, save_path, factor):
 import json
 import collections
 import numpy as np
-def create_model_plot(basedir):
+def create_model_plot(basedir, metric):
     correctness_results = collections.defaultdict(lambda: collections.defaultdict(float))
     for model in os.listdir(basedir):
-        if 'qwen' not in model: continue
+        if 'new' not in model: continue
         if '.DS' in model: continue
         for param in os.listdir(os.path.join(basedir, model)):
             if '.DS' in param: continue
-            filename = os.path.join(basedir, model,param, 'relevant_refs', 'relevant_refs.json')
+            filename = pd.read_csv(basedir, model,param, metric, f'{metric}_score.csv')
             
             try:
-                with open(filename,"r") as file:
-                    data = json.load(file)
-                    
-                for k in data:
-                    correctness_results[model][param]=data[k]
+                key = 'latency/mean' if metric == 'latency' else 'score'
+
+                correctness_results[model][param]=filename[key]
             except Exception as e:
                 print(f"Skipping {model} {param} bc of {e}")
     # Extract keys (x-axis)
@@ -171,7 +169,7 @@ def create_model_plot(basedir):
     width = 0.8 / len(models)     # width for each model’s bar
 
     # Assign colors per model
-    colors = plt.cm.tab10(np.linspace(0, 1, len(models)))
+    #colors = plt.cm.tab10(np.linspace(0, 1, len(models)))
 
     # Plot each model’s bars
     for i, model in enumerate(models):
@@ -183,7 +181,7 @@ def create_model_plot(basedir):
     plt.xticks(x + width * (len(models) - 1) / 2, all_keys, rotation=90)
     plt.xlabel("Key")
     plt.ylabel("Value")
-    plt.title("Model Comparison by Key (missing = 0)")
+    plt.title(f"{metric}: Model Comparison")
     plt.legend(title="Model")
     plt.tight_layout()
     plt.show()
@@ -191,9 +189,9 @@ def create_model_plot(basedir):
 
     # Now `data` is a Python dict (or list, depending on the JSON structure)
 
-    plt.savefig("metrics/models.png")
+    plt.savefig(f"Plots/{metric}_models.png")
 
-#create_model_plot('/Users/rishikasrinivas/SULI/DUNEGPT_CHROMAFASS/LLM_for_DUNE/LLM_for_DUNE/metrics/metrics')
+create_model_plot('./metrics')
 
 def create_reranker_plot(metric):
     title = 'Source Retrieval' if metric == 'relevant_refs' else 'LLM Response'
@@ -506,5 +504,5 @@ def plot_search_methods(old_search_path, new_search_path):
     plt.show()
 
 
-plot_search_methods()
+#plot_search_methods()
 

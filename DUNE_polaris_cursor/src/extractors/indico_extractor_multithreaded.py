@@ -37,6 +37,7 @@ DEFAULT_UA = (
     "AppleWebKit/537.36 (KHTML, like Gecko) "
     "Chrome/126.0.0.0 Safari/537.36"
 )
+
 DEFAULT_COOKIES_PATH = os.path.expanduser("~/.indico_cookies.json")
 
 
@@ -49,13 +50,13 @@ class IndicoExtractor(BaseExtractor, Session):
     - Avoids scraping HTML.
     """
 
-    def __init__(self, faiss=None):
+    def __init__(self, chroma=None):
         
         self.base_url = INDICO_BASE_URL.rstrip("/")
         self.category_id = INDICO_CATEGORY_ID
         
         self.max_file_bytes =  50 * 1024 * 1024
-        self.faiss=faiss
+        self.chroma = chroma
         self.api_token = INDICO_API_TOKEN or os.getenv("INDICO_API_TOKEN")
         self.cookies_file = (INDICO_COOKIES_FILE
                              or os.getenv("INDICO_COOKIES_FILE")
@@ -196,8 +197,6 @@ class IndicoExtractor(BaseExtractor, Session):
         if isinstance(obj.get("folders"), list):
             for attachment_metadata in obj['folders']:
                 attachments.extend(attachment_metadata["attachments"])
-        else:
-            logger.error(f"DID NOT FIND AN ATTACHMENT IN OBJECT")
         
 
         # Materials may be under 'material' or 'materials'
@@ -422,7 +421,6 @@ class IndicoExtractor(BaseExtractor, Session):
             download_url = a['download_url']
             content_type = a.get('content_type','')
             if not content_type: 
-                #content_type=self.get_content_type(a) #potential special cases of content_type not existing in download but it being a valid link
                 continue
 
             filename = a['filename']
@@ -466,7 +464,7 @@ class IndicoExtractor(BaseExtractor, Session):
 
         dataset: List[Dict[str, Any]] = []
         event_counts=set()
-        current_versions=self.faiss.get_indico_ids()
+        current_versions=self.chroma.get_indico_ids()
         for ct, event in enumerate(events):
             doc = {}
             event_id = event.get("id")
@@ -588,6 +586,6 @@ class IndicoExtractor(BaseExtractor, Session):
             except Exception as e:
                 logger.error(f"Error processing event {event_id}: {e}") #22667
 
-        logger.info(f"Extracted {len(dataset)} Indico documents")
+        logger.info(f"Extracted {len(dataset)} Indico embeddings")
         yield len(event_counts), dataset, len(events)
 

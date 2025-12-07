@@ -30,7 +30,6 @@ class FermilabAPIClient:
         links:list[str]=None,
     ) -> str:
         """Send a chat completion request to Argo API"""
-        print(context.split()[:5])
         print(f"Question is {question} and context length is {len(context.split())}")
         headers = {
             #"Authorization": f"Bearer {self.api_key}",
@@ -42,7 +41,7 @@ class FermilabAPIClient:
             "messages": [
                 {
                     "role": "system", 
-                    "content": "You are a helpful assistant specialized in scientific documentation for the DUNE experiment. Provide succinct answers. If you don't see an answer in the context, preceed your response with 'This answer does not reference Indico nor Dune DocDB."
+                    "content": "You are a helpful assistant specialized in scientific documentation for the DUNE experiment. Provide succinct answers. If you don't see an answer in the context, preceed your response with 'This answer does not reference Indico nor Dune DocDB."                
                 },
                 {
                     "role": "user", 
@@ -52,8 +51,33 @@ class FermilabAPIClient:
         }
         if 'ollama' in base_url:
             payload['stream'] = True
+        else:
+            payload['stream']=False
+        if '120' in model:
+            base_url='https://vllm.fnal.gov/v1/chat/completions'
         response = []
+        #yield 'STATUS:PROCESSINGg
+        if '120' in model:
+            with requests.post(base_url, json=payload, stream=True) as resp:
+                for line in resp.iter_lines(decode_unicode=True):
+                    if not line:
+                        continue
+                    if line.startswith("data: "):
+                        data_str = line[len("data: "):].strip()
+                        if data_str == "[DONE]":
+                            break
+            # parse JSON chunk here
+                        import json
+                        chunk = json.loads(data_str)
+                        #print(chunk)
+                        if 'content' in chunk['choices'][0]['delta'].keys():
+                            response.append(chunk['choices'][0]['delta'].get('content',''))
+                        else:
+                            response.append(chunk['choices'][0]['delta'].get('response_content',''))
+            return ' '.join(response) #print("Received chunk:", chunk)
+
         try:
+            import json
             logger.info(f"Sending request to {base_url}")
             with requests.post(base_url, json=payload, stream=True, timeout=300) as resp:
                 for line in resp.iter_lines():
@@ -66,17 +90,20 @@ class FermilabAPIClient:
                             elif "response" in data:
                                 token = data["response"]
                             if token:
-                                yield token #markdown.markdown(token)
+                                #yield token #markdown.markdown(token)
                                 response.append(token)
                         except Exception as e:
                             logger.error(e)
                             continue
-            if links:
-                sources = [{'url': url} for url in links]
-                print("Retruning links")
-                yield f'SOURCES: ' + json.dumps(sources)
-            else:
-                print("FOund no links")
+            try:
+                if links:
+                    sources = [{'url': url} for url in links]
+                    print("Retruning links")
+                    #yield f'SOURCES: ' + json.dumps(sources)
+                else:
+                    print("FOund no links")
+            except:
+                print("skip")
             return ' '.join(response)
             
         except requests.Timeout:
