@@ -33,7 +33,7 @@ A Retrieval-Augmented Generation (RAG) based LLM application for DUNE scientific
 
 ### Prerequisites
 
-- Python 3.10+
+- Python 3.11+
 - DUNE DocDB credentials
 - Argo API credentials
 - Optional: DUNE Indico access key
@@ -58,8 +58,18 @@ A Retrieval-Augmented Generation (RAG) based LLM application for DUNE scientific
 
 3. **Install dependencies**
    ```bash
+   python3.11 -m venv venv
+   source venv/bin/activate
+
    pip3 install -r requirements.txt
    python3 -m spacy download en_core_web_sm
+   python3 update_sqlite.py venv
+
+   ```
+
+   To install tesseract for image support
+
+   ```
    brew install tesseract  # for local installation
    
    # For tesseract package installation on Aurora, see below:
@@ -76,25 +86,39 @@ A Retrieval-Augmented Generation (RAG) based LLM application for DUNE scientific
    export LD_LIBRARY_PATH=$HOME/.local/lib:$LD_LIBRARY_PATH
    # Check that Tesseract is installed correctly:
    tesseract --version
-
+   ```
+   
 # Configure build to install in your local directory
 ./autogen.sh
 ./configure --prefix=$HOME/.local
 make -j$(nproc)
 make install
-   ```
+
 
 4. **Index documents**
    ```bash
-   python3 cli.py index --docdb-limit 10 --indico-limit 10
+   python3 cli.py index --docdb-limit 10 --indico-limit 10 --start_idx_ddb 0 --start_idx_ind 0 --chunk-size 2000
    ```
+   start_idx_ddb/start_idx_ind: Which webpage to start at (-1 to not scrape from DocDB/Indico respectively)
+   
+   docdb-limit/indico-limit: How any webpages/categories to scrape respectively (-1 to scrape everything)
 
-5. **Start the server**
+6. **Start the server**
    ```bash
    python3 cli.py serve
    ```
 
-Visit `http://localhost:8000` to access the web interface.
+7. **Start server from local machine**
+   ```bash
+   ssh -L <port to open locally>:localhost:8000 <username to ssh into target machine> 
+   ```
+   ex:
+   ```
+   ssh -L 5000:localhost:8000 user@aurora.alcf.anl.gov
+   ```
+   Webpage launched locally on localhost:5000
+
+Visit `http://localhost:<port>` to access the web interface as explained above.
 
 📋 **For detailed installation instructions, including troubleshooting and advanced configuration, see [INSTALL.md](INSTALL.md)**
 
@@ -133,8 +157,8 @@ All configuration is managed through environment variables. See `env.example` fo
 ### Optional Variables
 
 - `DUNE_INDICO_ACCESS_KEY`: Indico access key (for private events)
-- `DOC_LIMIT_DOCDB`: Number of DocDB documents to process (default: 50)
-- `DOC_LIMIT_INDICO`: Number of Indico documents to process (default: 50)
+- `DOC_LIMIT_DOCDB`: Number of DocDB documents to process (default: 50) Note: -1 for no limit (get all webpages)
+- `DOC_LIMIT_INDICO`: Number of Indico documents to process (default: 50) Note: -1 for no limit (get all webpages)
 - `HOST`: Server host (default: 0.0.0.0)
 - `PORT`: Server port (default: 8000)
 - `LOG_LEVEL`: Logging level (default: INFO)
@@ -311,3 +335,4 @@ For issues and questions:
 ---
 
 **DUNE-GPT** - Making DUNE scientific documentation accessible through AI-powered search and retrieval. 
+
