@@ -66,14 +66,20 @@ class FermilabAPIClient:
                         data_str = line[len("data: "):].strip()
                         if data_str == "[DONE]":
                             break
-            # parse JSON chunk here
                         import json
                         chunk = json.loads(data_str)
-                        #print(chunk)
                         if 'content' in chunk['choices'][0]['delta'].keys():
-                            response.append(chunk['choices'][0]['delta'].get('content',''))
+                            content = chunk['choices'][0]['delta'].get('content','')
                         else:
-                            response.append(chunk['choices'][0]['delta'].get('response_content',''))
+                            content = chunk['choices'][0]['delta'].get('response_content','')
+                        #yield content
+                        response.append(content)
+            if links:
+                sources = [{'url': url} for url in links]
+                print("Retruning links")
+                #yield f'SOURCES: ' + json.dumps(sources)
+            else:
+                print("FOund no links")
             return ' '.join(response) #print("Received chunk:", chunk)
 
         try:

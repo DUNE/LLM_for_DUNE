@@ -12,7 +12,7 @@ from config import (
     EMBEDDING_MODEL,
     MAX_VARIABLE_NUMBER,
     create_directories,
-    TOP_K
+    DEFAULT_TOP_K
 )
 import re
 CHROMA_DB_NAME='DUNE_VECTOR_DB'
@@ -67,7 +67,6 @@ class ChromaManager:
         self.docdb_metadata_modified = defaultdict()
         self.metadata= defaultdict()
         self.documents= defaultdict()
-        self.doc_ids=set()
         self.events_ids=set()
         self.fetch_ddb_ind_data()
         self.num_events=len(self.events_ids)
@@ -92,11 +91,10 @@ class ChromaManager:
             self.metadata[id] = md
             self.documents[id]=doc
 
-            self.doc_ids.add(id)
 
             event_id = id.split("_")[0]
             self.events_ids.add(event_id)
-
+        self.doc_ids = list(self.metadata.keys())
 
     def _configure_threading(self):
         os.environ["OMP_NUM_THREADS"] = "1"
@@ -119,7 +117,6 @@ class ChromaManager:
         for i in ids:
             if documents[ids_to_idx_map[i]].get('cleaned_text', None):
                 up_ids.append(i)
-                self.doc_ids.add(i)
             else:
                 logger.error(f"Cannot add {i} because didn't extract text from it")
 
@@ -204,7 +201,6 @@ class ChromaManager:
 
         if ids_to_add is not None:
             added += self.add_to_chroma(documents= documents, ids= ids_to_add, ids_to_idx_map=map_ids_to_idx, mode='add')
-        self.doc_ids.update(ids_to_add)
 
         return added
     
@@ -366,13 +362,15 @@ class ChromaManager:
         """
             Performs keyword and semantic search (k_docs chunks each), reranking each output and selecting the best top_k
         """
+        assert k_docs==2
+        assert top_k==3
         if keyword:
-            keyword_doc_ids = self.keyword_search(query, k_docs)
+            keyword_doc_ids = self.keyword_search(query, 3*k_docs)
         else:
             keyword_doc_ids = []
+        print("src/indexing/chroma kdocs = ", k_docs)
         semantic_doc_ids = self.semantic_search(query, 'document', k_docs)
         semantic_doc_ids.extend(self.semantic_search(query, 'slides', k_docs))
-
         merged_docids = self.merge(keyword_doc_ids,semantic_doc_ids )
 
         reranked_docids = self.reranker_search(query, merged_docids, top_k)

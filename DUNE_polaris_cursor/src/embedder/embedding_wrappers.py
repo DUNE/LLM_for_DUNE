@@ -41,7 +41,6 @@ class OriginalEmbedder:
         return self.model_name
     def embed_query(self, input):
         # You can just delegate to your existing embed method
-        print(type(input))
         with torch.no_grad():
             embedding = self.model.encode(
                 [f"query: {input[0]}"],

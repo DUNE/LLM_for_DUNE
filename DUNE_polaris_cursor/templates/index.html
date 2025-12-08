@@ -3,38 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <link rel="stylesheet" href="static/styles.css">
-
     <title>DUNE-GPT</title>
 
-
     <style>
+        * {
+            box-sizing: border-box;
+        }
+        
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        h1 {
+            max-width: 800px;
+            margin: 0 0 20px 0;
+            padding: 0 15px;
         }
         
         .header-section {
             max-width: 800px;
-            margin: 0 auto 30px auto;
+            margin: 0 0 30px 0;
+            padding: 0 15px;
         }
         
         form {
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+            max-width: 800px;
+            margin: 0 0 30px 0;
+            padding: 0 15px;
+            width: 100%;
         }
         
         textarea {
-    		width: 100%;
-    		padding: 10px;
-    		font-size: 16px;
-    		resize: none;
-    		overflow: hidden;
-    		min-height: 50px;
-   		border: 1px solid #ccc;
-    		border-radius: 4px;
-    		box-sizing: border-box;
-	}
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            resize: none;
+            overflow: hidden;
+            min-height: 50px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
 
         button {
             padding: 8px 16px;
@@ -42,57 +56,29 @@
             margin-top: 10px;
         }
         
-        /* Main content area with sources - BELOW the search */
-        .veryoldcontent-wrapper {
+        /* Sources row - horizontal cards */
+        .sources-row {
             display: flex;
-            gap: 30px;
-            align-items: flex-start;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        
-	.content-wrapper {
-    		display: flex;
-    		/*gap: 30px;*/
-    		align-items: flex-start;
-    		width: 1080px;  /* Fixed: 800px (response) + 280px (sidebar) */
-    		max-width: 100%;  /* Responsive on smaller screens */
-    		margin: 0 auto;
-	}
-
-        #response {
-            flex: 1;
-            min-width: 0;
+            gap: 20px;
+            margin-bottom: 30px;
             max-width: 800px;
+            margin: 0 0 30px 0;
+            padding: 0 15px;
+            width: 100%;
+            visibility: hidden;
         }
         
-        /* Sources sidebar */
-        .sources-sidebar {
-            width: 280px;
-            flex-shrink: 0;
-            order: 2;
-	    visibility: hidden;
-	}
-
-	.sources-sidebar.visible {
-		visibility: visible
-	}
-        
-        .sources-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #5f6368;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .sources-row.visible {
+            visibility: visible;
         }
         
         .source-card {
+            flex: 1;
+            min-width: 0;
             background: #f8f9fa;
             border: 1px solid #e8eaed;
             border-radius: 8px;
             padding: 12px;
-            margin-bottom: 10px;
             cursor: pointer;
             transition: all 0.2s;
             text-decoration: none;
@@ -109,7 +95,7 @@
         
         .source-thumbnail {
             width: 100%;
-            height: 140px;
+            height: 120px;
             background: #e8eaed;
             border-radius: 6px;
             margin-bottom: 8px;
@@ -130,24 +116,49 @@
             justify-content: center;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            font-size: 48px;
+            font-size: 36px;
             font-weight: bold;
         }
         
-        .source-title {
-            font-size: 13px;
-            font-weight: 500;
-            color: #202124;
-            margin-bottom: 4px;
-            line-height: 1.4;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+        .source-domain {
+            font-size: 12px;
+            color: #5f6368;
+            text-align: center;
+            word-break: break-word;
         }
         
-        .source-domain {
-            font-size: 11px;
+        /* Answer section */
+        #answer {
+            max-width: 800px;
+            margin: 0 0 0 0;
+            padding: 20px 15px;
+            background: #ffffff;
+            border-radius: 8px;
+            width: 100%;
+            min-height: 100px;
+        }
+        
+        /* Spinner */
+        .spinner-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            gap: 15px;
+        }
+        
+        .spinner-icon {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        .spinner-text {
+            font-size: 14px;
             color: #5f6368;
         }
         
@@ -165,13 +176,14 @@
             margin-top: 10px;
         }
         
-        #logo {
-            position: absolute;
+        #dune-logo {
+            position: fixed;
             top: 20px;
             right: 20px;
-            width: 120px;
+            width: 200px;
             height: auto;
-            z-index: 10;
+            z-index: 9999;
+            max-width: calc(100vw - 40px);
         }
         
         @keyframes spin {
@@ -179,16 +191,23 @@
             100% { transform: rotate(360deg); }
         }
         
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .content-wrapper {
-                flex-direction: column;
+        /* Tablet and smaller */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
             }
             
-            .sources-sidebar {
-                width: 100%;
-                position: static;
-		display: none;
+            h1 {
+                padding: 0 10px;
+            }
+            
+            form {
+                padding: 0 10px;
+            }
+            
+            .sources-row {
+                flex-direction: column;
+                padding: 0 10px;
             }
             
             .source-card {
@@ -200,17 +219,63 @@
             .source-thumbnail {
                 width: 100px;
                 height: 80px;
-                margin-bottom: 0;
                 flex-shrink: 0;
+                margin-bottom: 0;
             }
             
             .source-info {
                 flex: 1;
                 min-width: 0;
             }
+            
+            .source-domain {
+                text-align: left;
+            }
+            
+            #answer {
+                padding: 15px 10px;
+            }
+            
+            #dune-logo {
+                width: 120px;
+                top: 10px;
+                right: 10px;
+            }
+        }
+        
+        /* Mobile phones */
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            textarea {
+                font-size: 14px;
+            }
+            
+            button {
+                font-size: 14px;
+                padding: 6px 12px;
+            }
+            
+            .source-thumbnail {
+                width: 80px;
+                height: 60px;
+            }
+            
+            .source-thumbnail-placeholder {
+                font-size: 24px;
+            }
+            
+            .source-domain {
+                font-size: 11px;
+            }
+            
+            #dune-logo {
+                width: 100px;
+            }
         }
     </style>
-
 </head>
 <body>
     <h1>DUNE-GPT</h1>
@@ -229,128 +294,132 @@
     {% endif %}
     
     {% if not auth_enabled or user %}
+    <!-- Search Form -->
     <form>
-	<textarea id='input' placeholder="Ask a question:" cols="50"></textarea>
-	<button type="submit">Send</button>
+        <textarea id='input' placeholder="Ask a question:" cols="50"></textarea>
+        <button type="submit">Send</button>
     </form>
-    <div class="container">
-        <div class="content-wrapper">
-            <div class="main-content">
-                <div class="answer-text" id="answer">
-                    <!-- Answer content will be streamed here -->
-                </div>
-            </div>
-
-            <div class="sources-sidebar" id='sources-sidebar'>
-		<div class="sources-title">Sources</div>
-                <div id="sources-container">
-                    <!-- Sources will be added here -->
-                </div>
-            </div>
-        </div>
+    
+    <!-- Sources Row (3 horizontal cards) -->
+    <div class="sources-row" id="sources-row">
+        <!-- Sources will be added here -->
     </div>
+    
+    <!-- Answer Section -->
+    <div id="answer">
+        <!-- Answer content will be streamed here -->
+    </div>
+    
     <pre id="body"></pre>
+    
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
         const body = document.getElementById('answer');
         const submit_btn = document.querySelector('button');
         const input = document.getElementById('input');
-	input.addEventListener('input', function() {
-   		this.style.height = 'auto';
-    		this.style.height = this.scrollHeight + 'px';
-	});
-	const sourcesContainer = document.getElementById('sources-container');
-        const sourcesSidebar = document.getElementById('sources-sidebar');
-	submit_btn.addEventListener("click", async (e) => {
-	    e.preventDefault();
-	    console.log("In evemt")
-	    const spinner = document.createElement('div');
-    	    spinner.id = 'status-spinner';
-    	    spinner.innerHTML = '<div class="spinner-icon"></div><div class="spinner-text">Searching documents...</div>';
-            body.appendChild(spinner);
-	    console.log("Before clear - container children:", sourcesContainer.children.length);
-    	    body.innerHTML = '';
-            sourcesContainer.innerHTML = '';
-            console.log("After clear - container children:", sourcesContainer.children.length);
-	    sourcesSidebar.style.visibility = 'hidden';
+        const sourcesRow = document.getElementById('sources-row');
+        
+        input.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+        
+        submit_btn.addEventListener("click", async (e) => {
+            e.preventDefault();
+            console.log("In event");
+            
+            // Show spinner
+            body.innerHTML = `
+                <div class="spinner-container">
+                    <div class="spinner-icon"></div>
+                    <div class="spinner-text">Searching documents...</div>
+                </div>
+            `;
+            
+            console.log("Before clear - sources row children:", sourcesRow.children.length);
+            sourcesRow.innerHTML = '';
+            sourcesRow.classList.remove('visible');
+            console.log("After clear - sources row children:", sourcesRow.children.length);
+            
             const formData = new FormData();
             formData.append('question', input.value);
-	    const response = await fetch("/ui", {
+            
+            const response = await fetch("/ui", {
                 method: "POST",
                 body: formData
             });
 
-	
-
             const reader = response.body.getReader();
-            console.log("Got a response")
+            console.log("Got a response");
             let output = "";	
-	    let isStreaming = false;
+            let isStreaming = false;
+            
             while (true) {
-		console.log("True")
+                console.log("True");
                 const { done, value } = await reader.read();
-		console.log("value ", value)
+                console.log("value ", value);
                 const chunk = new TextDecoder().decode(value);
-		if (chunk.includes('STATUS:SEARCHING')) {
-         		spinner.querySelector('.spinner-text').textContent = 'Searching documents...';
-            		continue;
-        	}
+                
+                if (chunk.includes('STATUS:SEARCHING')) {
+                    body.innerHTML = `
+                        <div class="spinner-container">
+                            <div class="spinner-icon"></div>
+                            <div class="spinner-text">Searching documents...</div>
+                        </div>
+                    `;
+                    continue;
+                }
 
-        	if (chunk.includes('STATUS:PROCESSING')) {
-            		spinner.querySelector('.spinner-text').textContent = 'Processing response...';
-            		continue;
-       	 	}
+                if (chunk.includes('STATUS:PROCESSING')) {
+                    body.innerHTML = `
+                        <div class="spinner-container">
+                            <div class="spinner-icon"></div>
+                            <div class="spinner-text">Processing response...</div>
+                        </div>
+                    `;
+                    continue;
+                }
 
-        	// Remove spinner on first real content
-        	if (!isStreaming && !chunk.startsWith('STATUS:')) {
-           		spinner.remove();
-            		isStreaming = true;
-        	}
-		output += chunk
+                // Remove spinner on first real content
+                if (!isStreaming && !chunk.startsWith('STATUS:')) {
+                    isStreaming = true;
+                }
+                
+                output += chunk;
                 body.innerHTML = marked.parse(output);
-		if (output.includes('SOURCES: ')) {
-         		const [answerText, sourcesJson] = output.split('SOURCES: ');
-            		body.innerHTML = marked.parse(answerText);
+                
+                if (output.includes('SOURCES: ')) {
+                    const [answerText, sourcesJson] = output.split('SOURCES: ');
+                    body.innerHTML = marked.parse(answerText);
 
-            		try {
-			        sourcesSidebar.style.visibility = 'visible';
-
-                		sources = JSON.parse(sourcesJson);
-				sources.forEach(source => {
-					console.log("callinga dd source with ", source.url);
-                    			addSource(source.url);
-                		});
-            		} catch (e) {
-                		console.error('Error parsing sources:', e);
-            		}
-			return;
-        	} else {
-            		body.innerHTML = marked.parse(output);
-        	}
-	    
+                    try {
+                        sources = JSON.parse(sourcesJson);
+                        sources.forEach(source => {
+                            console.log("calling add source with ", source.url);
+                            addSource(source.url);
+                        });
+                        sourcesRow.classList.add('visible');
+                    } catch (e) {
+                        console.error('Error parsing sources:', e);
+                    }
+                    return;
+                } else {
+                    body.innerHTML = marked.parse(output);
+                }
+            
                 if (done) {
                     return;
-
-		}
-            
-	    }
-            
-	})
+                }
+            }
+        });
        
-    	function addSource(url, thumbnailUrl = null) {
-            console.log("in add source")
-	    const sourcesContainer = document.getElementById('sources-container');
-            const sourcesSidebar = document.getElementById('sources-sidebar');
+        function addSource(url, thumbnailUrl = null) {
+            console.log("in add source");
             
-            // Show sidebar when first source is added
-            sourcesSidebar.classList.add('visible');
-			    //sourcesSidebar.style.display = 'block';
-            console.log("sourcesContainer:", sourcesContainer); // DEBUG
-    console.log("sourcesSidebar:", sourcesSidebar);
             try {
                 const domain = new URL(url).hostname.replace('www.', '');
                 
-                console.log("dmain ", domain)
+                console.log("domain ", domain);
                 const sourceCard = document.createElement('a');
                 sourceCard.className = 'source-card';
                 sourceCard.href = url;
@@ -368,16 +437,16 @@
                     </div>
                 `;
                 
-                sourcesContainer.appendChild(sourceCard);
+                sourcesRow.appendChild(sourceCard);
             } catch (e) {
                 console.error('Error adding source:', e);
             }
-	} 
+        } 
     </script>
     {% endif %}
+    
+    <img src="static/images/DUNElogo_color.png"
+         alt="DUNE Logo" 
+         id="dune-logo">
 </body>
-<img src="static/images/DUNElogo_color.png"
-     alt="DUNE Logo" 
-     id="dune-logo" 
-     style="position: absolute; top: 20px; right: 20px; width: 200px; height: auto; z-index: 9999;">
 </html>
