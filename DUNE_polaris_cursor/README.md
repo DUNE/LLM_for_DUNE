@@ -234,14 +234,20 @@ DUNEGPT_polaris_cursor/
 ├── src/                     # Source code
 │   ├── api/                 # API clients
 │   │   └── argo_client.py   # Argo API client
+│   │   └── fermilab_client.py   # Fermilab API client
 │   ├── core/                # Core business logic
-│   │   └── document_processor.py
+│   │   └── document_processor.py (single threaded with faiss)
+│   │   └── document_processor_chroma.py (multi threaded with chroma)
+│   │   └── document_processor_faiss.py (multi threaded with faiss)
 │   ├── extractors/          # Document extractors
 │   │   ├── base.py         # Base extractor class
 │   │   ├── docdb_extractor.py
 │   │   └── indico_extractor.py
+│   │   ├── docdb_extractor_multithreaded.py
+│   │   └── indico_extractor_multithreaded.py
 │   ├── indexing/           # FAISS indexing
 │   │   └── faiss_manager.py
+│   │   └── chroma_manager.py
 │   └── utils/              # Utilities
 │       └── logger.py       # Logging setup
 │
@@ -251,6 +257,14 @@ DUNEGPT_polaris_cursor/
 │   └── images/
 └── data/                   # Data storage
     └── faiss/              # FAISS index files
+├── benchmarking/                     # Source code
+│   ├── QuestionAnswer/                 # API clients
+│   │   └── generateQA.py   # Uses Argo to generate test question answer pairs
+│   │benchmarking_plot.py #Makes plots for different experiments
+│   │test_models.sh #tests metrics against differet models   
+│   │test_ks.sh #tests metrics against differet k values
+│   │evaluation.py #Runs evaluation for Correctness, Source Retrieval, Latency
+ 
 ```
 
 ## Production Deployment
