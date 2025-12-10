@@ -33,12 +33,12 @@ print("ALL IMPORTS IMPORTED")
 logger = get_logger(__name__)
 
 # Global variables
-argo_client: Optional[FermilabAPIClient] = None
-print(STORE, CHROMA_PATH)
+fermi_client: Optional[FermilabAPIClient] = None
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage application lifecycle"""
-    global db_manager, argo_client
+    global db_manager, fermi_client
     
     # Startup
     logger.info("Starting DUNE-GPT application")
@@ -55,7 +55,7 @@ async def lifespan(app: FastAPI):
     else:
         raise Exception(f"Requires Faiss or Chroma. Got {STORE}")
     
-    argo_client = FermilabAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
+    fermi_client = FermilabAPIClient()
     
     # Check if index is empty
     stats = db_manager.get_stats()
@@ -156,12 +156,12 @@ async def form_post(request: Request, question: str = Form(...), user: Optional[
     """Handle form submission and return results"""
     try:
         logger.info(f"Question received from {user.get('email', 'anonymous') if user else 'anonymous'}: {question}")
-        # Search FAISS index
+        # Search Chroma index
         context_snippets, references = db_manager.search(question, k_docs= K_DOCS, top_k=DEFAULT_TOP_K)
         context = "\n\n".join(context_snippets)
         
-        # Get answer from Argo API
-        return StreamingResponse(argo_client.chat_completion(question, context, links=references), media_type="text/html")
+        # Get answer from Fermilab API
+        return StreamingResponse(fermi_client.chat_completion(question, context, links=references), media_type="text/html")
     
     except Exception as e:
         logger.error(f"Error processing question: {e}")
@@ -185,8 +185,8 @@ async def api_search(q: str, top_k: int = DEFAULT_TOP_K):
         context_snippets, references = db_manager.search(q, top_k=top_k)
         context = "\n\n".join(context_snippets)
         
-        # Get answer from Argo API
-        answer = argo_client.chat_completion(q, context)
+        # Get answer from Fermilab API
+        answer = fermi_client.chat_completion(q, context)
         
         return {
             "question": q,
@@ -204,12 +204,12 @@ async def health_check():
     """Health check endpoint"""
     try:
         stats = db_manager.get_stats()
-        argo_healthy = argo_client.health_check()
+        fermi_healthy = fermi_client.health_check()
         
         return {
             "status": "healthy" if argo_healthy else "degraded",
             "db_index": stats,
-            "argo_api": "available" if argo_healthy else "unavailable"
+            "fermilab_api": "available" if argo_healthy else "unavailable"
         }
     
     except Exception as e:
