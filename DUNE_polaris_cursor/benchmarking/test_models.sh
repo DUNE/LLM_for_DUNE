@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-data_dir=("data")  #("Faiss-multiqa", "Chroma-multiqa")
+data_dir=("data")  
 for dir in "${data_dir[@]}"; do
 	models=("gpt-oss:120b" "qwen2.5vl:latest" "mixtral:latest" "gpt-oss:20b" "qwen2.5-coder:1.5b" "llama3.1:8b" "llama3.2:latest" "gemma3:latest")
 	for model in "${models[@]}"; do	
@@ -15,7 +15,7 @@ for dir in "${data_dir[@]}"; do
         	if [ ! -d "$save" ]; then
                 	mkdir -p "$save"
         	fi
-        	#python3.11 -m benchmarking.evaluation --port 9 --experiment_name test --method latency --data_path "$item" --savedir $save --top_k 5
+        	python3.11 -m benchmarking.evaluation --port 9 --experiment_name test --method latency --data_path "$item" --savedir $save --top_k 5
 	done
 done
 
