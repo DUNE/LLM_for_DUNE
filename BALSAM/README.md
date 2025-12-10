@@ -3,7 +3,7 @@ This folder is used to initiate parallel BALSAM jobs.
 
 **To Connect the Jobs to the Document Extraction Code:**
 
-- cd into the scripts directory
+- (Go to the BALSAM Dir and) cd into the scripts directory
 
         cd DUNEGPT_polaris_cursor_balsam/scripts
         cd app
