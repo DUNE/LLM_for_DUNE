@@ -3,7 +3,8 @@ import json
 import matplotlib
 import matplotlib.pyplot as plt
 import os
-
+import pandas as pd
+import numpy as np
 # Load JSON
 
 
@@ -11,498 +12,394 @@ import os
 plot_dir = "Plots"
 os.makedirs(plot_dir, exist_ok=True)
 
-import pandas as pd
-
 
 def create_vectordb_vs_embedder_plot(metric, title, save_path, factor):
-    CORRECTNESS_METRIC = './metrics/db_chunk_comparison/FAISS/correctness_FAISS.json'
-    RELEVENT_REFS_METRIC = './metrics/db_chunk_comparison/FAISS/relevant_refs_FAISS.json'
-    res={}
+    """
+    Creates comparison plots for vector databases and embedders.
+    
+    This function generates 5 subplots:
+    1-2: Compare vector databases (CHROMA vs FAISS) for fixed embedders
+    3-4: Compare embedders (CHATLAS vs MULTI-QA) for fixed databases
+    5: Compare chunking strategies (Text vs Semantic)
+
+    args:
+        metric: 'correctness' or 'relevant_refs'
+        title: Title of final plot
+        save_path: Where to save plot (as .png)
+        factor: If results are accumulated over multiple runs and need to be averaged out
+    """
+    
+    # Load metrics data
     metrics = pd.read_csv("metrics/results.csv")
-    for row in metrics.iterrows():
-        print(row)
+    results = {}
+    
+    # Parse metrics into a dictionary
+    for _, row in metrics.iterrows():
+        db, embedder, method, chunk_size = row['index'].split("_")
+        key = f"{db}_{embedder}_{method}_{chunk_size}"
+        results[key] = row[metric]
+    
+    # Sort by chunk size
+    results = dict(sorted(results.items(), key=lambda x: int(x[0].rsplit("_", 1)[-1])))
+    
+    # Initialize data structures for different comparisons
+    comparisons = {
+        'chatlas_dbs': {'labels': [], 'chroma': [], 'faiss': []},
+        'multiqa_dbs': {'labels': [], 'chroma': [], 'faiss': []},
+        'chroma_embedders': {'labels': [], 'chatlas': [], 'multiqa': []},
+        'faiss_embedders': {'labels': [], 'chatlas': [], 'multiqa': []},
+        'chunking': {'labels': [], 'values': []}
+    }
+    
+    # Parse results and organize data for plotting
+    for key, value in results.items():
+        parts = key.split('_')
+        db, embedder, method, chunk_size = parts[0], parts[1], parts[2], parts[3]
         
-        db, embedder, method, cs= row[1]['index'].split("_")
-        # Open the JSON file
+        # Format chunk size label
+        label = 'NoChunking' if '7000' in chunk_size else chunk_size
         
+        # Skip 800 chunk size
+        if '800' in chunk_size:
+            continue
         
-
-        res[f"{db}_{embedder}_{method}_{cs}"] = row[1][metric]
-
-    res =  dict(sorted(res.items(), key=lambda x: int(x[0].rsplit("_", 1)[-1])))
-
-    print(res.keys())
-    compare_db_with_chatlas, compare_db_with_multi, compare_emb_with_chroma, compare_emb_faiss = [], [], [], []
-    compare_emb_with_chroma_CHATvalues, compare_db_with_chatlas_FAISSvalues, compare_db_with_multi_CHROMAvalues, compare_db_with_multi_FAISSvalues = [], [], [], []
-    compare_db_with_chatlas_CHROMAvalues, compare_emb_with_chroma_MULTIvalues, compare_emb_faiss_CHATvalues, compare_emb_faiss_MULTIvalues = [], [], [], []
-    text_v_semantic_chunking, text_v_semantic_chunking_values=[],[]
-    data=[]
-    for x in res:
-        l=x.split('_')[-1]
-        if '8000' in x:
-            if 'semantic' in x:
-                text_v_semantic_chunking.append('Semantic Chunking')
-            else:
-                text_v_semantic_chunking.append('Text Chunking')
-
-            text_v_semantic_chunking_values.append(res[x]) 
-        if '7000' in l:
-            l = 'NoChunking'
-        if '800' in l: continue
-        if ('Chroma_chatlas' in x or 'FAISS_chatlas' in x) and 'embedder' in x:
-            if l not in  compare_db_with_chatlas:compare_db_with_chatlas.append(l)
-            if 'Chroma' in x:
-                compare_db_with_chatlas_CHROMAvalues.append(res[x])
-            else:
-                compare_db_with_chatlas_FAISSvalues.append(res[x])
+        # Chunking comparison (only for 8000 chunk size)
+        if '8000' in chunk_size:
+            chunking_type = 'Semantic Chunking' if 'semantic' in key else 'Text Chunking'
+            comparisons['chunking']['labels'].append(chunking_type)
+            comparisons['chunking']['values'].append(value)
+        
+        # Only process embedder comparisons
+        if 'embedder' not in key:
+            continue
+        
+        # Compare databases with fixed CHATLAS embedder
+        if 'chatlas' in embedder:
+            if label not in comparisons['chatlas_dbs']['labels']:
+                comparisons['chatlas_dbs']['labels'].append(label)
             
-            
-        if ('Chroma_multi' in x or 'FAISS_multi-qa' in x) and 'embedder' in x:
-            if l not in compare_db_with_multi: compare_db_with_multi.append(l)
-            if 'Chroma' in x:
-                compare_db_with_multi_CHROMAvalues.append(res[x])
-                if '8000' in x:
-                    compare_db_with_multi_FAISSvalues.append(0)
-            else:
-                compare_db_with_multi_FAISSvalues.append(res[x])
-                
-
-        if ('Chroma_chatlas' in x or 'Chroma_multi' in x) and 'embedder' in x:
-            if l not in compare_emb_with_chroma: compare_emb_with_chroma.append(l)
-            if 'chatlas' in x:
-                compare_emb_with_chroma_CHATvalues.append(res[x])
-            else:
-                compare_emb_with_chroma_MULTIvalues.append(res[x])
-                if '8000' in x:
-                    compare_emb_with_chroma_CHATvalues.append(0)
-        if ('FAISS_chatlas' in x or 'FAISS_multi-qa' in x) and 'embedder' in x:
-            if l not in compare_emb_faiss: compare_emb_faiss.append(l)
-            if 'chatlas' in x:
-                compare_emb_faiss_CHATvalues.append(res[x])
-            else:
-                compare_emb_faiss_MULTIvalues.append(res[x])
+            if db == 'Chroma':
+                comparisons['chatlas_dbs']['chroma'].append(value)
+            else:  # FAISS
+                comparisons['chatlas_dbs']['faiss'].append(value)
         
-    print(compare_emb_with_chroma_MULTIvalues)
-     
-    data.append({'title': 'Comparing Chatlas against VectorStores', 'labels':compare_db_with_chatlas, 'values1': compare_db_with_chatlas_CHROMAvalues, 'values2': compare_db_with_chatlas_FAISSvalues })
-    data.append({'title': 'Comparing Multi-QA against VectorStores', 'labels':compare_db_with_multi, 'values1': compare_db_with_multi_CHROMAvalues, 'values2': compare_db_with_multi_FAISSvalues})
-    data.append({'title': 'Comparing Embeddings with Chroma', 'labels':compare_emb_with_chroma, 'values1': compare_emb_with_chroma_CHATvalues , 'values2':compare_emb_with_chroma_MULTIvalues})
-    data.append({'title': 'Comparing Embeddings with FAISS', 'labels':compare_emb_faiss, 'values1': compare_emb_faiss_CHATvalues, 'values2': compare_emb_faiss_MULTIvalues})
-
-    # Set up a 2x2 grid
+        # Compare databases with fixed MULTI-QA embedder
+        if 'multi' in embedder:
+            if label not in comparisons['multiqa_dbs']['labels']:
+                comparisons['multiqa_dbs']['labels'].append(label)
+            
+            if db == 'Chroma':
+                comparisons['multiqa_dbs']['chroma'].append(value)
+                # Add placeholder for missing FAISS data at chunk size 8000
+                if '8000' in chunk_size:
+                    comparisons['multiqa_dbs']['faiss'].append(0)
+            else:  # FAISS
+                comparisons['multiqa_dbs']['faiss'].append(value)
+        
+        # Compare embedders with fixed CHROMA database
+        if db == 'Chroma':
+            if label not in comparisons['chroma_embedders']['labels']:
+                comparisons['chroma_embedders']['labels'].append(label)
+            
+            if 'chatlas' in embedder:
+                comparisons['chroma_embedders']['chatlas'].append(value)
+            else:  # multi-qa
+                comparisons['chroma_embedders']['multiqa'].append(value)
+                # Add placeholder for missing chatlas data at chunk size 8000
+                if '8000' in chunk_size:
+                    comparisons['chroma_embedders']['chatlas'].append(0)
+        
+        # Compare embedders with fixed FAISS database
+        if db == 'FAISS':
+            if label not in comparisons['faiss_embedders']['labels']:
+                comparisons['faiss_embedders']['labels'].append(label)
+            
+            if 'chatlas' in embedder:
+                comparisons['faiss_embedders']['chatlas'].append(value)
+            else:  # multi-qa
+                comparisons['faiss_embedders']['multiqa'].append(value)
+    
+    # Prepare plot configurations
+    plot_configs = [
+        {
+            'title': 'Comparing Chatlas against VectorStores',
+            'data': comparisons['chatlas_dbs'],
+            'legend': ['CHROMA', 'FAISS']
+        },
+        {
+            'title': 'Comparing Multi-QA against VectorStores',
+            'data': comparisons['multiqa_dbs'],
+            'legend': ['CHROMA', 'FAISS']
+        },
+        {
+            'title': 'Comparing Embeddings with Chroma',
+            'data': comparisons['chroma_embedders'],
+            'legend': ['CHATLAS', 'MULTI-QA']
+        },
+        {
+            'title': 'Comparing Embeddings with FAISS',
+            'data': comparisons['faiss_embedders'],
+            'legend': ['CHATLAS', 'MULTI-QA']
+        }
+    ]
+    
+    # Create subplots
     fig, axes = plt.subplots(2, 3, figsize=(20, 12))
     axes = axes.flatten()
-    import numpy as np
-    # Plot each chart
-    bar_width = 0.35  # width of each bar
-    for i in range(4):
-        labels = data[i]["labels"]
+    bar_width = 0.35
+    
+    # Plot database and embedder comparisons
+    for i, config in enumerate(plot_configs):
+        labels = config['data']['labels']
+        x = np.arange(len(labels))
         
-        x = np.arange(len(labels))  # x locations for the groups
-        values1 = data[i]["values1"]
-        values2 = data[i]["values2"]
-   
-
-        ax = axes[i]
-        if i < 2:
-            print(labels,len(values1), len(values2))
-            bars1 = ax.bar(x - bar_width/2, values1, width=bar_width, label='CHROMA')#, color='skyblue')
-            bars2 = ax.bar(x + bar_width/2, values2, width=bar_width, label='FAISS')#, color='salmon')
-        else:
-            bars1 = ax.bar(x - bar_width/2, values1, width=bar_width, label='CHATLAS')#, color='skyblue')
-            bars2 = ax.bar(x + bar_width/2, values2, width=bar_width, label='MULTI-QA')#, color='salmon')
-        ax.bar_label(bars1,fmt='%.3f', padding=3, fontsize=9)
-        ax.bar_label(bars2, fmt='%.3f',padding=3, fontsize=9)
-        ax.set_title(f"{title}:\n{data[i]['title']}")
-        ax.set_xticks(x)
-        ax.set_xticklabels(labels)
-        ax.set_ylabel("Accuracy")
-        ax.set_xlabel("Chunk Size")
-        ax.legend()
+        # Get values based on plot type
+        if i < 2:  # Database comparisons
+            values1 = config['data']['chroma']
+            values2 = config['data']['faiss']
+        else:  # Embedder comparisons
+            values1 = config['data']['chatlas']
+            values2 = config['data']['multiqa']
+        
+        # Create bars
+        bars1 = axes[i].bar(x - bar_width/2, values1, width=bar_width, label=config['legend'][0])
+        bars2 = axes[i].bar(x + bar_width/2, values2, width=bar_width, label=config['legend'][1])
+        
+        # Add labels and formatting
+        axes[i].bar_label(bars1, fmt='%.3f', padding=3, fontsize=9)
+        axes[i].bar_label(bars2, fmt='%.3f', padding=3, fontsize=9)
+        axes[i].set_title(f"{title}:\n{config['title']}")
+        axes[i].set_xticks(x)
+        axes[i].set_xticklabels(labels)
+        axes[i].set_ylabel("Accuracy")
+        axes[i].set_xlabel("Chunk Size")
+        axes[i].legend()
+    
+    # Plot chunking comparison
+    x = np.arange(len(comparisons['chunking']['labels']))
+    bars = axes[4].bar(x, comparisons['chunking']['values'])
+    axes[4].bar_label(bars, fmt='%.3f', padding=3, fontsize=9)
+    axes[4].set_title(f"{title}:\nComparing Chunking")
+    axes[4].set_xticks(x)
+    axes[4].set_xticklabels(comparisons['chunking']['labels'])
+    axes[4].set_ylabel("Accuracy")
+    axes[4].set_xlabel("Chunking Strategy")
+    
+    # Final adjustments and save
+    plt.subplots_adjust(wspace=0.4, hspace=0.6)
+    plt.savefig(save_path)
+    plt.close()
     
 
 
-
-    #fig, axes = plt.subplots(1, 2, figsize=(12, 8))
-    x=np.arange(2)
-    bars1=axes[-1].bar(x,text_v_semantic_chunking_values)#color='skyblue' )
-    axes[-1].bar_label(bars1,fmt='%.3f', padding=3, fontsize=9)
-    axes[-1].set_title(f"{title}:\nComparing Chunking")
-    axes[-1].set_xticks(x)
-    axes[-1].set_xticklabels(text_v_semantic_chunking)
-    axes[-1].set_ylabel("Accuracy")
-    axes[-1].set_xlabel("Chunk Size")
-    axes[-1].legend()
-    plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=2)
-    plt.subplots_adjust(wspace=0.4, hspace=0.6)
-    plt.savefig(save_path)
-
-
-#create_vectordb_vs_embedder_plot('correctness', 'LLM Response Accuracy', 'correctness_plot.png',factor=2)
-#create_vectordb_vs_embedder_plot('relevant_refs', 'LLM Source Retrieval Accuracy', 'relevant_refs_plot.png',factor=1)
-#create_plot(RELEVENT_REFS_METRIC, 'Extraction Method: PDF Plumber', 'Chunk Size', 'Relevant References', 'relevant_refs_plot.png')
-import json
-import collections
-import numpy as np
 def create_model_plot(basedir, metric):
-    correctness_results = collections.defaultdict(lambda: collections.defaultdict(float))
-    for model in os.listdir(basedir):
-        if 'new' not in model: continue
-        if '.DS' in model: continue
-        for param in os.listdir(os.path.join(basedir, model)):
-            if '.DS' in param: continue
-            filename = pd.read_csv(basedir, model,param, metric, f'{metric}_score.csv')
+    """
+    Creates a bar chart comparing different models on a given metric.
+    
+    This function:
+    1. Loads metric scores for each model and parameter combination
+    2. Creates grouped bar charts showing how each model performs
+    3. Groups bars by parameter, with each model shown side-by-side
+    
+    Args:
+        basedir: Base directory containing model subdirectories
+        metric: The metric to evaluate (e.g., 'correctness', 'accuracy')
+
+    Directory
+        basedir
+            |__ modelname
+                |__ experiment (param)
+                    |__ metric
+                        |__ {metric}_score.csv
+                        |__ {metric}_tracking.csv
+            |__ modelname2
+                |__ etc...
+    """
+    
+    # Store scores: model -> parameter -> score
+    model_scores = defaultdict(lambda: defaultdict(float))
+    
+    # Load scores for each model
+    for model_name in os.listdir(basedir):
+        # Skip non-model directories
+        if '.DS' in model_name:
+            continue
+        
+        model_path = os.path.join(basedir, model_name)
+        
+        # Load scores for each parameter configuration
+        for param in os.listdir(model_path):
+            if '.DS' in param:
+                continue
             
             try:
-                key = 'latency/mean' if metric == 'latency' else 'score'
-
-                correctness_results[model][param]=filename[key]
+                # Load the metric score CSV file
+                score_file = os.path.join(basedir, model_name, param, metric, f'{metric}_score.csv')
+                scores_df = pd.read_csv(score_file)
+                
+                # Extract the score value
+                model_scores[model_name][param] = scores_df['score'].values[0]
+                
             except Exception as e:
-                print(f"Skipping {model} {param} bc of {e}")
-    # Extract keys (x-axis)
-   
-    # Collect all unique keys across models
-    all_keys = sorted({k for subdict in correctness_results.values() for k in subdict.keys()})
-    models = list(correctness_results.keys())
-
-    x = np.arange(len(all_keys))  # positions for each key
-    width = 0.8 / len(models)     # width for each model’s bar
-
-    # Assign colors per model
-    #colors = plt.cm.tab10(np.linspace(0, 1, len(models)))
-
-    # Plot each model’s bars
-    for i, model in enumerate(models):
-        vals = [correctness_results[model].get(k, 0) for k in all_keys]
-        print(vals)
-        plt.bar(x + i * width, vals, width, label=model)
-
-    # Format
-    plt.xticks(x + width * (len(models) - 1) / 2, all_keys, rotation=90)
-    plt.xlabel("Key")
-    plt.ylabel("Value")
-    plt.title(f"{metric}: Model Comparison")
-    plt.legend(title="Model")
-    plt.tight_layout()
-    plt.show()
-
-
-    # Now `data` is a Python dict (or list, depending on the JSON structure)
-
-    plt.savefig(f"Plots/{metric}_models.png")
-
-create_model_plot('./metrics')
-
-def create_reranker_plot(metric):
-    title = 'Source Retrieval' if metric == 'relevant_refs' else 'LLM Response'
-    scores = {
-        "Chroma_multi-qa_embedder_2000_noreranking": 0.6971,
-        "Chroma_multi-qa_embedder_2000_withreranking": 'gpt4o', # 0.63
-        'e5_embedding768_with_reranking_chroma_2000': 'gpt4o',
-        'e5_embedding768_no_reranking_chroma_2000': 'gpt4o',
-    }
-
-    labels = {
-        "Chroma_multi-qa_embedder_2000_noreranking": 'Chroma_MultiQA_NoRerank_2000',
-        "Chroma_multi-qa_embedder_2000_withreranking": 'Chroma_MultiQA_Rerank_2000', # 0.63
-        'e5_embedding768_with_reranking_chroma_2000': 'Chroma_e5_Rerank_2000',
-        'e5_embedding768_no_reranking_chroma_2000': 'Chroma_e5_NoRerank_2000',
-    }
-    results={}
-
-    for method in scores:
-        if isinstance(scores[method],float):
-            results[method] = scores[method]
-        else:
-            with open(os.path.join("metrics", scores[method], method, f'{metric}/{metric}.json'), "r") as f:
-                data = json.load(f)
-            for _, value in data.items():
-                results[method] = value
-
-    # Split keys and values
-    labels = list(labels.values())
-    values = list(results.values())
-
-    # Set bar colors (emphasize reranking in red)
-    colors = ['skyblue' for i in range(len(labels))]  # Assume second is reranked
-
-    # Create bar plot
-    plt.figure(figsize=(10, 6))
-    bars = plt.bar(labels, values, color=colors)
-
-    # Add score labels on top of bars
-    for bar in bars:
-        yval = bar.get_height()
-        plt.text(bar.get_x() + bar.get_width()/2, yval + 0.01, f"{yval:.3f}",
-                ha='center', va='bottom', fontsize=12)
-
-    # Highlight the drop due to reranking
-    plt.title(f"Effect of Reranking on {title} Performance", fontsize=14)
-    plt.ylabel("Score", fontsize=12)
-    plt.xticks(rotation=25, ha='center')
-    plt.ylim(0, 1.0)   
-    plt.tight_layout()
-    plt.savefig(f"metrics/{metric}_comparison.png") 
-import matplotlib.pyplot as plt
-import numpy as np
-
-def generate_vectordb_vs_embedder_plot(metric):
-    """
-    Generate a side-by-side bar plot for two bar groups.
-
-    Parameters:
-        bar1name (str): Label for the first bar group.
-        bar1values (list): Values for the first bar group.
-        bar2name (str): Label for the second bar group.
-        bar2values (list): Values for the second bar group.
-    """
-    
-    if metric == 'correctness':
-        ylabel = 'LLM Accuracy'
-        title = 'Accuracy per Chunk Size'
-        filename = os.path.join(plot_dir, 'correctness_Chroma_v_Faiss.png')
-        metric_file = CORRECTNESS_METRIC
-    elif metric == 'relevant_refs':
-        ylabel = 'Source Retrieval Accuracy'
-        title = 'Retrieval Per Chunk Size'
-        filename = os.path.join(plot_dir, 'retrieval_Chroma_v_Faiss.png')
-        metric_file = RELEVENT_REFS_METRIC
-
-    with open(metric_file, "r") as f:
-        data = json.load(f)
-    
-    dataset_faiss = {}
-    dataset_chroma = {}
-    for key in data:
-        if '800' in key: print(key)
-        if 'FAISS' in key:
-            o_key=key
-            if '7000' in key:
-                o_key=key
-                key = '_No Chunking'
-            
-            dataset_faiss[key] = data[o_key]/5
-        elif 'Chroma' in key:
-            o_key=key
-            if '7000' in key:
-                key = '_No Chunking'
-            dataset_chroma[key] = data[o_key]/2
-
-    categories = [f'{key.split("_")[1]}' for key in dataset_faiss]
-    x = np.arange(len(categories))
-    width = 0.35
-
-    fig, ax = plt.subplots()
-    bar1=ax.bar(x - width/2, dataset_faiss.values(), width, label='faiss')
-    bar2=ax.bar(x + width/2, dataset_chroma.values(), width, label='chroma')
-
-    for bar in bar1:
-        yval = bar.get_height()
-        ax.text(bar.get_x() + bar.get_width()/2, yval + 0.01 * max(dataset_faiss.values()), f'{yval:.2f}', ha='center', va='bottom')
-
-    for bar in bar2:
-        yval = bar.get_height()
-        ax.text(bar.get_x() + bar.get_width()/2, yval + 0.01 * max(dataset_chroma.values()), f'{yval:.2f}', ha='center', va='bottom')
-
-
-    ax.set_xlabel('Chunk Sizes')
-    ax.set_ylabel(ylabel)
-    ax.set_title(title)
-    ax.set_xticks(x)
-    ax.set_xticklabels(categories)
-    ax.legend()
-
-    plt.tight_layout()
-    plt.show()
-    #plt.savefig(filename)
-#generate_vectordb_vs_embedder_plot(metric='relevant_refs')
-#create_reranker_plot(metric='correctness')
-
-def create_search_distinction_plot(methods, metric,save_path):
-    accuracy = defaultdict()
-    for method in methods:
-        with open(f"./metrics/gpt4o/sigmoid_{method}_e5_embedder_with_priority_2000/relevant_refs/{metric}.json", 'r') as f:
-            res = json.load(f)
-            accuracy[method] = res['e5_embedder_with_priority_2000']
-    fig, ax = plt.subplots()
-    x=np.arange(2)
-    x=np.arange(2)
-    bars1=ax.bar(x,accuracy.values(),color='skyblue' )
-    ax.bar_label(bars1,fmt='%.3f', padding=3, fontsize=9)
-    ax.set_title(f"{metric.upper()}:\nComparing Search Methods")
-    ax.set_xticks(x)
-    ax.set_xticklabels(accuracy.keys())
-    ax.set_ylabel("Retrival Accuracy")
-    ax.set_xlabel("With/Without Document vs Slide Separation")
-    ax.legend()
-    plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=2)
-    plt.subplots_adjust(wspace=0.4, hspace=0.6)
-    plt.savefig(save_path)
-#create_search_distinction_plot(['distinction', 'withoutdistinction'], 'relevant_refs',"./metrics/searchComparison.png")
-
-def plot_search_keyword_configuration_parameters_keyword_nokey(method, flder, title):
-    accuracy = defaultdict(dict)
-    root=f"./metrics/{flder}"
-    
-    for folder in os.listdir(root):
-        path = os.path.join(root, folder, method, f"{method}.json")
-        try:
-            with open(path, "r", encoding="utf-8") as f:
-                data = json.load(f) 
-                accuracy[folder] = data['data']
-        except:
-            print('dne')
-    accuracy = dict(sorted(accuracy.items()))
-    
-    # Separate key_ and no_key configurations
-    key_configs = {}
-    no_key_configs = {}
-    
-    for k, v in accuracy.items():
-        value = v/2 if v > 1 else v
-        if k.startswith('keyword'):
-            # Get everything after 'key_'
-            base_name = k[len('keyword'):]  # Remove 'key_' (4 characters)
-            key_configs[base_name] = value
-        elif k.startswith('no_keyword'):
-            # Get everything after 'no_key_'
-            base_name = k[len('no_keyword'):]  # Remove 'no_key_' (7 characters)
-            no_key_configs[base_name] = value
-    
-    # Get all unique base configurations
-    all_configs = sorted(set(list(key_configs.keys()) + list(no_key_configs.keys())))
+                print(f"Skipping {model_name}/{param}: {e}")
     
     # Prepare data for plotting
-    x_labels = [' '.join(config.split("_")) for config in all_configs]
-    key_values = [key_configs.get(config, 0) for config in all_configs]
-    no_key_values = [no_key_configs.get(config, 0) for config in all_configs]
+    models = list(model_scores.keys())
+    parameters = sorted({param for model in model_scores.values() for param in model.keys()})
     
-    # Create bar positions
-    x_pos = np.arange(len(all_configs))
-    width = 0.35
+    # Set up bar positions
+    x_positions = np.arange(len(parameters))
+    bar_width = 0.8 / len(models)
     
-    # Plot adjacent bars
-
-    bars1 =plt.bar(x_pos - width/2, key_values, width, label='keyword', color='steelblue')
-    for bar in bars1:
-        height = bar.get_height()
-        if height > 0:
-            plt.text(bar.get_x() + bar.get_width()/2., height,
-                    f'{height:.2f}',
-                    ha='center', va='bottom', fontsize=8)
+    # Create the plot
+    fig, ax = plt.subplots(figsize=(12, 6))
     
-    if any('no' in k for k in accuracy):
-        bars2 =plt.bar(x_pos + width/2, no_key_values, width, label='no keyword', color='coral')
-        for bar in bars2:
-            height = bar.get_height()
-            if height > 0:
-                plt.text(bar.get_x() + bar.get_width()/2., height,
-                        f'{height:.2f}',
-                        ha='center', va='bottom', fontsize=8)
-
-    else:
-        print("skippng none")
+    # Plot bars for each model
+    for i, model in enumerate(models):
+        # Get scores for this model across all parameters
+        scores = [model_scores[model].get(param, 0) for param in parameters]
+        
+        # Calculate bar positions for this model
+        offset = i * bar_width
+        ax.bar(x_positions + offset, scores, bar_width, label=model)
     
+    # Format the plot
+    ax.set_xlabel("Parameter Configuration")
+    ax.set_ylabel(f"{metric.capitalize()} Score")
+    ax.set_title(f"{metric.capitalize()}: Model Performance Comparison")
+    ax.set_xticks(x_positions + bar_width * (len(models) - 1) / 2)
+    ax.set_xticklabels(parameters, rotation=45, ha='right')
+    ax.legend(title="Model", loc='best')
+    ax.grid(axis='y', alpha=0.3)
     
-    plt.xlabel('Configuration')
-    plt.ylabel('Accuracy')
-    plt.xticks(x_pos, x_labels, rotation=45, ha='right')
-    plt.legend()
-    plt.title(title)
+    # Save the plot
     plt.tight_layout()
-    #plt.show()
-    plt.savefig(f"Plots/{'_'.join(title.split())}.png")
+    output_path = f"Plots/{metric}_models.png"
+    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    plt.close()
     
-    print(f"Configurations: {all_configs}")
-    print(f"key_ =values: {key_values}")
-    print(f"no_key values: {no_key_values}")
-#plot_search_keyword_configuration_parameters_keyword_nokey('relevant_refs', 'gpt4o_return3_gen_newsearch', 'Retrieval Acc: Search Config K Documents, Slides, Keyword and Returning top 3')
-#plot_search_keyword_configuration_parameters_keyword_nokey('correctness', 'gpt4o_return3_gen_newsearch', 'Response Acc: Search Config K Documents, Slides, Keyword and Returning top 3')
+    print(f"Plot saved to {output_path}")
+    
+    return model_scores
+create_model_plot('./metrics')
 
 import os
 import json
-from collections import defaultdict
-import numpy as np
 import matplotlib.pyplot as plt
 
-
-def plot_search_methods(old_search_path, new_search_path):
-    accuracy = defaultdict(lambda: defaultdict(float))
-   
-    # --- Load Old Search ---
-    for metric in os.listdir(old_search_path):
-        path = os.path.join(old_search_path, metric, f'{metric}.json')
-        with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f) 
-            accuracy['old_search'][metric] = data['data']
-
-    # --- Load New Search ---
-    for metric in os.listdir(new_search_path):
-        path = os.path.join(new_search_path, metric, f'{metric}.json')
-        with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f) 
-            accuracy['new_search'][metric] = data['data']
-
-    categories = ['old_search', 'new_search']
-
-    # Subplot metric groups
-    subplot1_metrics = ['correctness', 'relevant_refs']
-    subplot2_metrics = ['latency']
-
-    # Set up figure with 2 subplots
-    fig, axes = plt.subplots(1, 2, figsize=(14, 6))
-
-    # -------------------------------
-    #   SUBPLOT 1 — correctness + relevant_res
-    # -------------------------------
-    ax = axes[0]
-    width = 0.3
-    x = np.arange(len(categories))
-
-    colors = ['#1f77b4', '#2ca02c']  # blue, green
-
-    for i, metric in enumerate(subplot1_metrics):
-        values = [accuracy[cat][metric] for cat in categories]
-        bars = ax.bar(x + i * width, values, width, label=metric.replace("_", " ").title(), color=colors[i])
-
-        # Add labels
-        for bar in bars:
-            height = bar.get_height()
-            ax.text(bar.get_x() + bar.get_width()/2., height,
-                    f'{height:.2f}', ha='center', va='bottom', fontsize=8)
-
-    ax.set_title("Correctness & Relevant Results")
-    ax.set_xticks(x + width / 2)
-    ax.set_xticklabels(["Without Keyword and Document/Slide\n Distinction\n(18 attachments + reranking\n select top 3)", "With Keyword and Document/Slide\n Distinction (5 docs + 5 slides + 5 keyword\n select top 3)"])
-    ax.set_ylabel("Score")
-    ax.legend()
-    ax.grid(axis='y', alpha=0.3)
-
-    # -------------------------------
-    #   SUBPLOT 2 — latency
-    # -------------------------------
-    ax = axes[1]
-
-    metric = 'latency'
-    values = [accuracy[cat][metric] for cat in categories]
-    bars = ax.bar(x, values, width=0.4, color='#ff7f0e', label='Latency')
-
+def create_distinction_plot(metric, title, save_filename, output_path):
+    """
+    Creates a bar chart comparing metric performance with and without some concept (ex: with text/slide distinction vs wo text/slide distinction).
+    
+    This function:
+    1. Loads scores for different configurations
+    2. Compares performance with <some concept> enabled vs disabled
+    3. Shows the effect of <some concept> on the specified metric
+    
+    Args:
+        metric: The metric to evaluate ('relevant_refs' for source retrieval, 
+                or other metrics for LLM response quality)
+    """
+    
+    # Set plot title based on metric
+    plot_title = 'Source Retrieval' if metric == 'relevant_refs' else 'LLM Response'
+    
+    # Configuration: maps experiment keys to their data sources: can replace with any with/without based experiment
+    # - float values: hardcoded scores
+    # - string values: model names to load scores from files
+    experiment_configs = {
+        #EXPERIMENT: RESULT
+        #OR
+        #EXPERIMENT: FOLDER
+    }
+    # ex: {
+        #"Chroma_multi-qa_embedder_2000_noreranking": 0.6971,
+        #"Chroma_multi-qa_embedder_2000_withreranking": 'gpt4o',
+        #'e5_embedding768_with_reranking_chroma_2000': 'gpt4o',
+        #'e5_embedding768_no_reranking_chroma_2000': 'gpt4o',
+    #}
+    
+    
+    # Human-readable labels for display
+    display_labels = {
+        EXPERIMENT: x-axis label
+    }
+    #ex:{
+        #"Chroma_multi-qa_embedder_2000_noreranking": 'Chroma_MultiQA_NoRerank_2000',
+        #"Chroma_multi-qa_embedder_2000_withreranking": 'Chroma_MultiQA_Rerank_2000',
+        #'e5_embedding768_with_reranking_chroma_2000': 'Chroma_E5_Rerank_2000',
+        #'e5_embedding768_no_reranking_chroma_2000': 'Chroma_E5_NoRerank_2000',
+    #}
+    
+    # Load scores for each experiment
+    experiment_scores = {}
+    
+    for experiment_key, data_source in experiment_configs.items():
+        if isinstance(data_source, float):
+            # Use hardcoded score
+            experiment_scores[experiment_key] = data_source
+        else:
+            # Load score from JSON file
+            score_file = os.path.join("metrics", data_source, experiment_key, 
+                                     metric, f'{metric}.json')
+            try:
+                with open(score_file, "r") as f:
+                    data = json.load(f)
+                # Extract the score (assumes single value in dict)
+                experiment_scores[experiment_key] = list(data.values())[0]
+            except Exception as e:
+                print(f"Warning: Could not load {experiment_key}: {e}")
+                experiment_scores[experiment_key] = 0
+    
+    # Prepare data for plotting
+    labels = [display_labels[key] for key in experiment_scores.keys()]
+    scores = list(experiment_scores.values())
+    
+    # Assign colors: highlight With/Without experiments
+    colors = ['#ff7f7f' if 'With' in label else '#87ceeb' 
+              for label in labels]
+    
+    # Create the plot
+    fig, ax = plt.subplots(figsize=(12, 6))
+    bars = ax.bar(labels, scores, color=colors, edgecolor='black', linewidth=1.2)
+    
+    # Add score labels on top of bars
     for bar in bars:
         height = bar.get_height()
-        ax.text(bar.get_x() + bar.get_width()/2., height,
-                f'{height:.2f}', ha='center', va='bottom', fontsize=8)
-
-    ax.set_title("Latency Comparison")
-    ax.set_xticks(x)
-    ax.set_xticklabels(["Without Keyword and Document/Slide\n Distinction\n(18 attachments + reranking\n select top 3)", "With Keyword and Document/Slide\n Distinction (5 docs + 5 slides + 5 keyword\n select top 3)"])
-    ax.set_ylabel("Time (seconds)")
-    ax.legend()
-    ax.grid(axis='y', alpha=0.3)
-
+        ax.text(bar.get_x() + bar.get_width()/2, height + 0.01, 
+               f"{height:.3f}",
+               ha='center', va='bottom', fontsize=11, fontweight='bold')
+    
+    # Format the plot
+    ax.set_title(f"{title}" 
+                fontsize=14, fontweight='bold', pad=20)
+                
+    ax.set_ylabel("Score", fontsize=12)
+    ax.set_xlabel("Configuration", fontsize=12)
+    ax.set_ylim(0, 1.0)
+    ax.set_xticklabels(labels, rotation=30, ha='right')
+    ax.grid(axis='y', alpha=0.3, linestyle='--')
+    
+    # Add legend
+    from matplotlib.patches import Patch
+    legend_elements = [
+        Patch(facecolor='#87ceeb', edgecolor='black', label='Without'),
+        Patch(facecolor='#ff7f7f', edgecolor='black', label='With')
+    ]
+    ax.legend(handles=legend_elements, loc='upper right')
+    
+    # Save the plot
     plt.tight_layout()
-    plt.savefig("Plots/SearchMethod+Configuration.png")
-    plt.show()
-
-
-#plot_search_methods()
+    output_path = f"metrics/{metric}_{save_filename}"
+    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    plt.close()
+   
+    
+    # Print summary statistics
+    print(f"\n{plot_title} Scores:")
+    for label, score in zip(labels, scores):
+        print(f"  {label}: {score:.4f}")
+    
+    return experiment_scores
+    
 
