@@ -25,12 +25,10 @@ class BaseExtractor(ABC):
         if not text: return []
         start = 0
         end=chunk_size
-        logger.info(f"Chunk size is {chunk_size} and total num words are {len(text)}")
         chunks = []
         while start < len(text):
             chunks.append(' '.join(text[start:end]))
             start=end
-            logger.info(f"Chunk size is {chunk_size} and chunk num words are {len(chunks[-1].split())}")
 
             end += chunk_size
         return chunks

@@ -133,7 +133,6 @@ class DocDBExtractor(BaseExtractor, Session):
             # Positive markers
             title_div = soup.find("div", id="DocTitle")
             has_retrieve = soup.find("a", href=re.compile(r"RetrieveFile\?docid=\d+"))
-
             # Negative markers typical of DocDB "not found" pages
             not_found = soup.find(string=re.compile(r"(no such document|document not found|unknown document|invalid docid)", re.I))
 
@@ -143,7 +142,7 @@ class DocDBExtractor(BaseExtractor, Session):
                 return "exists"
 
             # If 200 but inconclusive, lean 'exists' so we don't cap too low
-            return "exists"
+            return "inconclusive"
         except requests.RequestException as e:
             logger.warning(f"Error checking doc {docid}: {e}")
             return "error"
@@ -456,8 +455,6 @@ class DocDBExtractor(BaseExtractor, Session):
                     to_update_links=[]
                     to_update_metadata=[]
                     for l,m in zip(links, metadata):
-                        print(existing_versions)
-                        logger.info(f"current version: {m.get('docdb_version')}\nexisitng verison for {m.get('doc_id')}: {existing_versions.get(m.get('doc_id'))}")
                         if int(m.get('docdb_version')) <= int(existing_versions.get(m.get('doc_id'), -1)):
                             logger.info(f"Skipping {m.get('docdb_version')}")
                             continue
@@ -477,7 +474,6 @@ class DocDBExtractor(BaseExtractor, Session):
         existing_ids=collections.defaultdict(int)
         with ThreadPoolExecutor(max_workers=self.max_workers_files) as pool:
             futures = {pool.submit(self._download_file, link, self.session, self.max_file_bytes): (link, metadata) for link, metadata in zip(all_links, all_metadata)}
-            logger.info(f"Downloaded {len(futures)} links")
             for fut in as_completed(futures):
                 link, metadata = futures[fut]
                 
@@ -496,7 +492,6 @@ class DocDBExtractor(BaseExtractor, Session):
                     raw_text, document_type = self.get_raw_text(content_type=ct, content=content)
                     cleaned_text_list = raw_text.split()
                     chunks = self.get_chunks(cleaned_text_list, chunk_size=chunk_size)
-                    logger.info(f"Found {len(chunks)} chunks for {link}")
                     for chunk in chunks:
                         
                         root_id = doc_id
@@ -513,7 +508,6 @@ class DocDBExtractor(BaseExtractor, Session):
                         })
 
                         existing_ids[doc_id] = f"{root_id}_{child_id+1}"
-                        logger.info(f"Added chunk of size {len(chunk.split())} from {link} to documents")
                 
                     logger.info(f"Finished extracting from {link}")
                 except Exception as e:
