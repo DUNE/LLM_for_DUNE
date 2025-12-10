@@ -10,13 +10,9 @@ logger = get_logger(__name__)
 class FermilabAPIClient:
     """Client for Argo API interactions"""
     
-    def __init__(self, username: str, api_key: str):
-        self.username = username
-        self.api_key = api_key
+    def __init__(self):
         self.base_url = FERMILAB_API_URL
-        
-        if not self.username or not self.api_key:
-            raise ValueError("Argo API credentials not provided")
+    
     
     def chat_completion(
         self, 
@@ -31,10 +27,7 @@ class FermilabAPIClient:
     ) -> str:
         """Send a chat completion request to Argo API"""
         print(f"Question is {question} and context length is {len(context.split())}")
-        headers = {
-            #"Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json"
-        }
+        
         logger.info(f"Using model {model}")
         payload = {
             "model": model,
@@ -53,11 +46,12 @@ class FermilabAPIClient:
             payload['stream'] = True
         else:
             payload['stream']=False
-        if '120' in model:
-            base_url='https://vllm.fnal.gov/v1/chat/completions'
+    
         response = []
-        #yield 'STATUS:PROCESSINGg
-        if '120' in model:
+        yield 'STATUS:PROCESSING'
+        
+        # for VLLM
+        try:
             with requests.post(base_url, json=payload, stream=True) as resp:
                 for line in resp.iter_lines(decode_unicode=True):
                     if not line:
@@ -72,45 +66,39 @@ class FermilabAPIClient:
                             content = chunk['choices'][0]['delta'].get('content','')
                         else:
                             content = chunk['choices'][0]['delta'].get('response_content','')
-                        #yield content
+                        yield content
                         response.append(content)
             if links:
                 sources = [{'url': url} for url in links]
-                print("Retruning links")
-                #yield f'SOURCES: ' + json.dumps(sources)
-            else:
-                print("FOund no links")
-            return ' '.join(response) #print("Received chunk:", chunk)
-
-        try:
-            import json
-            logger.info(f"Sending request to {base_url}")
-            with requests.post(base_url, json=payload, stream=True, timeout=300) as resp:
-                for line in resp.iter_lines():
-                    if line:
-                        try:
-                            data = json.loads(line.decode("utf-8"))
-                            token = ""
-                            if "message" in data and "content" in data["message"]:
-                                token = data["message"]["content"]
-                            elif "response" in data:
-                                token = data["response"]
-                            if token:
-                                #yield token #markdown.markdown(token)
-                                response.append(token)
-                        except Exception as e:
-                            logger.error(e)
-                            continue
-            try:
-                if links:
-                    sources = [{'url': url} for url in links]
-                    print("Retruning links")
-                    #yield f'SOURCES: ' + json.dumps(sources)
-                else:
-                    print("FOund no links")
-            except:
-                print("skip")
+                yield f'SOURCES: ' + json.dumps(sources)
             return ' '.join(response)
+        
+        
+        # for Ollama LLM
+        # try:
+            # import json
+            # logger.info(f"Sending request to {base_url}")
+            # with requests.post(base_url, json=payload, stream=True, timeout=300) as resp:
+                # for line in resp.iter_lines():
+                    # if line:
+                        # try:
+                            # data = json.loads(line.decode("utf-8"))
+                            # token = ""
+                            # if "message" in data and "content" in data["message"]:
+                                # token = data["message"]["content"]
+                            # elif "response" in data:
+                                # token = data["response"]
+                            # if token:
+                                # yield token #markdown.markdown(token)
+                                # response.append(token)
+                        # except Exception as e:
+                            # logger.error(e)
+                            # continue
+           
+            # if links:
+                # sources = [{'url': url} for url in links]
+                # yield f'SOURCES: ' + json.dumps(sources)
+            # return ' '.join(response)
             
         except requests.Timeout:
             logger.error(f"Fermilab API request timed out {question}, {len(context.split())}")
