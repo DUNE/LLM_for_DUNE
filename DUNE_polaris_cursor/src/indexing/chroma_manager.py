@@ -12,15 +12,16 @@ from config import (
     EMBEDDING_MODEL,
     MAX_VARIABLE_NUMBER,
     create_directories,
-    DEFAULT_TOP_K
+    DEFAULT_TOP_K,
 )
 import re
-CHROMA_DB_NAME='DUNE_VECTOR_DB'
 from src.utils.logger import get_logger
 from chromadb.config import DEFAULT_TENANT, DEFAULT_DATABASE, Settings
-logger = get_logger(__name__)
 import torch.nn as nn
 import chromadb
+
+logger = get_logger(__name__)
+CHROMA_DB_NAME='DUNE_VECTOR_DB'
 class ChromaManager:
     """Manager for FAISS index operations"""
 
@@ -29,7 +30,6 @@ class ChromaManager:
         self.bm25_cache=None
         self._configure_threading()
         self.reranker=CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2', max_length=512)
-        self.sigmoid = nn.Sigmoid()
 
         self.chroma_client = chromadb.PersistentClient(path=data, settings=Settings())
         print("Collections available:", self.chroma_client.list_collections())
@@ -45,7 +45,7 @@ class ChromaManager:
                 embedding_function=self.model
             )
         except Exception as e:
-            logger.error(f"Error intiiateing chroma {e}")
+            logger.error(f"Error initiating chroma {e}")
 
         self.chroma_ntotal = self.chroma_collection.count()
 
