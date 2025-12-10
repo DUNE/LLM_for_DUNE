@@ -3,8 +3,9 @@ This folder is used to initiate parallel BALSAM jobs.
 
 **To Connect the Jobs to the Document Extraction Code:**
 
-- cd into the scripts directory
+- (Go to the BALSAM dir and) cd into the scripts directory
 
+        cd DUNEGPT_polaris_cursor_balsam/scripts
         cd app
         python3 embed_docdb_indico.py
 - This command sets the command the job needs to run and exports all the necessary variables to the environment. Specifically, it reads the variables that are defined within the jobs with respect to which docdb/indico document to start from and end at and exports these to the environment. When the jobs are initiated and the respective command (cli.py) is run, the code in cli.py will read these recently exported variables and process the documents with respect to these variabled.
