@@ -28,7 +28,11 @@ from src.extractors.docdb_extractor_multithreaded import DocDBExtractor
 
 fermi_client=FermilabAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
 MODEL='gpt-oss:20b'
-rel=0
+
+indico_session=IndicoExtractor()
+docdb_session=DocDBExtractor()
+docdb_session._build_session()
+
 
 def normalize(s):
     # Remove all whitespace characters like \n, \t, spaces, etc.
@@ -38,20 +42,24 @@ def normalize(s):
         return expected[:-1]
     return expected
 
-indico_session=IndicoExtractor()
-docdb_session=DocDBExtractor()
-docdb_session._build_session()
-
 def relevant_refs(question, expected, contexts, references):
+    '''
+        expected: str (ground truth link)
+        contexts: list[str] (context snippets)
+        references: list[str] (link context snippets came from)
+        question: str (question)
 
+        Check if the references found the expected link and if so return a 1
+        If not pass all context snippets to an LLM (MODEL) to decide if it's a good set of snippets to use and give an associated score between 0 and 1
+    '''
     expect = normalize(expected)
+    
     if expect in references:
-        print("found")
         return 1
     else:
         prompt = f'Read this context and determine if it provides an answer to the question: {question}, if so, return a float value closer to 1 in the format of a json with the only permitted key being "score". If the content in the file is not related to the question at all or loosely relates to the question, give a score close to 0'
         results = 0
-        #look at the questoin, open the references and check if they relate to the quesiton
+        
             
         resp=fermi_client.chat_completion(question=prompt, context=' '.join(contexts),  model=MODEL) #base_url='https://vllm.fnal.gov/v1/chat/completions')
         match = re.search(r'(\d[\d\s]*\.?[\d\s]*)', resp)
@@ -64,6 +72,13 @@ def relevant_refs(question, expected, contexts, references):
     return results
 
 def correctness(main_question, expectation, output) -> float:
+    '''
+        expectation: str (ground truth response)
+        output: str (DUNE GPT's response)
+        main_question: str (question)
+
+        Check if the answer is factually correct and answers the question using the ground truth as a guide (score continuous on [0,1])
+    '''
     results = 0
 
     try:
@@ -75,7 +90,7 @@ def correctness(main_question, expectation, output) -> float:
         context = f"Generated output: {output}\nExpected out: {expectation}"
         resp = fermi_client.chat_completion(question=question, context=context, model =MODEL) #'nomic-embed-text:latest')# base_url='https://vllm.fnal.gov/v1/chat/completions')
         match = re.search(r'(\d[\d\s]*\.?[\d\s]*)', resp)
-        print(resp)
+
         if match:
             # Remove spaces to clean up
             number_str = match.group(1).replace(" ", "")
@@ -85,7 +100,6 @@ def correctness(main_question, expectation, output) -> float:
     except Exception as e:
         print("Excpetion ", e)
         return e
-    print("results ", results)
     return results
 
 
@@ -99,14 +113,11 @@ def extract_https_url(text):
 
 class Evalutation():
     def __init__(self, port, experiment_name, data_path,model, top_k, keyword):
-
-        #self.faiss_manager = FAISSManager(data_path) 
-        self.faiss_manager = ChromaManager(data_path)#FAISSManager(data_path)
-        print(f"connecting to client")
+        self.chroma_manager = ChromaManager(data_path)
+  
         self.model=model
-        #self.fermi_client = ArgoAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
         self.fermi_client=FermilabAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
-        print("Conntected to client")
+     
         self.top_K=top_k
         self.keyword=keyword
 
@@ -118,12 +129,10 @@ class Evalutation():
         for row in qa.iterrows():
             dictionary={}
             try: link = re.sub(r'\s+', '', row[1]['link'])
-
             except: continue
+                
             dictionary['inputs'] = {'question': row[1]['question']}
-
             dictionary['expectations'] = {'expected_response': row[1]['answer']}
-           
             qas.append(dictionary)
         self.eval_dataset = qas
     
@@ -145,9 +154,7 @@ class Evalutation():
                 continue
         self.ref_dataset = refs
     def create_latency_dataset(self):
-
-
-        latency_dataset=pd.read_csv(QA_PATH)[:2]
+        latency_dataset=pd.read_csv(QA_PATH)
         latency=[]
         for row in latency_dataset.iterrows():
             dictionary={}
@@ -159,63 +166,53 @@ class Evalutation():
     
     def evaluate(self,method):
         self.create_validation_dataset()
-        print("in evaluate fn")
+
         print(f"Starting eval: {method}")
-        with mlflow.start_run():
-            if method == 'correctness':
-                self.create_validation_dataset()
-                '''results = mlflow.genai.evaluate(
-                    data=self.eval_dataset,
-                    predict_fn=self.llm_qa_response,
-                    scorers=[correctness],
-                )'''
-                score = 0
-                df=[]
-                for dictionary in self.eval_dataset:
-                    question = dictionary['inputs']['question']
-                    expected = dictionary['expectations']['expected_response']
-                    contexts, references = self.faiss_manager.search(question, top_k = self.top_K)
-                    answer = self.fermi_client.chat_completion(question, " ".join(contexts), model=self.model)
-                    score_temp = correctness(question, expected, answer)
-                    df.append({'question': question, 'expected_response': expected, 'score': score_temp, 'true response': answer, 'contexts': contexts})
-                    score += score_temp
-                return df, [{'score' : score/len(self.eval_dataset)}]
+        
+        if method == 'correctness':
+            self.create_validation_dataset()
+            score = 0
+            df=[]
+            for dictionary in self.eval_dataset:
+                question = dictionary['inputs']['question']
+                expected = dictionary['expectations']['expected_response']
+                contexts, references = self.chroma_manager.search(question, top_k = self.top_K)
+                answer = self.fermi_client.chat_completion(question, " ".join(contexts), model=self.model)
+                score_temp = correctness(question, expected, answer)
+                df.append({'question': question, 'expected_response': expected, 'score': score_temp, 'true response': answer, 'contexts': contexts})
+                score += score_temp
+            return df, [{'score' : score/len(self.eval_dataset)}]
 
 
-            elif method == 'relevant_refs':
-                self.create_refs_dataset()
-                '''results = mlflow.genai.evaluate(
-                    data=self.ref_dataset,
-                    predict_fn=self.llm_references,
-                    scorers=[relevant_refs],
-                )'''
-                score = 0
-                df=[]
-                for dictionary in self.ref_dataset:
-                    question = dictionary['inputs']['question']
-                    reference = dictionary['expectations']['expected_response']
-                    
-                    contexts, references = self.faiss_manager.search(question)
-                    score_temp = relevant_refs(question, reference, contexts, references)
-                    df.append({'question': question, 'expected_reference': reference, 'score': score_temp, 'true references': references, 'contexts': contexts})
-                    score += score_temp
-                print(score/len(self.ref_dataset), score)
-                return df, [{'score' : score/len(self.ref_dataset)}]
+        elif method == 'relevant_refs':
+            self.create_refs_dataset()
+            score = 0
+            df=[]
+            for dictionary in self.ref_dataset:
+                question = dictionary['inputs']['question']
+                reference = dictionary['expectations']['expected_response']
+                
+                contexts, references = self.chroma_manager.search(question)
+                score_temp = relevant_refs(question, reference, contexts, references)
+                df.append({'question': question, 'expected_reference': reference, 'score': score_temp, 'true references': references, 'contexts': contexts})
+                score += score_temp
 
-            elif method=='latency':
-                duration=0.0
-                qa=pd.read_csv(QA_PATH)
-                df = []
-                for q in qa.iterrows():
-                    question = q[1]['question']
-                    start=time.time()
-                    context,links=self.faiss_manager.search(question, top_k=self.top_K, keyword=self.keyword)
-                    resp=self.fermi_client.chat_completion(question, ' '.join(context), model=self.model)
-                    end=time.time()
-                    df.append({'question': q, 'latency' : end-start})
-                    duration += (end-start)
-                print(f"duration total: {duration}, total qs: {len(qa)}")
-                return df, [{'latency/mean': duration/100}]
+            return df, [{'score' : score/len(self.ref_dataset)}]
+
+        elif method=='latency':
+            duration=0.0
+            qa=pd.read_csv(QA_PATH)
+            df = []
+            for q in qa.iterrows():
+                question = q[1]['question']
+                start=time.time()
+                context,links=self.chroma_manager.search(question, top_k=self.top_K, keyword=self.keyword)
+                resp=self.fermi_client.chat_completion(question, ' '.join(context), model=self.model)
+                end=time.time()
+                df.append({'question': q, 'latency' : end-start})
+                duration += (end-start)
+           
+            return df, [{'latency/mean': duration/100}]
 
 import argparse
 
