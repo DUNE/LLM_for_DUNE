@@ -300,7 +300,7 @@ class ChromaManager:
     
     def merge(self, keyword_doc_ids,semantic_doc_ids):
         """
-        
+            Merges doc_ids extracted from text and slide semantic search and keyword search
         """
 
         def normalize_scores(results):
@@ -362,13 +362,12 @@ class ChromaManager:
         """
             Performs keyword and semantic search (k_docs chunks each), reranking each output and selecting the best top_k
         """
-        assert k_docs==2
-        assert top_k==3
+      
         if keyword:
             keyword_doc_ids = self.keyword_search(query, 3*k_docs)
         else:
             keyword_doc_ids = []
-        print("src/indexing/chroma kdocs = ", k_docs)
+        
         semantic_doc_ids = self.semantic_search(query, 'document', k_docs)
         semantic_doc_ids.extend(self.semantic_search(query, 'slides', k_docs))
         merged_docids = self.merge(keyword_doc_ids,semantic_doc_ids )
