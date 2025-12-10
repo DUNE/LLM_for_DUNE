@@ -17,7 +17,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from config import STORE, validate_config, create_directories, DOC_LIMIT_DOCDB, DOC_LIMIT_INDICO, CHROMA_PATH, CHUNK_SIZE
 if STORE == 'faiss':
-    from src.core.document_processor_multithread import DocumentProcessor
+    from src.core.document_processor_faiss import DocumentProcessor
 elif STORE == 'chroma':
     from src.core.document_processor_chroma import DocumentProcessor
 else:

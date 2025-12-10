@@ -12,6 +12,7 @@ from config import (
     EMBEDDING_MODEL,
     MAX_VARIABLE_NUMBER,
     create_directories,
+    DEFAULT_TOP_K
 )
 import re
 CHROMA_DB_NAME='DUNE_VECTOR_DB'
@@ -29,10 +30,6 @@ class ChromaManager:
         self._configure_threading()
         self.reranker=CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2', max_length=512)
         self.sigmoid = nn.Sigmoid()
-        #self.reranker=CrossEncoder('valhalla/longformer-base-4096-finetuned-squadv1',max_length=4096)
-        #self.reranker = AutoModel.from_pretrained("allenai/longformer-base-4096", torch_dtype="auto")
-
-        #self.reranker = FlagReranker('BAAI/bge-reranker-v2-m3', use_fp16=True) # Setting use_fp16 to True speeds up computation with a slight performance degradation
 
         self.chroma_client = chromadb.PersistentClient(path=data, settings=Settings())
         print("Collections available:", self.chroma_client.list_collections())
@@ -70,7 +67,6 @@ class ChromaManager:
         self.docdb_metadata_modified = defaultdict()
         self.metadata= defaultdict()
         self.documents= defaultdict()
-        self.doc_ids=set()
         self.events_ids=set()
         self.fetch_ddb_ind_data()
         self.num_events=len(self.events_ids)
@@ -95,11 +91,10 @@ class ChromaManager:
             self.metadata[id] = md
             self.documents[id]=doc
 
-            self.doc_ids.add(id)
 
             event_id = id.split("_")[0]
             self.events_ids.add(event_id)
-
+        self.doc_ids = list(self.metadata.keys())
 
     def _configure_threading(self):
         os.environ["OMP_NUM_THREADS"] = "1"
@@ -107,10 +102,15 @@ class ChromaManager:
         os.environ["OPENBLAS_NUM_THREADS"] = "1"
         torch.set_num_threads(1)
         torch.set_num_interop_threads(1)
+    
     def generate_embeddings(self, texts: List[str]) -> np.ndarray:
         return self.model.encode(texts, convert_to_numpy=True).astype(np.float32)
 
     def add_to_chroma(self, documents, ids, ids_to_idx_map, mode):
+        '''
+        Updates self.doc_ids and adds/updates chroma with new entries
+        '''
+
         metadatas= []
         doc_texts=[]
         up_ids=[]
@@ -164,6 +164,10 @@ class ChromaManager:
 
 
     def  update_indico_docdb_record(self, documents):
+        """
+        Updates global variables recording the status of the database with resepct to specific metadata of each document
+        """
+
         try:
             for doc in documents:
                 source = doc.get("source", '')
@@ -175,39 +179,31 @@ class ChromaManager:
 
                 elif source == 'indico':
                     self.indico_ids[did.split("_")[0].split("/")[0]]=True
-                #self.doc_ids.add(did)
         except Exception as e:
             logger.error(f"Error in updating list of doc_ids with Indico/DocDB: {e}")
 
     def add_documents(self, documents: List[Dict[str, Any]], num_events: int) -> int:
-        logger.info("in add documents")
+        """
+        Adds new and updates existing documents to ChromaDB (embedding model defined in Chroma instantiation)
+        """
         self.num_events+=num_events
-        #which index each doc id is at in documents
+        
         map_ids_to_idx = {d['document_id']:idx for idx,d in enumerate(documents)}
 
-
         self.update_indico_docdb_record(documents)
-        logger.info("updated global var")
 
-
-        #all ids to add/update
         ids = set(map_ids_to_idx.keys())
 
-        #update existing ids in chroma
         ids_to_update = list(self.doc_ids.intersection(ids))
-        print(self.doc_ids, ids)
         added = self.add_to_chroma(documents = documents, ids = ids_to_update, ids_to_idx_map =  map_ids_to_idx, mode = 'update')
-        logger.info(" updated to chroma documents")
 
-
-        #add new ids to chroma
         ids_to_add = ids - self.doc_ids
 
         if ids_to_add is not None:
             added += self.add_to_chroma(documents= documents, ids= ids_to_add, ids_to_idx_map=map_ids_to_idx, mode='add')
-        self.doc_ids.update(ids_to_add)
 
         return added
+    
     def get_indico_ids(self) -> Dict[int, int]:
         """
         Return a map { doc_id: max_version_indexed } for all DocDB docs.
@@ -215,17 +211,15 @@ class ChromaManager:
         return self.indico_ids
 
 
-
-
     def get_docdb_versions(self) -> Dict[int, int]:
         """
         Return a map { doc_id: max_version_indexed } for all DocDB docs.
         """
         return self.docdb_versions
+    
     def get_content_modification_dates(self) -> Dict[int, str]:
         return self.docdb_content_modified
 
-    #def metamodf
     def get_metadata_modification_dates(self) -> Dict[int, str]:
         return self.docdb_metadata_modified
 
@@ -243,18 +237,14 @@ class ChromaManager:
                 refs.append(link)
         for docs in results['documents'][0]:
             snippets.append(docs)
-        #might be able to zip these for oops together. 
-        #check if results are returned as connected idices 
-        #ie if metadata idx1 is assoc w dcyments idx 1
 
         return snippets, refs
+
     def search_old(self, query: str, top_k: int = 3) -> Tuple[List[str], List[str]]:
         """
             Finds the docID_number associated with the retrieved text, then goes back to the docID to find header info
         """
         results = self.chroma_collection.query(query_texts=[query],  n_results=top_k*6)
-# rerank the results with original query and documents returned from Chroma
-        #scores = self.reranker.predict([(query, doc) for doc in results["documents"][0]])
 
         scores = []
         scores = self.reranker.predict(
@@ -270,9 +260,6 @@ class ChromaManager:
             if link:
                 refs.append(link)
             snippets.append(results['documents'][0][i])
-        #might be able to zip these for oops together.
-        #check if results are returned as connected idices
-        #ie if metadata idx1 is assoc w dcyments idx 1
         return snippets, refs
 
     def tokenize(self, doc):
@@ -282,22 +269,24 @@ class ChromaManager:
         tokenized_docs = [self.tokenize(doc) for doc in documents]
         self.bm25_cache = BM25Okapi(tokenized_docs)
         
-    def keyword_search(self, query, top_k):
+    def keyword_search(self, query, k_docs):
+        """
+        Performs keyword search returning k_docs chunks
+        """
         all_entries = self.chroma_collection.get()
         if not self.bm25_cache:
             self.build_bm25_index(all_entries['documents'])
         
         bm25_scores = self.bm25_cache.get_scores(query.split())
-        top_indices = np.argsort(bm25_scores)[::-1][:top_k]
-        doc_ids = list(self.metadata.keys())
-        results = [(doc_ids[idx], bm25_scores[idx]) for idx in top_indices]
+        top_indices = np.argsort(bm25_scores)[::-1][:k_docs]
+        results = [(self.doc_ids[idx], bm25_scores[idx]) for idx in top_indices]
         return results
 
-    def semantic_search(self, query, doc_type, top_k):
+    def semantic_search(self, query, doc_type, k_docs):
 
         results = self.chroma_collection.query(
             query_texts=[query],
-            n_results=top_k,
+            n_results=k_docs,
             where={'document_type': doc_type}
         )
         if not results['ids'][0]:
@@ -310,6 +299,10 @@ class ChromaManager:
         return list(zip(results['ids'][0], similarities))
     
     def merge(self, keyword_doc_ids,semantic_doc_ids):
+        """
+        
+        """
+
         def normalize_scores(results):
             if not results:
                 return {}
@@ -343,7 +336,7 @@ class ChromaManager:
         try:
             documents = [self.documents[doc_id] for doc_id in merged_docids]
         except:
-            print("No documents for")
+            print("No documents to rerank")
             return []
                 
         # Create query-document pairs
@@ -356,35 +349,34 @@ class ChromaManager:
         results = list(zip(merged_docids, ce_scores))
         results.sort(key=lambda x: x[1], reverse=True)
         
-        return results[:3]
+        return results[:top_k]
 
 
     def get_links(self, reranked_docids):
         return [self.metadata[id_[0]]['event_url'] for id_ in reranked_docids]
+
     def get_content(self, reranked_docids):
-        print(f"Looking at ids: {[id_[0] for id_ in reranked_docids]}")
         return [self.documents[id_[0]] for id_ in reranked_docids]
 
-    def search(self, query: str, top_k: int = 5, keyword=True) -> Tuple[List[str], List[str]]:
+    def search(self, query: str,top_k: int = 3, k_docs: int = 2,  keyword=True) -> Tuple[List[str], List[str]]:
         """
-            Finds the docID_number associated with the retrieved text, then goes back to the docID to find header info
+            Performs keyword and semantic search (k_docs chunks each), reranking each output and selecting the best top_k
         """
-        top_k=5
-        assert top_k==5
+        assert k_docs==2
+        assert top_k==3
         if keyword:
-            keyword_doc_ids = self.keyword_search(query, top_k)
+            keyword_doc_ids = self.keyword_search(query, 3*k_docs)
         else:
             keyword_doc_ids = []
-        semantic_doc_ids = self.semantic_search(query, 'document', top_k)
-        semantic_doc_ids.extend(self.semantic_search(query, 'slides', top_k))
-
+        print("src/indexing/chroma kdocs = ", k_docs)
+        semantic_doc_ids = self.semantic_search(query, 'document', k_docs)
+        semantic_doc_ids.extend(self.semantic_search(query, 'slides', k_docs))
         merged_docids = self.merge(keyword_doc_ids,semantic_doc_ids )
 
         reranked_docids = self.reranker_search(query, merged_docids, top_k)
 
         links = self.get_links(reranked_docids)
         content = self.get_content(reranked_docids)
-        logger.info(f"Returning {len(content)} sources eaxc of len {len(content[0])}")
         return content, links
 
     def save_all(self):

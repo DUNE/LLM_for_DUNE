@@ -26,13 +26,12 @@ from src.extractors.indico_extractor_multithreaded import IndicoExtractor
 from src.extractors.docdb_extractor_multithreaded import DocDBExtractor
 
 
-fermi_client=FermilabAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
+fermi_client=ArgoAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
 MODEL='gpt-oss:20b'
 rel=0
 
 def normalize(s):
     # Remove all whitespace characters like \n, \t, spaces, etc.
-
     expected = re.sub(r'\s+', '', s)
     if expected[-1] == '.': 
         return expected[:-1]
@@ -41,46 +40,67 @@ def normalize(s):
 indico_session=IndicoExtractor()
 docdb_session=DocDBExtractor()
 docdb_session._build_session()
-
-def relevant_refs(question, expected, contexts, references):
-
-    expect = normalize(expected)
+c=0
+@scorer
+def relevant_refs(outputs:dict, expectations:dict):
+    c+=1
+    #logger.error(outputs)
+    data= json.loads(outputs)
+    question = data['question']
+    references = data['references']
+    contexts = data['context_snippets']
+    
+    logger.info(f"num snipbfore  {len(contexts)}")
+    expect = normalize(expectations['expected_response'])
+    assert len(references)>0
     if expect in references:
         print("found")
+        rel+=3
         return 1
     else:
         prompt = f'Read this context and determine if it provides an answer to the question: {question}, if so, return a float value closer to 1 in the format of a json with the only permitted key being "score". If the content in the file is not related to the question at all or loosely relates to the question, give a score close to 0'
         results = 0
         #look at the questoin, open the references and check if they relate to the quesiton
+        for link, snippet in zip(references,contexts):
+            if not link: continue
+            document_text=snippet
+            if not document_text:
+                continue
             
-        resp=fermi_client.chat_completion(question=prompt, context=' '.join(contexts),  model=MODEL) #base_url='https://vllm.fnal.gov/v1/chat/completions')
-        match = re.search(r'(\d[\d\s]*\.?[\d\s]*)', resp)
+            resp=fermi_client.chat_completion(question=prompt, context=document_text)#, model=MODEL, base_url='https://vllm.fnal.gov/v1/chat/completions')
+            match = re.search(r'(\d[\d\s]*\.?[\d\s]*)', resp)
 
-        if match:
+            if match:
                 # Remove spaces to clean up
-            number_str = match.group(1).replace(" ", "")
+                number_str = match.group(1).replace(" ", "")
 
-        results += float(number_str)
-    return results
+            results += float(number_str)
+    length = 0
+    for i in references:
+        if i:
+            length += 1
+    print(results, c)
+    rel += results
+    if c>=99: print("res ", rel)
+    return results / length
 
-def correctness(main_question, expectation, output) -> float:
+@scorer
+def correctness(outputs: dict, expectations: dict= None) -> float:
+    outputs = outputs.get("generated_response", "")
+    expectations = expectations.get("expected_response", "")
     results = 0
-
     try:
-        if '[ERROR]' in output:
-            print(output)
+        if '[ERROR]' in outputs:
             return 0.0
-        question=f"Determine if the generated output is correct. Return a float value between 0 and 1 in the format of a json with the only permitted key being 'score'. Your float value must not contain any letters, they must strictly be comprised of numerical values and decimals. You will evaluate correctness like this:  If the generated response is factually correct and provides a well formed answer to the question {main_question} return a score closer to 1. If the response is not well formed or not factually correct return a score closer to 0. Use the expected response as a guide to evaluate the generated response. Do not treat the expected response as the ground truth. Even if the generated response does not meet the guidelines of the expected response as long as the generated response is factually correct return a high score."
+        question="Using the expected output as the ground truth answer, determine if the generated output is correct .Return a float value between 0 and 1 in the format of a json with the only permitted key being 'score'. Your float value must not contain any letters, they must strictly be comprised of numerical values and decimals. You will evaluate correctness like this: Get the main points from the expected output and the generated output. Then evaluate how closely aligned these points are. The words do not need to match exactly. Even if the generated output is phrased differently, as long as the general idea behind the generated output is the same as that behind the expected out, give the generated output a score close to 1. However, if the generated output does not address the same points or convey the same ideas as that of the expected output, then give a value close to 0."
                             
-        context = f"Generated output: {output}\nExpected out: {expectation}"
+        context = f"Generated output: {outputs}\nExpected out: {expectations}"
         resp = fermi_client.chat_completion(question=question, context=context, model =MODEL) #'nomic-embed-text:latest')# base_url='https://vllm.fnal.gov/v1/chat/completions')
         match = re.search(r'(\d[\d\s]*\.?[\d\s]*)', resp)
-        print(resp)
         if match:
             # Remove spaces to clean up
             number_str = match.group(1).replace(" ", "")
-        else:
-            number_str = 0.0
+        
         results += float(number_str)
     except Exception as e:
         print("Excpetion ", e)
@@ -104,12 +124,15 @@ class Evalutation():
         self.faiss_manager = ChromaManager(data_path)#FAISSManager(data_path)
         print(f"connecting to client")
         self.model=model
-        #self.fermi_client = ArgoAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
-        self.fermi_client=FermilabAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
+        self.fermi_client = ArgoAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
+        #self.fermi_client=FermilabAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
         print("Conntected to client")
         self.top_K=top_k
         self.keyword=keyword
-
+        #mlflow.tracing.disable()
+        mlflow.set_tracking_uri("./my_mlruns")
+        #mlflow.set_tracking_uri(f"http://0.0.0.0:{port}")
+        mlflow.set_experiment("experiment_name")
         
     def create_validation_dataset(self):
         
@@ -123,12 +146,12 @@ class Evalutation():
             dictionary['inputs'] = {'question': row[1]['question']}
 
             dictionary['expectations'] = {'expected_response': row[1]['answer']}
-           
             qas.append(dictionary)
         self.eval_dataset = qas
     
     def create_refs_dataset(self):
     
+
         refs_dataset=pd.read_csv(QA_PATH)
         refs=[]
         for row in refs_dataset.iterrows():
@@ -156,7 +179,26 @@ class Evalutation():
             latency.append(dictionary)
         print("made latenvy ds")
         self.latency_dataset = latency
-    
+    def llm_qa_response(self, question):
+        context_snippets, references = self.faiss_manager.search(question, top_k=self.top_K, keyword=self.keyword)
+        context = "\n\n".join(context_snippets)
+        # Get answer from Argo API
+        answer = self.fermi_client.chat_completion(question, context, model=self.model)
+        
+        assert answer
+        return {"generated_response": answer}
+    def llm_references(self,question):
+        context_snippets, references = self.faiss_manager.search(question)#, top_k=self.top_K, keyword=self.keyword)
+        #logger.info(f"REFS {references}")
+        data = {
+            "question": question,
+            "references": references,
+            "context_snippets": context_snippets
+        }
+
+        return json.dumps(data) #f"question \ {question} \ {','.join(references)} \{json.dumps(context_snippets)}"
+
+    #@mlflow.trace
     def evaluate(self,method):
         self.create_validation_dataset()
         print("in evaluate fn")
@@ -164,58 +206,33 @@ class Evalutation():
         with mlflow.start_run():
             if method == 'correctness':
                 self.create_validation_dataset()
-                '''results = mlflow.genai.evaluate(
+                results = mlflow.genai.evaluate(
                     data=self.eval_dataset,
                     predict_fn=self.llm_qa_response,
                     scorers=[correctness],
-                )'''
-                score = 0
-                df=[]
-                for dictionary in self.eval_dataset:
-                    question = dictionary['inputs']['question']
-                    expected = dictionary['expectations']['expected_response']
-                    contexts, references = self.faiss_manager.search(question, top_k = self.top_K)
-                    answer = self.fermi_client.chat_completion(question, " ".join(contexts), model=self.model)
-                    score_temp = correctness(question, expected, answer)
-                    df.append({'question': question, 'expected_response': expected, 'score': score_temp, 'true response': answer, 'contexts': contexts})
-                    score += score_temp
-                return df, [{'score' : score/len(self.eval_dataset)}]
-
-
+                )
+                print("results ", rel/100)
             elif method == 'relevant_refs':
                 self.create_refs_dataset()
-                '''results = mlflow.genai.evaluate(
+                results = mlflow.genai.evaluate(
                     data=self.ref_dataset,
                     predict_fn=self.llm_references,
                     scorers=[relevant_refs],
-                )'''
-                score = 0
-                df=[]
-                for dictionary in self.ref_dataset:
-                    question = dictionary['inputs']['question']
-                    reference = dictionary['expectations']['expected_response']
-                    
-                    contexts, references = self.faiss_manager.search(question)
-                    score_temp = relevant_refs(question, reference, contexts, references)
-                    df.append({'question': question, 'expected_reference': reference, 'score': score_temp, 'true references': references, 'contexts': contexts})
-                    score += score_temp
-                print(score/len(self.ref_dataset), score)
-                return df, [{'score' : score/len(self.ref_dataset)}]
+                )
 
             elif method=='latency':
                 duration=0.0
                 qa=pd.read_csv(QA_PATH)
-                df = []
                 for q in qa.iterrows():
                     question = q[1]['question']
                     start=time.time()
-                    context,links=self.faiss_manager.search(question, top_k=self.top_K, keyword=self.keyword)
-                    resp=self.fermi_client.chat_completion(question, ' '.join(context), model=self.model)
+                    context,links=self.faiss_manager.search_old(question, top_k=self.top_K, keyword=self.keyword)
+                    resp=self.argo_client.chat_completion(question, ' '.join(context))
                     end=time.time()
-                    df.append({'question': q, 'latency' : end-start})
                     duration += (end-start)
                 print(f"duration total: {duration}, total qs: {len(qa)}")
-                return df, [{'latency/mean': duration/100}]
+                results = {'latency/mean': duration/100}
+        return results  
 
 import argparse
 
@@ -251,10 +268,42 @@ logger = init_logger('benchmarking_logger')
 
 
 val = Evalutation(args.port, args.experiment_name, args.data_path, args.model, args.top_k, args.keyword)
-results, score = val.evaluate(args.method)
+results = val.evaluate(args.method)
+print(rel/100)
+save=False
+try:
+    metrics= results.metrics
+    save=True
+except:
+    metrics=results
+for key in metrics:
+    if '/' in key:
+        metric=key.split('/')[0]
+        DATA_FILE = f"{args.savedir}/{key.split('/')[0]}.json"
+logger.info(f"Logging metrics to {DATA_FILE}")
 
-if isinstance(results, list):
-    pd.DataFrame(results).to_csv(os.path.join(args.savedir, f'{args.method}_tracking.csv'))
-    pd.DataFrame(score).to_csv(os.path.join(args.savedir, f'{args.method}_score.csv'))
-    exit(0)
+
+if os.path.exists(DATA_FILE):
+    with open(DATA_FILE, "r") as f:
+        data = json.load(f)
+else:
+    data = {}
+
+run_name = args.data_path.split("/")[-1]
+for key in metrics:
+    if  '/mean' in key:
+        #check if previous run's metric already stored and if so, add onto it so we can average later, else save it as a new entry 
+        if run_name in data:
+            data[run_name] += metrics[key]
+        else:
+            data[run_name] = metrics[key]
+
+with open(DATA_FILE, "w") as f:
+    json.dump(data, f)
+
+
+save_results_file = f"{args.savedir}/{metric}_evaluation_results.csv"
+logger.info(f"Saved results to {save_results_file}")
+if save:
+    results.result_df.to_csv(save_results_file, index=False)
 

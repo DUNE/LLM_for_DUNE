@@ -14,7 +14,7 @@ from typing import Optional, Dict, Any
 from config import (
     HOST, PORT, DEBUG, ARGO_API_USERNAME, ARGO_API_KEY, 
     DEFAULT_TOP_K, ENABLE_AUTHENTICATION, FERMILAB_REDIRECT_URI, 
-    STORE, validate_config, create_directories, CHROMA_PATH, FERMILAB_SESSION_SECRET
+    STORE, validate_config, create_directories, CHROMA_PATH, FERMILAB_SESSION_SECRET, K_DOCS
 )
 
 
@@ -156,25 +156,12 @@ async def form_post(request: Request, question: str = Form(...), user: Optional[
     """Handle form submission and return results"""
     try:
         logger.info(f"Question received from {user.get('email', 'anonymous') if user else 'anonymous'}: {question}")
-        
         # Search FAISS index
-        context_snippets, references = db_manager.search(question, top_k=DEFAULT_TOP_K)
+        context_snippets, references = db_manager.search(question, k_docs= K_DOCS, top_k=DEFAULT_TOP_K)
         context = "\n\n".join(context_snippets)
         
-        assert references, "no refs"
         # Get answer from Argo API
-        #return StreamingResponse(argo_client.chat_completion(question, context), media_type="text/html")
-        answer = argo_client.chat_completion(question, context)
-        import markdown
-        answer=markdown.markdown(answer)
-        return templates.TemplateResponse("index.html", {
-            "request": request,
-            "question": question,
-            "answer": answer,
-            "reference": references,
-            "user": user,
-            "auth_enabled": ENABLE_AUTHENTICATION
-        })
+        return StreamingResponse(argo_client.chat_completion(question, context, links=references), media_type="text/html")
     
     except Exception as e:
         logger.error(f"Error processing question: {e}")

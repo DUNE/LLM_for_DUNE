@@ -79,6 +79,7 @@ LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
 # Query Configuration
 DEFAULT_TOP_K = int(os.getenv("DEFAULT_TOP_K", "3"))
+K_DOCS = int(os.getenv("K_DOCS","2"))
 LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.1"))
 LLM_TOP_P = float(os.getenv("LLM_TOP_P", "0.9"))
 LLM_MODEL = os.getenv("LLM_MODEL", "gpt4o")

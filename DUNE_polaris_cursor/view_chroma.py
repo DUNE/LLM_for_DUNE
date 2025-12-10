@@ -28,7 +28,6 @@ for doc, id_, md in zip(mcd['documents'], mcd['ids'], mcd['metadatas']):
         max_len = max(len(doc.split()), max_len)
     ids[md.get('source', 'indico')].add(i)
     avg_words += len(doc.split())
-    max_len = max(len(doc.split()), max_len)
 
 
 #Store id's in a DB
