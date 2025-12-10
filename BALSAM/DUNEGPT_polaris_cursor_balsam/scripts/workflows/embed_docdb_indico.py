@@ -40,8 +40,8 @@ version = "v0"
 """
 Functions
 """
-num_jobs=5
-num_nodes=5
+num_jobs=5 #number of processes to run
+num_nodes=5 #max number of nodes to run all jobs (5 jobs and 5 nodes means each job MAY run on a seperate node but nor guarenteed)
 wall_time_min = 300 #180
 
 doc_limit = 1000 if queue == 'prod' else 50 #-------16K for indico 37K for ddb
@@ -76,11 +76,11 @@ if __name__=="__main__":
     #     site_id=site.id, 
     #     tags={"workflow": f"{name}_convert2h5_{version}"},
     #     )]
-    import argparse
-    #no parents for systematics
-    parser = argparse.ArgumentParser(description="Example argparse program")
 
-    parser.add_argument("--c", type=int, default=0, help="Doc Num to start at divided by 5")
+    import argparse
+    parser = argparse.ArgumentParser(description="Params to run jobs")
+
+    parser.add_argument("--c", type=int, default=0, help="Doc Num to start at divided by num_nodes")
 
     args = parser.parse_args()
     #Creating Parent Job
@@ -93,20 +93,19 @@ if __name__=="__main__":
             parent_job_ids = tmp_parent_job_ids
             tmp_parent_job_ids = []
             for i in range(args.c, args.c + num_nodes):
-                params={'data_dir':i , 'ddb_start': doc_limit*c, 'ind_start': indico_limit*c}
+                params={'data_dir':c , 'ddb_start': doc_limit*c, 'ind_start': indico_limit*c}
                 parent_job = []
                 if parent_job_ids:
                     parent_job = [parent_job_ids[i]]
                 parent = create_single_dependent_job("embed", c, parent_job, params, gpu_packing_count, start=start)
                 print(f"Created job starting at dddb doc {doc_limit*c} and indico doc: {indico_limit*c}")
-                print(f"Created job w/ id {parent.id} and parent is {parent_job}")
+                print(f"W/ id {parent.id} and parent is {parent_job}")
                 tmp_parent_job_ids.append(parent.id)
                 c += 1
         print(f"Created {num_jobs-1} jobs with start= {start}")
-        print("embed jobs created")
 
 
-#submit cpu jobs
+    #submit cpu jobs
     if "submit_all" in runs:
         # submit_all_jobs(num_nodes = spill_size//cpu_packing_count)
         # submit_all_jobs(num_nodes = min(spill_size//cpu_packing_count,max_nodes), wall_time_min = 60)
