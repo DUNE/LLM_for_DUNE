@@ -58,6 +58,8 @@ A Retrieval-Augmented Generation (RAG) based LLM application for DUNE scientific
 
 3. **Install dependencies**
    ```bash
+   # First check which version of Python you are using. It has to be >3.11
+   python --version 
    python3.11 -m venv venv
    source venv/bin/activate
 
