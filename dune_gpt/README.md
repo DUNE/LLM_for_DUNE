@@ -58,7 +58,21 @@ A Retrieval-Augmented Generation (RAG) based LLM application for DUNE scientific
 
 3. **Install dependencies**
    ```bash
-   # First check which version of Python you are using. This project requires **Python ≥ 3.11**. 
+   # First check which version of Python you are using. This project requires **Python >= 3.11 and < 3.13**.
+python --version
+
+# Python 3.11 is the recommended and primary supported version, and is used in production environments (e.g. FNAL gpvm). Newer Python versions (e.g. 3.13) are not yet supported due to upstream dependency limitations (e.g. greenlet / gevent).
+python3.11 -m venv venv
+
+# Or, if python3 already points to ≥3.11 and < 3.13**
+python3 -m venv venv
+
+source venv/bin/activate
+
+pip3 install -r requirements.txt
+python3 -m spacy download en_core_web_sm
+python3 update_sqlite.py venv
+
    python --version
 
    # Using Python 3.11 explicitly (recommended on FNAL gpvm)
