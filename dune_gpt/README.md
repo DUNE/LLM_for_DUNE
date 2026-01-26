@@ -60,8 +60,15 @@ A Retrieval-Augmented Generation (RAG) based LLM application for DUNE scientific
    ```bash
    # First check which version of Python you are using. It has to be >3.11
    python --version
-   
+
+   # This project requires **Python ≥ 3.11**. Examples:
+   ```bash
+   # Using Python 3.11 explicitly (recommended on FNAL gpvm)
    python3.11 -m venv venv
+
+   # Or, if python3 already points to ≥3.11
+   python3 -m venv venv
+   
    source venv/bin/activate
 
    pip3 install -r requirements.txt
