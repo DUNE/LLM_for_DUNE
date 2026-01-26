@@ -70,6 +70,19 @@ A Retrieval-Augmented Generation (RAG) based LLM application for DUNE scientific
    
    source venv/bin/activate
 
+   ```
+   ### Note on local development
+   For local development on macOS, it may be convenient to use conda to create a Python 3.11 environment:
+
+   ```
+   conda create -n dune-gpt python=3.11
+   conda activate dune-gpt
+
+   ```
+   
+   Then proceed with the rest of the commands
+   
+   ```
    pip3 install -r requirements.txt
    python3 -m spacy download en_core_web_sm
    python3 update_sqlite.py venv
