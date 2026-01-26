@@ -43,8 +43,8 @@ A Retrieval-Augmented Generation (RAG) based LLM application for DUNE scientific
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd DUNEGPT_polaris_cursor
+   git clone https://github.com/DUNE/LLM_for_DUNE/tree/main/dune_gpt
+   cd dune_gpt
    ```
 
 2. **Set up environment**
@@ -222,7 +222,7 @@ curl "http://localhost:8000/api/stats"
 ## Project Structure
 
 ```
-DUNEGPT_polaris_cursor/
+dune_gpt/
 ├── config.py                 # Configuration management
 ├── main.py                   # FastAPI web application
 ├── cli.py                    # Command-line interface
