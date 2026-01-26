@@ -119,7 +119,7 @@ make install
 
 4. **Index documents**
    ```bash
-   python3 cli.py index --docdb-limit 10 --indico-limit 10 --start_idx_ddb 0 --start_idx_ind 0 --chunk-size 2000
+   python3 cli.py index --docdb-limit 10 --indico-limit 10 --start_idx_ddb 0 --start_idx_ind 0 
    ```
    start_idx_ddb/start_idx_ind: Which webpage to start at (-1 to not scrape from DocDB/Indico respectively)
    
