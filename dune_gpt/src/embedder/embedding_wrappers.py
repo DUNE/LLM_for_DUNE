@@ -1,3 +1,9 @@
+import sys
+try:
+    import pysqlite3
+    sys.modules["sqlite3"] = pysqlite3
+except Exception:
+    pass
 from src.utils.logger import get_logger
 from sentence_transformers import SentenceTransformer
 logger = get_logger(__name__)

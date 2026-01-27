@@ -1,12 +1,5 @@
 from collections import defaultdict
 import os
-import sys
-
-try:
-    import pysqlite3
-    sys.modules["sqlite3"] = pysqlite3
-except Exception:
-    pass
 import pickle
 import numpy as np
 import torch
