@@ -12,11 +12,11 @@ import uvicorn
 from typing import Optional, Dict, Any
 
 from config import (
-    HOST, PORT, DEBUG, ARGO_API_USERNAME, ARGO_API_KEY, 
-    DEFAULT_TOP_K, ENABLE_AUTHENTICATION, FERMILAB_REDIRECT_URI, 
-    STORE, validate_config, create_directories, CHROMA_PATH, FERMILAB_SESSION_SECRET, K_DOCS
+    HOST, PORT, DEBUG, ARGO_API_USERNAME, ARGO_API_KEY,
+    DEFAULT_TOP_K, ENABLE_AUTHENTICATION, FERMILAB_REDIRECT_URI,
+    STORE, validate_config, create_directories, CHROMA_PATH, FERMILAB_SESSION_SECRET, K_DOCS,
+    LLM_PROVIDER
 )
-
 
 if STORE == 'faiss':
     from src.indexing.faiss_manager_langchain import FAISSManager
@@ -27,18 +27,19 @@ elif STORE == 'chroma':
 else:
     raise Exception(f"DUNE-GPT requires Faiss or Chroma. Got {STORE}")
 from src.api.fermilab_client import FermilabAPIClient
+from src.api.argo_client import ArgoAPIClient
 from src.auth.fermilab_auth import fermilab_auth
 from src.utils.logger import get_logger
 print("ALL IMPORTS IMPORTED")
 logger = get_logger(__name__)
 
 # Global variables
-fermi_client: Optional[FermilabAPIClient] = None
+llm_client = None  # FermilabAPIClient or ArgoAPIClient
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage application lifecycle"""
-    global db_manager, fermi_client
+    global db_manager, llm_client
     
     # Startup
     logger.info("Starting DUNE-GPT application")
@@ -55,7 +56,14 @@ async def lifespan(app: FastAPI):
     else:
         raise Exception(f"Requires Faiss or Chroma. Got {STORE}")
     
-    fermi_client = FermilabAPIClient()
+    if LLM_PROVIDER == "argo":
+        logger.info("Using Argo API client (LLM_PROVIDER=argo)")
+        if not ARGO_API_USERNAME or not ARGO_API_KEY:
+            raise RuntimeError("LLM_PROVIDER=argo but ARGO_API_USERNAME/ARGO_API_KEY not set")
+        llm_client = ArgoAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
+    else:
+        logger.info("Using Fermilab API client (LLM_PROVIDER=fermilab)")
+        llm_client = FermilabAPIClient()
     
     # Check if index is empty
     stats = db_manager.get_stats()
@@ -161,7 +169,8 @@ async def form_post(request: Request, question: str = Form(...), user: Optional[
         context = "\n\n".join(context_snippets)
         
         # Get answer from Fermilab API
-        return StreamingResponse(fermi_client.chat_completion(question, context, links=references), media_type="text/html")
+        return StreamingResponse(llm_client.chat_completion(question, context, links=references), media_type="text/html")
+
     
     except Exception as e:
         logger.error(f"Error processing question: {e}")
@@ -186,7 +195,7 @@ async def api_search(q: str, top_k: int = DEFAULT_TOP_K):
         context = "\n\n".join(context_snippets)
         
         # Get answer from Fermilab API
-        answer = fermi_client.chat_completion(q, context)
+        answer = llm_client.chat_completion(q, context)
         
         return {
             "question": q,
@@ -204,12 +213,13 @@ async def health_check():
     """Health check endpoint"""
     try:
         stats = db_manager.get_stats()
-        fermi_healthy = fermi_client.health_check()
-        
+        api_healthy = llm_client.health_check()
+
         return {
-            "status": "healthy" if argo_healthy else "degraded",
+            "status": "healthy" if api_healthy else "degraded",
             "db_index": stats,
-            "fermilab_api": "available" if argo_healthy else "unavailable"
+            "llm_provider": LLM_PROVIDER,
+            "llm_api": "available" if api_healthy else "unavailable",
         }
     
     except Exception as e:
