@@ -68,13 +68,13 @@ class DocumentProcessor:
                     
             except Exception as e:
                 logger.error(f"Error in extracting documents from dune docdb {e}"  )
-            return to_reindex
+            return []
         
         def log_to_db_docdb(documents_batch, num_processed, num_parsed):
             try:
                 with log_lock:
                     
-                    logger.info(f"to_reindex is {len(to_reindex)}")
+                    logger.info(f"documents_batch size = {len(documents_batch)}")
                     added = self.chroma_manager.add_documents(documents_batch, num_processed)
                     results['docdb_parsed']+=num_parsed
                     results["docdb_processed"] += num_processed
