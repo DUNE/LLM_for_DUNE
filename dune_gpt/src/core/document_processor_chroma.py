@@ -82,7 +82,7 @@ class DocumentProcessor:
 
 
                     logger.info(
-                        f"Added DocDB to Chroma: reindexed {len(documents_batch)}, added {added} vectors"
+                        f"Added DocDB batch: docs={len(documents_batch)}, vectors_added={added}"
                     )
 
                             
