@@ -189,21 +189,25 @@ async def api_search(q: str, top_k: int = DEFAULT_TOP_K):
     try:
         if not q.strip():
             raise HTTPException(status_code=400, detail="Question cannot be empty")
-        
-        # Search FAISS index
+
+        # Search vector index
         context_snippets, references = db_manager.search(q, top_k=top_k)
         context = "\n\n".join(context_snippets)
-        
-        # Get answer from Fermilab API
-        answer = llm_client.chat_completion(q, context)
-        
+
+        # Consume streaming generator into a string
+        answer_chunks = llm_client.chat_completion(q, context)
+        answer = "".join(
+            chunk for chunk in answer_chunks
+            if not chunk.startswith("STATUS:")
+        )
+
         return {
             "question": q,
             "answer": answer,
             "references": references,
-            "context_snippets": len(context_snippets)
+            "context_snippets": len(context_snippets),
         }
-    
+
     except Exception as e:
         logger.error(f"API error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
