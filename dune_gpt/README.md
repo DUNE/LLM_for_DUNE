@@ -85,7 +85,7 @@ A Retrieval-Augmented Generation (RAG) based LLM application for DUNE scientific
    ```
    pip3 install -r requirements.txt
    python3 -m spacy download en_core_web_sm
-   python3 update_sqlite.py  # Activate your Python environment (conda or venv), then run this command. 
+   # python3 update_sqlite.py  # Old method, Activate your Python environment (conda or venv), then run this command. 
 
    ```
 
