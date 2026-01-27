@@ -45,7 +45,7 @@ class DocumentProcessor:
         #
         # --- DocDB portion ---
         #
-        to_reindex: List[Dict[str, Any]] = []
+        documents_batch: List[Dict[str, Any]] = []
         def docdb_extraction(name):
             try:
                 logger.info("Processing DocDB documents")
@@ -70,19 +70,19 @@ class DocumentProcessor:
                 logger.error(f"Error in extracting documents from dune docdb {e}"  )
             return to_reindex
         
-        def log_to_db_docdb(to_reindex, num_processed, num_parsed):
+        def log_to_db_docdb(documents_batch, num_processed, num_parsed):
             try:
                 with log_lock:
                     
                     logger.info(f"to_reindex is {len(to_reindex)}")
-                    added = self.chroma_manager.add_documents(to_reindex, num_processed)
+                    added = self.chroma_manager.add_documents(documents_batch, num_processed)
                     results['docdb_parsed']+=num_parsed
                     results["docdb_processed"] += num_processed
                     results["total_embeddings_added"] += added
 
 
                     logger.info(
-                        f"Added DocDB to Chroma: reindexed {len(to_reindex)}, added {added} vectors"
+                        f"Added DocDB to Chroma: reindexed {len(documents_batch)}, added {added} vectors"
                     )
 
                             
