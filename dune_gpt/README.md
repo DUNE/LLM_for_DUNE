@@ -43,7 +43,7 @@ A Retrieval-Augmented Generation (RAG) based LLM application for DUNE scientific
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/DUNE/LLM_for_DUNE/tree/main/dune_gpt
+   git clone https://github.com/DUNE/LLM_for_DUNE.git
    cd dune_gpt
    ```
 
