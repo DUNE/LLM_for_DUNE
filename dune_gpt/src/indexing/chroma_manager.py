@@ -193,17 +193,19 @@ class ChromaManager:
         self.update_indico_docdb_record(documents)
 
         ids = set(map_ids_to_idx.keys())
+        existing_ids = set(self.doc_ids)
 
-        ids_to_update = list(self.doc_ids.intersection(ids))
-        added = self.add_to_chroma(documents = documents, ids = ids_to_update, ids_to_idx_map =  map_ids_to_idx, mode = 'update')
+        ids_to_update = list(existing_ids.intersection(ids))
+        added = self.add_to_chroma(documents=documents, ids=ids_to_update, ids_to_idx_map=map_ids_to_idx, mode='update')
 
-        ids_to_add = ids - self.doc_ids
+        ids_to_add = ids - existing_ids
 
         if ids_to_add is not None:
             added += self.add_to_chroma(documents= documents, ids= ids_to_add, ids_to_idx_map=map_ids_to_idx, mode='add')
 
+        self.doc_ids = list(existing_ids.union(ids))
         return added
-    
+                
     def get_indico_ids(self) -> Dict[int, int]:
         """
         Return a map { doc_id: max_version_indexed } for all DocDB docs.
