@@ -1,0 +1,12 @@
+# Python
+__pycache__/
+*.pyc
+
+# Environments / secrets
+.env
+.env.*
+venv/
+env/
+
+# Local data (Chroma / FAISS / sqlite)
+data/
