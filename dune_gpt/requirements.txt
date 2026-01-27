@@ -37,6 +37,7 @@ authlib==1.2.1
 
 # Environment Management
 python-dotenv==1.0.0
+pysqlite3-binary
 
 # Utilities
 pathlib2>=2.3.7
