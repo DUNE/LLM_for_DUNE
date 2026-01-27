@@ -20,6 +20,7 @@ class ArgoAPIClient:
         self, 
         question: str, 
         context: str,
+        links:list[str]=None,
         temperature: float = LLM_TEMPERATURE,
         top_p: float = LLM_TOP_P,
         model: str = LLM_MODEL,
