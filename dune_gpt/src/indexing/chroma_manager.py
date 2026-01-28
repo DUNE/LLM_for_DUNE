@@ -47,15 +47,8 @@ class ChromaManager:
         except Exception as e:
             logger.error(f"Error initiating chroma {e}")
 
-        self.chroma_ntotal = self.chroma_collection.count()
-
-
-        if self.chroma_ntotal == 0:
-            logger.info(f"Initiating new DB named {CHROMA_DB_NAME}")
-        else:
-            logger.info(f"Number of documents = {self.chroma_ntotal}")
-            logger.info(f"Retrieving existing DB named {CHROMA_DB_NAME}")
-
+        logger.info(f"Using Chroma collection '{CHROMA_DB_NAME}' (count deferred)")
+        
         # Setup device & model
 
 
