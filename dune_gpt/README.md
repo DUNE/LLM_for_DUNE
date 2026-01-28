@@ -54,6 +54,9 @@ A Retrieval-Augmented Generation (RAG) based LLM application for DUNE scientific
    
    # Edit .env with your credentials
    nano .env
+
+   # Note for HPC systems (Fermilab, Aurora):
+   # Set cache environment variables (HF_HOME, TORCH_HOME, PIP_CACHE_DIR, XDG_CACHE_HOME) to a high-quota filesystem (e.g. /exp/dune/data) to avoid $HOME quota issues.
    ```
 
 3. **Install dependencies**
