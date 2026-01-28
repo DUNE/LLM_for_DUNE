@@ -4,7 +4,7 @@ This guide provides step-by-step instructions for installing and running DUNE-GP
 
 ## 📋 Prerequisites
 
-- **Python 3.10+** (check with `python3 --version`)
+- **Python 3.11+** (check with `python3 --version`)
 - **Git** (for cloning the repository)
 - **DUNE DocDB credentials**
 - **Argo API credentials**
@@ -20,7 +20,7 @@ This guide provides step-by-step instructions for installing and running DUNE-GP
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd DUNEGPT_polaris_new
+cd dune_gpt
 
 # Create a Python virtual environment (recommended)
 python3 -m venv .venv
@@ -130,7 +130,7 @@ Visit `http://127.0.0.1:8000` in your browser.
 
 ```bash
 # Navigate to project directory
-cd /path/to/DUNEGPT_polaris_new
+cd /path/to/dune_gpt
 
 # Activate virtual environment (if using)
 source .venv/bin/activate
@@ -286,7 +286,7 @@ docker-compose logs dune-gpt
 ## 📁 File Structure
 
 ```
-DUNEGPT_polaris_new/
+dune_gpt/
 ├── cli.py              # Command-line interface
 ├── main.py             # Web application
 ├── config.py           # Configuration
