@@ -8,6 +8,8 @@ import os
 import click
 from pathlib import Path
 import sys
+from src.indexing.indexer import IndexingJob
+from config import DB_PATH
 
 # this loads variables from your .env file into the environment
 load_dotenv()
@@ -221,6 +223,11 @@ def serve():
         click.echo(f"Error: {e}", err=True)
         sys.exit(1)
 
+@cli.command()
+def index():
+    job = IndexingJob(DB_PATH)
+    job.run()
+    
 @cli.command()
 def health():
     """Check system health"""
