@@ -61,13 +61,13 @@ class ChromaManager:
         self.metadata= defaultdict()
         self.documents= defaultdict()
         self.events_ids=set()
-        self.fetch_ddb_ind_data()
         self.num_events=len(self.events_ids)
 
 
         # Ensure directories exist
         create_directories(data)
 
+    '''
     def fetch_ddb_ind_data(self):
         results = self.chroma_collection.get(include=["documents", "metadatas", "uris"])
         for id, md, doc in zip(results['ids'], results['metadatas'],results['documents'] ):
@@ -88,7 +88,8 @@ class ChromaManager:
             event_id = id.split("_")[0]
             self.events_ids.add(event_id)
         self.doc_ids = list(self.metadata.keys())
-
+    '''
+    
     def _configure_threading(self):
         os.environ["OMP_NUM_THREADS"] = "1"
         os.environ["MKL_NUM_THREADS"] = "1"
