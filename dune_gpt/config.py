@@ -16,6 +16,11 @@ FERMILAB_API_URL=os.getenv("FERMILAB_API_URL","")
 QA_PATH = './benchmarking/QuestionAnswer/QA.csv'
 #'./benchmarking/QuestionAnswer/Cleaned_questions2.csv'
 
+# DB Path
+DB_PATH = os.getenv("DB_PATH")
+if not DB_PATH:
+    raise RuntimeError("DB_PATH is not set in environment (.env)")
+
 # Database Configuration
 DUNE_DOCDB_USERNAME = os.getenv("DUNE_DOCDB_USERNAME")
 DUNE_DOCDB_PASSWORD = os.getenv("DUNE_DOCDB_PASSWORD")
