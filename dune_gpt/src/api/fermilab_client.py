@@ -42,10 +42,12 @@ class FermilabAPIClient:
                 }
             ]
         }
-        if 'ollama' in base_url:
-            payload['stream'] = True
-        else:
-            payload['stream']=False
+
+        # if 'ollama' in base_url:
+        #     payload['stream'] = True
+        # else:
+        #     payload['stream']=False
+        payload['stream'] = True
     
         response = []
         yield 'STATUS:PROCESSING'
@@ -54,6 +56,7 @@ class FermilabAPIClient:
         try:
             with requests.post(base_url, json=payload, stream=True) as resp:
                 for line in resp.iter_lines(decode_unicode=True):
+                    print(line)
                     if not line:
                         continue
                     if line.startswith("data: "):
