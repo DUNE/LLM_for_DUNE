@@ -140,6 +140,9 @@ make install
    ex:
    ```
    ssh -L 5000:localhost:8000 user@aurora.alcf.anl.gov
+   or
+   ssh -L 8000:127.0.0.1:8000 user@dunegpvmXX.fnal.gov
+   Then keep that SSH session open, and open it in your local browser. 
    ```
    Webpage launched locally on localhost:5000
 
