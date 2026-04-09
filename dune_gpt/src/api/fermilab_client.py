@@ -56,7 +56,6 @@ class FermilabAPIClient:
         try:
             with requests.post(base_url, json=payload, stream=True) as resp:
                 for line in resp.iter_lines(decode_unicode=True):
-                    print(line)
                     if not line:
                         continue
                     if line.startswith("data: "):

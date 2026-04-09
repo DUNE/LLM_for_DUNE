@@ -1,43 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="static/styles.css">
-    <title>DUNE-GPT</title>
+    <title>AskDUNE</title>
 
     <style>
         * {
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
             min-height: 100vh;
         }
-        
+
         h1 {
             max-width: 800px;
             margin: 0 0 20px 0;
             padding: 0 15px;
         }
-        
+
         .header-section {
             max-width: 800px;
             margin: 0 0 30px 0;
             padding: 0 15px;
         }
-        
-        form {
-            margin-bottom: 30px;
-            max-width: 800px;
-            margin: 0 0 30px 0;
-            padding: 0 15px;
-            width: 100%;
-        }
-        
+
         textarea {
             width: 100%;
             padding: 10px;
@@ -55,89 +48,62 @@
             font-size: 16px;
             margin-top: 10px;
         }
-        
-        /* Sources row - horizontal cards */
-        .sources-row {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 30px;
-            max-width: 800px;
-            margin: 0 0 30px 0;
-            padding: 0 15px;
-            width: 100%;
-            visibility: hidden;
-        }
-        
-        .sources-row.visible {
-            visibility: visible;
-        }
-        
-        .source-card {
-            flex: 1;
-            min-width: 0;
-            background: #f8f9fa;
-            border: 1px solid #e8eaed;
-            border-radius: 8px;
-            padding: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-decoration: none;
-            display: block;
-            color: inherit;
-        }
-        
-        .source-card:hover {
-            background: #e8f0fe;
-            border-color: #1a73e8;
-            transform: translateY(-2px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        
-        .source-thumbnail {
-            width: 100%;
-            height: 120px;
-            background: #e8eaed;
-            border-radius: 6px;
-            margin-bottom: 8px;
-            overflow: hidden;
-        }
-        
-        .source-thumbnail img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .source-thumbnail-placeholder {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            font-size: 36px;
-            font-weight: bold;
-        }
-        
-        .source-domain {
-            font-size: 12px;
-            color: #5f6368;
-            text-align: center;
-            word-break: break-word;
-        }
-        
-        /* Answer section */
+
         #answer {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding-bottom: 100px;
             max-width: 800px;
-            margin: 0 0 0 0;
-            padding: 20px 15px;
-            background: #ffffff;
-            border-radius: 8px;
+            margin: 0 auto;
             width: 100%;
-            min-height: 100px;
         }
-        
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 15px;
+            margin: 5px 0;
+            line-height: 1.5;
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background-color: #007bff;
+            color: white;
+            border-bottom-right-radius: 2px;
+        }
+
+        .ai-message {
+            align-self: flex-start;
+            background-color: #f1f0f0;
+            color: #333;
+            border-bottom-left-radius: 2px;
+        }
+
+        .sources-list {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #dcdcdc;
+            padding-left: 20px;
+        }
+
+        .sources-list li {
+            margin-bottom: 5px;
+            word-break: break-all;
+        }
+
+        form {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 15px;
+            position: sticky;
+            background: white;
+            border-top: 1px solid #eee;
+            box-sizing: border-box;
+        }
+
         /* Spinner */
         .spinner-container {
             display: flex;
@@ -147,7 +113,7 @@
             padding: 40px;
             gap: 15px;
         }
-        
+
         .spinner-icon {
             border: 4px solid #f3f3f3;
             border-top: 4px solid #667eea;
@@ -156,16 +122,16 @@
             height: 40px;
             animation: spin 1s linear infinite;
         }
-        
+
         .spinner-text {
             font-size: 14px;
             color: #5f6368;
         }
-        
+
         a {
             color: #0645AD;
         }
-        
+
         .loader {
             border: 6px solid #f3f3f3;
             border-top: 6px solid #555;
@@ -175,7 +141,7 @@
             animation: spin 1s linear infinite;
             margin-top: 10px;
         }
-        
+
         #dune-logo {
             position: fixed;
             top: 20px;
@@ -185,268 +151,199 @@
             z-index: 9999;
             max-width: calc(100vw - 40px);
         }
-        
+
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
-        
+
         /* Tablet and smaller */
         @media (max-width: 768px) {
             body {
                 padding: 10px;
             }
-            
+
             h1 {
                 padding: 0 10px;
             }
-            
+
             form {
                 padding: 0 10px;
             }
-            
-            .sources-row {
-                flex-direction: column;
-                padding: 0 10px;
-            }
-            
-            .source-card {
-                display: flex;
-                gap: 12px;
-                align-items: flex-start;
-            }
-            
-            .source-thumbnail {
-                width: 100px;
-                height: 80px;
-                flex-shrink: 0;
-                margin-bottom: 0;
-            }
-            
-            .source-info {
-                flex: 1;
-                min-width: 0;
-            }
-            
-            .source-domain {
-                text-align: left;
-            }
-            
+
             #answer {
                 padding: 15px 10px;
             }
-            
+
             #dune-logo {
                 width: 120px;
                 top: 10px;
                 right: 10px;
             }
         }
-        
+
         /* Mobile phones */
         @media (max-width: 480px) {
             h1 {
                 font-size: 1.5rem;
             }
-            
+
             textarea {
                 font-size: 14px;
             }
-            
+
             button {
                 font-size: 14px;
                 padding: 6px 12px;
             }
-            
-            .source-thumbnail {
-                width: 80px;
-                height: 60px;
-            }
-            
-            .source-thumbnail-placeholder {
-                font-size: 24px;
-            }
-            
-            .source-domain {
-                font-size: 11px;
-            }
-            
+
             #dune-logo {
                 width: 100px;
             }
         }
     </style>
 </head>
+
 <body>
-    <h1>DUNE-GPT</h1>
-    
-    <!-- Authentication Status -->
+    <h1>AskDUNE</h1>
+
     {% if auth_enabled %}
-        <div style="margin-bottom: 20px; padding: 10px; background-color: #f0f8ff; border-radius: 5px;">
-            {% if user %}
-                <p>✅ <strong>Authenticated as:</strong> {{ user.email }}</p>
-                <a href="/logout" style="color: #dc3545; text-decoration: none;">🚪 Logout</a>
-            {% else %}
-                <p>🔐 <strong>Authentication Required</strong></p>
-                <a href="/login" style="color: #007bff; text-decoration: none;">🔑 Login with Fermilab</a>
-            {% endif %}
-        </div>
+    <div style="margin-bottom: 20px; padding: 10px; background-color: #f0f8ff; border-radius: 5px;">
+        {% if user %}
+        <p>✅ <strong>Authenticated as:</strong> {{ user.email }}</p>
+        <a href="/logout" style="color: #dc3545; text-decoration: none;">🚪 Logout</a>
+        {% else %}
+        <p>🔐 <strong>Authentication Required</strong></p>
+        <a href="/login" style="color: #007bff; text-decoration: none;">🔑 Login with Fermilab</a>
+        {% endif %}
+    </div>
     {% endif %}
-    
+
     {% if not auth_enabled or user %}
-    <!-- Search Form -->
+    <div id="answer">
+    </div>
+
     <form>
         <textarea id='input' placeholder="Ask a question:" cols="50"></textarea>
         <button type="submit">Send</button>
     </form>
-    
-    <!-- Sources Row (3 horizontal cards) -->
-    <div class="sources-row" id="sources-row">
-        <!-- Sources will be added here -->
-    </div>
-    
-    <!-- Answer Section -->
-    <div id="answer">
-        <!-- Answer content will be streamed here -->
-    </div>
-    
+
     <pre id="body"></pre>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
         const body = document.getElementById('answer');
         const submit_btn = document.querySelector('button');
         const input = document.getElementById('input');
         const sourcesRow = document.getElementById('sources-row');
-        
-        input.addEventListener('input', function() {
+
+        input.addEventListener('input', function () {
             this.style.height = 'auto';
             this.style.height = this.scrollHeight + 'px';
         });
-        
+
         submit_btn.addEventListener("click", async (e) => {
             e.preventDefault();
-            console.log("In event");
-            
-            // Show spinner
-            body.innerHTML = `
-                <div class="spinner-container">
-                    <div class="spinner-icon"></div>
-                    <div class="spinner-text">Searching documents...</div>
-                </div>
-            `;
-            
-            console.log("Before clear - sources row children:", sourcesRow.children.length);
-            sourcesRow.innerHTML = '';
-            sourcesRow.classList.remove('visible');
-            console.log("After clear - sources row children:", sourcesRow.children.length);
-            
+            const userPrompt = input.value.trim();
+            if (!userPrompt) {
+                return;
+            }
+
+            const userDiv = document.createElement('div');
+            userDiv.className = 'message user-message';
+            userDiv.textContent = userPrompt;
+            body.appendChild(userDiv);
+
+            input.value = '';
+            input.style.height = 'auto';
+
+            const aiDiv = document.createElement('div');
+            aiDiv.className = 'message ai-message';
+            aiDiv.innerHTML = `<div class="spinner-text">Thinking...</div>`;
+            body.appendChild(aiDiv);
+
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+
             const formData = new FormData();
-            formData.append('question', input.value);
-            
+            formData.append('question', userPrompt);
+
             const response = await fetch("/ui", {
                 method: "POST",
                 body: formData
             });
 
             const reader = response.body.getReader();
-            console.log("Got a response");
-            let output = "";	
-            let isStreaming = false;
-            
+            let output = "";
+
             while (true) {
-                console.log("True");
                 const { done, value } = await reader.read();
-                console.log("value ", value);
                 const chunk = new TextDecoder().decode(value);
-                
-                if (chunk.includes('STATUS:SEARCHING')) {
-                    body.innerHTML = `
-                        <div class="spinner-container">
-                            <div class="spinner-icon"></div>
-                            <div class="spinner-text">Searching documents...</div>
-                        </div>
-                    `;
+
+                if (chunk.includes('STATUS:')) {
                     continue;
                 }
 
-                if (chunk.includes('STATUS:PROCESSING')) {
-                    body.innerHTML = `
-                        <div class="spinner-container">
-                            <div class="spinner-icon"></div>
-                            <div class="spinner-text">Processing response...</div>
-                        </div>
-                    `;
-                    continue;
-                }
-
-                // Remove spinner on first real content
-                if (!isStreaming && !chunk.startsWith('STATUS:')) {
-                    isStreaming = true;
-                }
-                
                 output += chunk;
-                body.innerHTML = marked.parse(output);
-                
+
                 if (output.includes('SOURCES: ')) {
                     const [answerText, sourcesJson] = output.split('SOURCES: ');
-                    body.innerHTML = marked.parse(answerText);
+                    aiDiv.innerHTML = marked.parse(answerText);
 
                     try {
-                        sources = JSON.parse(sourcesJson);
-                        sources.forEach(source => {
-                            console.log("calling add source with ", source.url);
-                            addSource(source.url);
-                        });
-                        sourcesRow.classList.add('visible');
+                        const sources = JSON.parse(sourcesJson);
+                        if (sources && sources.length > 0) {
+                            const sourcesContainer = document.createElement('ul');
+                            sourcesContainer.className = 'sources-list';
+
+                            sources.forEach(source => {
+                                addSourceToBubble(source, sourcesContainer);
+                            });
+
+                            aiDiv.appendChild(sourcesContainer);
+                        }
                     } catch (e) {
-                        console.error('Error parsing sources:', e);
+                        console.error("Error parsing sources:", e);
                     }
-                    return;
+
+                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                    break;
                 } else {
-                    body.innerHTML = marked.parse(output);
+                    aiDiv.innerHTML = marked.parse(output);
                 }
-            
+
+                window.scrollTo(0, document.body.scrollHeight);
+
                 if (done) {
-                    return;
+                    break;
                 }
             }
         });
-       
-        function addSource(url, thumbnailUrl = null) {
-            console.log("in add source");
-            
+
+        function addSourceToBubble(source, container) {
             try {
-                const domain = new URL(url).hostname.replace('www.', '');
-                
-                console.log("domain ", domain);
-                const sourceCard = document.createElement('a');
-                sourceCard.className = 'source-card';
-                sourceCard.href = url;
-                sourceCard.target = '_blank';
-                
-                sourceCard.innerHTML = `
-                    <div class="source-thumbnail">
-                        ${thumbnailUrl 
-                            ? `<img src="${thumbnailUrl}">` 
-                            : `<div class="source-thumbnail-placeholder">${domain.charAt(0).toUpperCase()}</div>`
-                        }
-                    </div>
-                    <div class="source-info">
-                        <div class="source-domain">${domain}</div>
-                    </div>
-                `;
-                
-                sourcesRow.appendChild(sourceCard);
+                const url = source.url || source;
+
+                const listItem = document.createElement('li');
+                const link = document.createElement('a');
+                link.href = url;
+                link.target = '_blank';
+                link.textContent = url;
+
+                listItem.appendChild(link);
+                container.appendChild(listItem);
             } catch (e) {
                 console.error('Error adding source:', e);
             }
-        } 
+        }
     </script>
     {% endif %}
-    
-    <img src="static/images/DUNElogo_color.png"
-         alt="DUNE Logo" 
-         id="dune-logo">
+
+    <img src="static/images/DUNElogo_color.png" alt="DUNE Logo" id="dune-logo">
 </body>
+
 </html>
