@@ -2,7 +2,7 @@ import markdown
 import requests
 
 from typing import Optional
-from config import FERMILAB_API_URL,  LLM_TEMPERATURE, LLM_TOP_P, LLM_MODEL
+from config import FERMILAB_BASE_URL,  LLM_TEMPERATURE, LLM_TOP_P, LLM_MODEL
 from src.utils.logger import get_logger
 import json
 logger = get_logger(__name__)
@@ -11,7 +11,7 @@ class FermilabAPIClient:
     """Client for Argo API interactions"""
     
     def __init__(self):
-        self.base_url = FERMILAB_API_URL
+        self.base_url = FERMILAB_BASE_URL
     
     
     def chat_completion(
@@ -22,7 +22,7 @@ class FermilabAPIClient:
         top_p: float = LLM_TOP_P,
         model: str = LLM_MODEL,
         timeout: int = 60,
-        base_url: str = FERMILAB_API_URL,
+        base_url: str = FERMILAB_BASE_URL,
         links:list[str]=None,
     ) -> str:
         """Send a chat completion request to Argo API"""

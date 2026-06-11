@@ -11,7 +11,8 @@ LLM_PROVIDER = os.getenv("LLM_PROVIDER", "fermilab").lower()
 ARGO_API_USERNAME = os.getenv("ARGO_API_USERNAME")
 ARGO_API_KEY = os.getenv("ARGO_API_KEY")
 ARGO_API_URL = os.getenv("ARGO_API_URL", "https://apps.inside.anl.gov/argoapi/api/v1/resource/chat/")
-FERMILAB_API_URL=os.getenv("FERMILAB_API_URL","")
+FERMILAB_BASE_URL = os.getenv("FERMILAB_BASE_URL")
+FERMILAB_API_KEY = os.getenv("FERMILAB_API_URL", "EMPTY")
 
 QA_PATH = './benchmarking/QuestionAnswer/QA.csv'
 #'./benchmarking/QuestionAnswer/Cleaned_questions2.csv'
@@ -88,6 +89,10 @@ K_DOCS = int(os.getenv("K_DOCS","2"))
 LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.1"))
 LLM_TOP_P = float(os.getenv("LLM_TOP_P", "0.9"))
 LLM_MODEL = os.getenv("LLM_MODEL", "gpt4o")
+
+RAG_COMMAND = os.getenv("RAG_COMMAND", "!docs")
+HISTORY_LIMIT = int(os.getenv("HISTORY_LIMIT", 10))
+
 
 # Validate required environment variables
 def validate_config():
