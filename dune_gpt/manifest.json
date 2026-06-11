@@ -10,20 +10,31 @@
     },
     "bot_user": {
       "display_name": "AskDUNE",
-      "always_online": true
+      "always_online": false
+    },
+    "assistant_view": {
+      "assistant_description": "Hi, I am an agent built using Bolt for Python. I am here to help you out!",
+      "suggested_prompts": []
     }
   },
   "oauth_config": {
     "scopes": {
-      "bot": ["channels:history", "chat:write", "im:history", "assistant:write"]
+      "bot": [
+        "assistant:write",
+        "im:history",
+        "chat:write"
+      ]
     }
   },
   "settings": {
     "event_subscriptions": {
-      "bot_events": ["message.channels", "message.im"]
+      "bot_events": [
+        "assistant_thread_started",
+        "message.im"
+      ]
     },
     "interactivity": {
-      "is_enabled": true
+      "is_enabled": false
     },
     "org_deploy_enabled": true,
     "socket_mode_enabled": true,

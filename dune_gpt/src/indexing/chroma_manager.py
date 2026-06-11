@@ -19,6 +19,7 @@ from src.utils.logger import get_logger
 from chromadb.config import DEFAULT_TENANT, DEFAULT_DATABASE, Settings
 import torch.nn as nn
 import chromadb
+from langchain_core.runnables import chain
 
 logger = get_logger(__name__)
 CHROMA_DB_NAME='DUNE_VECTOR_DB'
@@ -401,4 +402,9 @@ class ChromaManager:
 
         self.doc_ids = None
 
-
+    def as_retriever(self, **kwargs) -> dict:
+        @chain
+        def fetch_documents(question: str):
+            return self.search(question, **kwargs)
+        
+        return fetch_documents
