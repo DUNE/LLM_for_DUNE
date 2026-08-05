@@ -1,60 +1,66 @@
-# Multi-stage build for production deployment
-FROM python:3.10-slim as builder
+# AskDUNE container image
+FROM python:3.11-slim AS builder
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    curl \
-    software-properties-common \
-    git \
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
+# Build tools needed by some Python packages.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential \
+        git \
     && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
 WORKDIR /app
 
-# Copy requirements and install Python dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
 
-# Download spaCy model
-RUN python -m spacy download en_core_web_sm
+RUN python -m pip install --upgrade pip && \
+    python -m pip install --prefix=/install -r requirements.txt
 
-# Production stage
-FROM python:3.10-slim as production
+# Install the spaCy model into the same package prefix.
+RUN PYTHONPATH=/install/lib/python3.11/site-packages \
+    python -m spacy download en_core_web_sm \
+        --target /install/lib/python3.11/site-packages
 
-# Install runtime dependencies
-RUN apt-get update && apt-get install -y \
-    curl \
+
+# Runtime image
+FROM python:3.11-slim AS runtime
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    HOST=0.0.0.0 \
+    PORT=8000 \
+    DB_PATH=/data/chroma \
+    HF_HOME=/cache/huggingface \
+    TORCH_HOME=/cache/torch \
+    XDG_CACHE_HOME=/cache
+
+# Runtime programs used by health checks and document processing.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        curl \
+        libgl1 \
+        libglib2.0-0 \
+        poppler-utils \
+        tesseract-ocr \
     && rm -rf /var/lib/apt/lists/*
 
-# Create non-root user
-RUN groupadd --gid 1000 dune && \
-    useradd --uid 1000 --gid dune --shell /bin/bash --create-home dune
-
-# Set working directory
 WORKDIR /app
 
-# Copy Python packages from builder stage
-COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
-COPY --from=builder /usr/local/bin /usr/local/bin
+COPY --from=builder /install /usr/local
+COPY . .
 
-# Copy application code
-COPY --chown=dune:dune . .
+# Keep application data and downloaded model caches outside the image.
+RUN mkdir -p /data/chroma /cache/huggingface /cache/torch && \
+    chgrp -R 0 /app /data /cache && \
+    chmod -R g=u /app /data /cache
 
-# Create data directory with proper permissions
-RUN mkdir -p /app/data/faiss && \
-    chown -R dune:dune /app/data
+# Compatible with rootless Podman and future OKD non-root deployment.
+USER 1001
 
-# Switch to non-root user
-USER dune
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/api/health || exit 1
-
-# Expose port
 EXPOSE 8000
 
-# Default command
-CMD ["python", "main.py"] 
+HEALTHCHECK --interval=30s --timeout=10s --start-period=180s --retries=3 \
+    CMD curl --fail http://127.0.0.1:8000/api/health || exit 1
+
+CMD ["python", "cli.py", "serve"]
