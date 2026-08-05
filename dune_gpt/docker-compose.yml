@@ -1,42 +1,60 @@
-version: '3.8'
-
 services:
-  dune-gpt:
-    build: .
-    container_name: dune-gpt
-    ports:
-      - "8000:8000"
+  askdune:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: askdune
+
+    # Load secrets and application configuration from the host.
+    # This file is not copied into the image.
+    env_file:
+      - .env
+
     environment:
-      # Required environment variables - set these in your .env file
-      - ARGO_API_USERNAME=${ARGO_API_USERNAME}
-      - ARGO_API_KEY=${ARGO_API_KEY}
-      - DUNE_DOCDB_USERNAME=${DUNE_DOCDB_USERNAME}
-      - DUNE_DOCDB_PASSWORD=${DUNE_DOCDB_PASSWORD}
-      
-      # Optional environment variables
-      - DUNE_INDICO_ACCESS_KEY=${DUNE_INDICO_ACCESS_KEY:-}
-      - DOC_LIMIT_DOCDB=${DOC_LIMIT_DOCDB:-50}
-      - DOC_LIMIT_INDICO=${DOC_LIMIT_INDICO:-50}
-      - HOST=${HOST:-0.0.0.0}
-      - PORT=${PORT:-8000}
-      - DEBUG=${DEBUG:-false}
-      - LOG_LEVEL=${LOG_LEVEL:-INFO}
-      - DEFAULT_TOP_K=${DEFAULT_TOP_K:-3}
-      - LLM_TEMPERATURE=${LLM_TEMPERATURE:-0.1}
-      - LLM_TOP_P=${LLM_TOP_P:-0.9}
-      - LLM_MODEL=${LLM_MODEL:-gpt4o}
-      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-multi-qa-mpnet-base-dot-v1}
+      # The service must listen on all container interfaces.
+      HOST: "0.0.0.0"
+      PORT: "8000"
+
+      # This is the database path inside the container.
+      DB_PATH: "/data/chroma"
+
+      # Persist downloaded embedding/reranking models.
+      HF_HOME: "/cache/huggingface"
+      TORCH_HOME: "/cache/torch"
+      XDG_CACHE_HOME: "/cache"
+
+    # Keep the pilot endpoint private on the VM.
+    # Fermilab's HTTPS reverse proxy can connect to this later.
+    ports:
+      - "127.0.0.1:8000:8000"
+
     volumes:
-      # Persist FAISS index data
-      - faiss_data:/app/data/faiss
+      # Host Chroma path is configured using HOST_DB_PATH.
+      - "${HOST_DB_PATH}:/data/chroma"
+
+      # Do not download the Hugging Face models on every restart.
+      - askdune_model_cache:/cache
+
+    # Helpful on the current rootless Podman/SELinux host when mounting
+    # directories from /exp. Revisit this for an eventual OKD deployment.
+    security_opt:
+      - label=disable
+
     restart: unless-stopped
+
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      test:
+        [
+          "CMD",
+          "curl",
+          "--fail",
+          "http://127.0.0.1:8000/api/health"
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 180s
 
 volumes:
-  faiss_data:
-    driver: local 
+  askdune_model_cache:
