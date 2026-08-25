@@ -20,6 +20,8 @@
   "oauth_config": {
     "scopes": {
       "bot": [
+        "users:read",
+        "assistant:write",
         "assistant:write",
         "im:history",
         "chat:write"

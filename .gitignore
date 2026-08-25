@@ -21,3 +21,6 @@ data/
 
 # Slack
 .Slack
+
+# Google Sheets
+creds.json

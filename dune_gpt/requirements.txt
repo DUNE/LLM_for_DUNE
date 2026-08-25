@@ -70,4 +70,9 @@ slack-cli-hooks<1.0.0
 markdown_to_mrkdwn
 
 langchain_core
-langchain_openai 
+langchain_openai
+
+google-api-python-client
+google-auth-httplib2 
+google-auth-oauthlib
+gspread

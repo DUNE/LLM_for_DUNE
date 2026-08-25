@@ -93,6 +93,10 @@ LLM_MODEL = os.getenv("LLM_MODEL", "gpt4o")
 RAG_COMMAND = os.getenv("RAG_COMMAND", "!docs")
 HISTORY_LIMIT = int(os.getenv("HISTORY_LIMIT", 10))
 
+# Google Sheets
+SPREADSHEET_ID = os.getenv("SPREADSHEET_ID")
+CREDENTIALS_PATH = os.getenv("CREDENTIALS_PATH")
+
 
 # Validate required environment variables
 def validate_config():
