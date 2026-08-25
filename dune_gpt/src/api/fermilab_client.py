@@ -62,7 +62,6 @@ class FermilabAPIClient:
                         data_str = line[len("data: "):].strip()
                         if data_str == "[DONE]":
                             break
-                        import json
                         chunk = json.loads(data_str)
                         if 'content' in chunk['choices'][0]['delta'].keys():
                             content = chunk['choices'][0]['delta'].get('content','')
