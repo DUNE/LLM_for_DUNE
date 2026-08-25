@@ -19,6 +19,7 @@ from src.utils.logger import get_logger
 from chromadb.config import DEFAULT_TENANT, DEFAULT_DATABASE, Settings
 import torch.nn as nn
 import chromadb
+from langchain_core.runnables import chain
 
 logger = get_logger(__name__)
 CHROMA_DB_NAME='DUNE_VECTOR_DB'
@@ -62,12 +63,15 @@ class ChromaManager:
         self.documents= defaultdict()
         self.events_ids=set()
         self.num_events=len(self.events_ids)
-
+        self.chroma_ntotal = 0
+        self.doc_ids = []
 
         # Ensure directories exist
         create_directories(data)
 
-    '''
+        self.fetch_ddb_ind_data()
+
+    
     def fetch_ddb_ind_data(self):
         results = self.chroma_collection.get(include=["documents", "metadatas", "uris"])
         for id, md, doc in zip(results['ids'], results['metadatas'],results['documents'] ):
@@ -88,7 +92,7 @@ class ChromaManager:
             event_id = id.split("_")[0]
             self.events_ids.add(event_id)
         self.doc_ids = list(self.metadata.keys())
-    '''
+    
     
     def _configure_threading(self):
         os.environ["OMP_NUM_THREADS"] = "1"
@@ -275,7 +279,7 @@ class ChromaManager:
         
         bm25_scores = self.bm25_cache.get_scores(query.split())
         top_indices = np.argsort(bm25_scores)[::-1][:k_docs]
-        results = [(self.doc_ids[idx], bm25_scores[idx]) for idx in top_indices]
+        results = [(all_entries['ids'][idx], bm25_scores[idx]) for idx in top_indices]
         return results
 
     def semantic_search(self, query, doc_type, k_docs):
@@ -398,4 +402,9 @@ class ChromaManager:
 
         self.doc_ids = None
 
-
+    def as_retriever(self, **kwargs) -> dict:
+        @chain
+        def fetch_documents(question: str):
+            return self.search(question, **kwargs)
+        
+        return fetch_documents

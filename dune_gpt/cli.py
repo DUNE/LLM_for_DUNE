@@ -224,7 +224,7 @@ def serve():
         sys.exit(1)
 
 @cli.command()
-def index():
+def index_job():
     job = IndexingJob(DB_PATH)
     job.run()
     

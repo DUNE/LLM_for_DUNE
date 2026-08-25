@@ -1,0 +1,43 @@
+{
+  "display_information": {
+    "name": "AskDUNE"
+  },
+  "features": {
+    "app_home": {
+      "home_tab_enabled": false,
+      "messages_tab_enabled": true,
+      "messages_tab_read_only_enabled": false
+    },
+    "bot_user": {
+      "display_name": "AskDUNE",
+      "always_online": false
+    },
+    "assistant_view": {
+      "assistant_description": "Hi, I am an agent built using Bolt for Python. I am here to help you out!",
+      "suggested_prompts": []
+    }
+  },
+  "oauth_config": {
+    "scopes": {
+      "bot": [
+        "assistant:write",
+        "im:history",
+        "chat:write"
+      ]
+    }
+  },
+  "settings": {
+    "event_subscriptions": {
+      "bot_events": [
+        "assistant_thread_started",
+        "message.im"
+      ]
+    },
+    "interactivity": {
+      "is_enabled": false
+    },
+    "org_deploy_enabled": true,
+    "socket_mode_enabled": true,
+    "token_rotation_enabled": false
+  }
+}

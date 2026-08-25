@@ -3,13 +3,14 @@ fastapi==0.104.1
 uvicorn[standard]==0.24.0
 jinja2==3.1.2
 python-multipart
-pysqlite3-binary
+pysqlite3-binary==0.5.4.post2
 markdown>=3.4
 
 # HTTP Client
 requests>=2.32.3
 
 # Machine Learning & NLP
+numpy==2.4.1
 sentence-transformers>=3.0.0
 torch>=2.0.0
 torchvision
@@ -43,7 +44,7 @@ python-dotenv==1.0.0
 pathlib2>=2.3.7
 typing-extensions>=4.5.0
 itsdangerous
-pydantic>=2.0
+pydantic>=2.9.0,<3
 
 # Development (optional)
 pytest>=7.4.0
@@ -51,7 +52,6 @@ pytest-asyncio>=0.21.0
 black>=23.0.0
 flake8>=6.0.0
 
-pydantic>=2.9.0,<3
 pdf2image
 
 # Web Automation
@@ -62,4 +62,12 @@ cloudscraper>=1.2.70
 # Embeddings
 
 # Vector DB / Chroma
-chromadb>=0.3.29
+chromadb==1.4.1
+
+# Slack
+slack-bolt
+slack-cli-hooks<1.0.0
+markdown_to_mrkdwn
+
+langchain_core
+langchain_openai 
