@@ -16,6 +16,7 @@ from requests.adapters import HTTPAdapter
 from requests.auth import HTTPBasicAuth
 from src.extractors.indico_extractor import DEFAULT_COOKIES_PATH, DEFAULT_UA, HAS_CLOUDSCRAPER
 from urllib3.util.retry import Retry
+from curl_cffi import requests
 
 from .base import BaseExtractor
 from .session import Session
@@ -43,7 +44,7 @@ def parse_date(date_str: str) -> str:
     return "Unknown Date"
 
 
-class DocDBExtractor(BaseExtractor, Session):
+class DocDBExtractor(BaseExtractor):
     """Extractor for DUNE DocDB documents (latest-first, backfill + weekly incrementals).
     - Downloads files (in memory), size-capped, and extracts text.
     - Uses ShowDocument (latest revision) pages only.
@@ -53,7 +54,7 @@ class DocDBExtractor(BaseExtractor, Session):
         self,
         faiss= None,
         max_retries: int = 5,
-        timeout_sec: int = 20,
+        timeout_sec: int = 10,
         max_pool: int = 20,
         max_file_bytes: int = 50 * 1024 * 1024,  # 50 MB
         max_workers_pages: int = 6,
@@ -66,47 +67,93 @@ class DocDBExtractor(BaseExtractor, Session):
             raise ValueError("DocDB credentials not provided")
         self.faiss=faiss
 
-        # Example base: "https://docs.dunescience.org/cgi-bin/ShowDocument?docid="
-        self.base_url = DOCDB_BASE_URL.rstrip("?&")
+        # Example base: "https://docs.dunescience.org/cgi-bin/sso/"
+        self.base_url = DOCDB_BASE_URL
+        self.doc_url = urljoin(self.base_url, "ShowDocument?docid=")
+        self.timeout_sec = timeout_sec
         self.session = self._build_session()
         self.max_file_bytes = max_file_bytes
         self.max_workers_pages = max_workers_pages
         self.max_workers_files = max_workers_files
-
-        parsed = urlparse(self.base_url)
-        self.root_base = f"{parsed.scheme}://{parsed.netloc}"
-        self.cgi_base = urljoin(self.root_base, "/cgi-bin/")
-        self.start_time =time.time() 
-
-        # Early auth sanity check (GET to avoid friendly 200 pages)
-        try:
-            r = self.session.get(self.base_url + "1", allow_redirects=True)
-            if r.status_code in (401, 403):
-                raise PermissionError("Unauthorized to access DocDB (check credentials or ACLs)")
-        except requests.RequestException as e:
-            logger.warning(f"Could not perform initial DocDB auth check: {e}")
+        self.start_time = time.time() 
 
         super().__init__()
 
     def _build_session(self) -> requests.Session:
-        s = requests.Session()
-        s.auth = HTTPBasicAuth(self.username, self.password)
-        s.headers.update({"User-Agent": "DUNE-DocDB-Extractor/1.2 (+python-requests)"})
-        retries = Retry(
-            total=5,
-            backoff_factor=0.5,
-            status_forcelist=[429, 500, 502, 503, 504],
-            allowed_methods=["HEAD", "GET", "OPTIONS"],
-            raise_on_status=False,
-        )
-        adapter = HTTPAdapter(max_retries=retries, pool_connections=10, pool_maxsize=20)
-        s.mount("https://", adapter)
-        s.mount("http://", adapter)
-        s.request = functools.partial(s.request, timeout=10)  # default timeout
+        """Configures HTTP retries, timeouts, and handles SSO login."""
+        s = requests.Session(impersonate="chrome120", timeout=self.timeout_sec)
+
+        self._sso_login(s)
+
         return s
 
+    def _sso_login(self, session: requests.session) -> None:
+        "Logs into DocDB using SAML SSO."
+        try:
+            homepage_url = urljoin(self.base_url, "DocumentDatabase")
 
+            # Step 1: Hit DocDB to trigger the initial SSO redirect
+            response = session.get(homepage_url)
+            response.raise_for_status()
 
+            # Step 2: Select username/password as the login method
+            soup = BeautifulSoup(response.text, "html.parser")
+            auth_form = soup.find("form")
+            if not auth_form:
+                raise RuntimeError("Initial SSO redirect form not found.")
+
+            auth_url = urljoin(response.url, auth_form.get("action"))
+            response = session.get(
+                auth_url,
+                params={"pfidpadapterid": "ad..FormBased", "rememberChoice": "false"},
+            )
+            response.raise_for_status()
+
+            # Step 3: Submit credentials to the login form
+            soup = BeautifulSoup(response.text, "html.parser")
+            login_form = soup.find("form")
+            if not login_form:
+                raise RuntimeError("Login credentials form not found.")
+
+            login_url = urljoin(response.url, login_form.get("action"))
+            login_data = {
+                "pf.username": self.username,
+                "pf.pass": self.password,
+                "pf.ok": "clicked",
+                "pf.adapterId": "FormBased",
+                "pf.cancel": "",
+            }
+            response = session.post(login_url, data=login_data)
+            response.raise_for_status()
+
+            # Step 4: Extract SAML token and POST it back to DocDB
+            soup = BeautifulSoup(response.text, "html.parser")
+            saml_form = soup.find("form")
+            saml_response = soup.select_one('input[name="SAMLResponse"]')
+            relay_state = soup.select_one('input[name="RelayState"]')
+            if not (saml_form and saml_response and relay_state):
+                raise PermissionError(
+                    "SAML attributes missing. Credentials may be incorrect."
+                )
+
+            saml_data = {
+                "RelayState": relay_state.get("value", ""),
+                "SAMLResponse": saml_response.get("value", ""),
+            }
+
+            post_url = urljoin(response.url, saml_form.get("action"))
+            auth_response = session.post(post_url, data=saml_data)
+            auth_response.raise_for_status()
+
+            # Step 5: Verify we reached DocDB instead of getting stuck on an SSO page
+            test_response = session.get(homepage_url)
+            if ("pingprod" in test_response.url):
+                raise PermissionError("SSO login failed.")
+
+        except Exception:
+            # Close session on failure to prevent memory leaks in multithreaded runs
+            session.close()
+            raise
 
     def _detect_type(self, url: str, headers: dict) -> str:
         ct = headers.get("content-type", "").split(";")[0].strip().lower()
@@ -118,7 +165,7 @@ class DocDBExtractor(BaseExtractor, Session):
     def check_document_page(self, docid: int) -> str:
         """Return 'exists', 'missing', 'unauthorized', or 'error' for a ShowDocument page.
         Use GET + HTML structure and negative markers to avoid false 'missing'."""
-        url = f"{self.base_url}{docid}"
+        url = f"{self.doc_url}{docid}"
         try:
             g = self.session.get(url, allow_redirects=True)
             if g.status_code in (401, 403):
@@ -289,7 +336,7 @@ class DocDBExtractor(BaseExtractor, Session):
                 href = a['href']
                 if 'RetrieveFile?docid=' not in href:
                     continue
-                full_url = href if href.startswith('http') else urljoin(self.cgi_base, href)
+                full_url = href if href.startswith('http') else urljoin(self.base_url, href)
                 qs = parse_qs(urlparse(full_url).query)
                 doc_id = qs.get("docid", ["unknown"])[0]
                 version = qs.get("version", qs.get("ver", [""]))[0]
@@ -380,7 +427,7 @@ class DocDBExtractor(BaseExtractor, Session):
 
                 else:
                     # **INLINE ATTACHMENT CHECK**
-                    page_url = f"{self.base_url}{docid}"
+                    page_url = f"{self.doc_url}{docid}"
                     
                     resp = self.session.get(page_url)
                     

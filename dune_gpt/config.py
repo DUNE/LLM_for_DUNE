@@ -59,7 +59,7 @@ EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "multi-qa-mpnet-base-dot-v1")
 EMBEDDING_DIM = 768
 
 # DocDB Configuration
-DOCDB_BASE_URL = "https://docs.dunescience.org/cgi-bin/private/ShowDocument?docid="
+DOCDB_BASE_URL = "https://docs.dunescience.org/cgi-bin/sso/"
 
 
 
