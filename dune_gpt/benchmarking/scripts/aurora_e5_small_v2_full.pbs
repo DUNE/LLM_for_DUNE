@@ -1,0 +1,39 @@
+#!/bin/bash -l
+#PBS -N dune_e5small
+#PBS -A LLM_for_DUNE
+#PBS -q capacity
+#PBS -l select=1
+#PBS -l walltime=04:00:00
+#PBS -l filesystems=home:flare
+#PBS -o benchmarking/matrix_runs/aurora_full_e5_small_v2_offline/pbs_stdout.log
+#PBS -e benchmarking/matrix_runs/aurora_full_e5_small_v2_offline/pbs_stderr.log
+
+cd /lus/flare/projects/LLM_for_DUNE/users/peilin/dunegpt || exit 1
+
+set -euo pipefail
+
+module load python/3.12.12
+source venv/bin/activate
+
+export HF_HOME="$PWD/.hf_cache"
+export SENTENCE_TRANSFORMERS_HOME="$PWD/.sentence_transformers_cache"
+export HF_HUB_OFFLINE=1
+export TRANSFORMERS_OFFLINE=1
+export HF_DATASETS_OFFLINE=1
+export HF_HUB_DISABLE_TELEMETRY=1
+export TOKENIZERS_PARALLELISM=false
+
+mkdir -p benchmarking/matrix_runs/aurora_full_e5_small_v2_offline
+
+python -c "import dotenv, pandas, chromadb, sentence_transformers; print('core imports ok')"
+python -c "from sentence_transformers import SentenceTransformer; m='intfloat/e5-small-v2'; model=SentenceTransformer(m); x=model.encode(['query: DUNE retrieval smoke test']); print(m, x.shape)"
+
+python benchmarking/scripts/run_embedding_matrix.py \
+  --run-name aurora_full_e5_small_v2_offline \
+  --source both \
+  --models intfloat/e5-small-v2 \
+  --chunk-sizes 1000,2000 \
+  --chunk-overlaps 0,100,200 \
+  --document-prefix "passage: " \
+  --query-prefix "query: " \
+  --skip-completed

@@ -10,6 +10,7 @@ from urllib.parse import urljoin, urlparse
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+from pathlib import Path
 
 # Optional: cloudscraper can help with basic Cloudflare challenges
 try:
@@ -27,6 +28,9 @@ from config import (
     INDICO_COOKIES_FILE,    # optional path to persist browser cookies
     INDICO_USE_BROWSER_LOGIN,  # bool: use Playwright to fetch cookies on first run
     CHUNK_SIZE,
+    parse_bool,
+    DEBUG_DUMP,
+    DEBUG_DUMP_DIR,
 )
 from src.utils.logger import get_logger
 
@@ -61,8 +65,9 @@ class IndicoExtractor(BaseExtractor, Session):
         self.cookies_file = (INDICO_COOKIES_FILE
                              or os.getenv("INDICO_COOKIES_FILE")
                              or DEFAULT_COOKIES_PATH)
-        self.use_browser_login = bool(
-            INDICO_USE_BROWSER_LOGIN or os.getenv("INDICO_USE_BROWSER_LOGIN")
+        self.use_browser_login = parse_bool(
+            os.getenv("INDICO_USE_BROWSER_LOGIN"),
+            INDICO_USE_BROWSER_LOGIN,
         )
         self.base_url = INDICO_BASE_URL.rstrip("/")
         self.category_id = INDICO_CATEGORY_ID
@@ -71,10 +76,37 @@ class IndicoExtractor(BaseExtractor, Session):
         self._load_cookies()
        
         self.total_fetched =0
+        self.debug_dump = DEBUG_DUMP
+        self.debug_dump_dir = Path(DEBUG_DUMP_DIR)
         # Load any previously captured cookies (e.g., via Playwright)
         
         self.start_time = time.time()
         super().__init__()
+
+    def _safe_name(self, value: Any) -> str:
+        return re.sub(r"[^A-Za-z0-9_.-]+", "_", str(value))
+
+    def _dump_debug_text(self, relative_path: str, content: str) -> None:
+        if not self.debug_dump:
+            return
+        try:
+            path = self.debug_dump_dir / relative_path
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(content or "", encoding="utf-8")
+            logger.info(f"Debug dump wrote {path}")
+        except Exception as e:
+            logger.warning(f"Failed to write debug dump {relative_path}: {e}")
+
+    def _dump_debug_json(self, relative_path: str, data: Any) -> None:
+        if not self.debug_dump:
+            return
+        try:
+            path = self.debug_dump_dir / relative_path
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+            logger.info(f"Debug dump wrote {path}")
+        except Exception as e:
+            logger.warning(f"Failed to write debug dump {relative_path}: {e}")
 
     # ------------------------ Session and Auth ------------------------
     def _build_session(self) -> requests.Session:
@@ -127,6 +159,7 @@ class IndicoExtractor(BaseExtractor, Session):
             raise RuntimeError("Cloudflare blocked category export; ensure token/cookies configured.")
         r.raise_for_status()
         data = r.json()
+        self._dump_debug_json(f"indico/category_{self._safe_name(categ_id)}/export_categ.json", data)
         self.total_fetched += min(len(data.get("results",[])), limit)
         if limit == -1:
             return data.get("results", [])
@@ -174,6 +207,7 @@ class IndicoExtractor(BaseExtractor, Session):
                             #f"{len(contribs)} contributions, "
                             #f"{len(top_attachments)} top attachments, "
                             #f"{len(materials)} materials")
+                self._dump_debug_json(f"indico/event_{self._safe_name(event_id)}/event_details.json", details)
                 return details
             
 
@@ -393,16 +427,27 @@ class IndicoExtractor(BaseExtractor, Session):
     
     def add_chunks_to_doc(self, event_id, document_type, chunk_size, raw_text, docs, doc, attachments_total):
         chunks = self.get_chunks(raw_text, chunk_size)
+        attachment_index = attachments_total + 1
         for i,chunk in enumerate(chunks):
-            doc['document_id']= f"{event_id}_{attachments_total}"
-            doc['cleaned_text'] = chunk
-            doc['document_type'] = document_type
-            docs.append(doc)
-    
-            attachments_total += 1
-            logger.info(f'event_id: {event_id} added: {event_id}_{attachments_total}, {i}th chunk of {len(chunks)}')
+            chunk_index = i + 1
+            chunk_doc = doc.copy()
+            chunk_doc['document_id']= f"{event_id}_att{attachment_index:03d}_chunk{chunk_index:03d}"
+            chunk_doc['attachment_index'] = attachment_index
+            chunk_doc['chunk_index'] = chunk_index
+            chunk_doc['cleaned_text'] = chunk
+            chunk_doc['document_type'] = document_type
+            docs.append(chunk_doc)
+            self._dump_debug_text(
+                f"indico/event_{self._safe_name(event_id)}/chunk_{self._safe_name(chunk_doc['document_id'])}.txt",
+                chunk,
+            )
+            self._dump_debug_json(
+                f"indico/event_{self._safe_name(event_id)}/chunk_{self._safe_name(chunk_doc['document_id'])}_metadata.json",
+                {k: v for k, v in chunk_doc.items() if k != "cleaned_text"},
+            )
+            logger.info(f"event_id: {event_id} added: {chunk_doc['document_id']}, {i}th chunk of {len(chunks)}")
 
-        return docs, attachments_total
+        return docs, attachments_total + 1
     
     def get_content_type(self, a):
         link = a['link_url']
@@ -434,6 +479,14 @@ class IndicoExtractor(BaseExtractor, Session):
             
             if content:
                 raw_text, document_type = self.get_raw_text(content_type,content)
+                self._dump_debug_json(
+                    f"indico/event_{self._safe_name(event_id)}/attachment_{attachments_total + 1}_metadata.json",
+                    doc,
+                )
+                self._dump_debug_text(
+                    f"indico/event_{self._safe_name(event_id)}/attachment_{attachments_total + 1}_raw_text.txt",
+                    raw_text,
+                )
                 raw_text=raw_text.split()
                 docs, attachments_total = self.add_chunks_to_doc(event_id, document_type, chunk_size, raw_text, docs, doc, attachments_total)
                 
@@ -445,13 +498,30 @@ class IndicoExtractor(BaseExtractor, Session):
         return docs, attachments_total
     def collect_subcategories(self):
         ids=[]
+        export_url = f"{self.base_url}/export/categ/{self.category_id}.json"
+        try:
+            response = self.session.get(export_url, timeout=45)
+            response.raise_for_status()
+            data = response.json()
+            self._dump_debug_json(f"indico/category_{self._safe_name(self.category_id)}/export_categ.json", data)
+            for category in data.get("additionalInfo", {}).get("eventCategories", []):
+                categ_id = category.get("id") or category.get("categId")
+                if categ_id is not None:
+                    ids.append(str(categ_id))
+            if ids:
+                return ids
+        except Exception as e:
+            logger.warning(f"Could not collect subcategories from export API: {e}")
+
         url= f"{self.base_url}/category/{self.category_id}"
         soup=self.get_soup_parser(url)
-        sub_urls = soup.find("ul", class_='category-list')
-        for a in sub_urls.find_all('a'):
-            id_ = a.get('href').split("/")[-2]
-            ids.append(id_)
-        return ids
+        if hasattr(soup, "find"):
+            sub_urls = soup.find("ul", class_='category-list')
+            if sub_urls:
+                for a in sub_urls.find_all('a'):
+                    id_ = a.get('href').split("/")[-2]
+                    ids.append(id_)
+        return ids or [str(self.category_id)]
     
     def extract_documents(self, limit: int = 50, start: int = 0, chunk_size: int = 80000) -> List[Dict[str, Any]]:
         logger.info(f"Extracting documents from Indico category {self.category_id} (limit: {limit})")

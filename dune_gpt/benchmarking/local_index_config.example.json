@@ -1,0 +1,10 @@
+{
+  "cache_path": "benchmarking/raw_attachments",
+  "source": "both",
+  "limit": null,
+  "data_path": "benchmarking/chroma_experiments/all-MiniLM-L6-v2_word2000",
+  "chunk_size": 2000,
+  "chunk_strategy": "word",
+  "chunk_overlap": 0,
+  "embedding_model": "sentence-transformers/all-MiniLM-L6-v2"
+}

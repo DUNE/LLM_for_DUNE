@@ -3,7 +3,7 @@ fastapi==0.104.1
 uvicorn[standard]==0.24.0
 jinja2==3.1.2
 python-multipart
-pysqlite3-binary
+#pysqlite3-binary
 markdown>=3.4
 
 # HTTP Client

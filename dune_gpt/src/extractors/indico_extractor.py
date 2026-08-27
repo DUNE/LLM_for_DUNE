@@ -22,7 +22,8 @@ from config import (
     INDICO_CATEGORY_ID,
     INDICO_API_TOKEN,       # Personal Access Token (create in Indico UI)
     INDICO_COOKIES_FILE,    # optional path to persist browser cookies
-    INDICO_USE_BROWSER_LOGIN  # bool: use Playwright to fetch cookies on first run
+    INDICO_USE_BROWSER_LOGIN,  # bool: use Playwright to fetch cookies on first run
+    parse_bool,
 )
 from src.utils.logger import get_logger
 
@@ -53,8 +54,9 @@ class IndicoExtractor(BaseExtractor):
         self.cookies_file = (INDICO_COOKIES_FILE
                              or os.getenv("INDICO_COOKIES_FILE")
                              or DEFAULT_COOKIES_PATH)
-        self.use_browser_login = bool(
-            INDICO_USE_BROWSER_LOGIN or os.getenv("INDICO_USE_BROWSER_LOGIN")
+        self.use_browser_login = parse_bool(
+            os.getenv("INDICO_USE_BROWSER_LOGIN"),
+            INDICO_USE_BROWSER_LOGIN,
         )
         self.max_file_bytes =  50 * 1024 * 1024
         self.faiss=faiss
@@ -571,13 +573,29 @@ class IndicoExtractor(BaseExtractor):
         return docs, attachments_total
     def collect_subcategories(self):
         ids=[]
+        export_url = f"{self.base_url}/export/categ/{self.category_id}.json"
+        try:
+            response = self.session.get(export_url, timeout=45)
+            response.raise_for_status()
+            data = response.json()
+            for category in data.get("additionalInfo", {}).get("eventCategories", []):
+                categ_id = category.get("id") or category.get("categId")
+                if categ_id is not None:
+                    ids.append(str(categ_id))
+            if ids:
+                return ids
+        except Exception as e:
+            logger.warning(f"Could not collect subcategories from export API: {e}")
+
         url= f"{self.base_url}/category/{self.category_id}"
         soup=self.get_soup_parser(url)
-        sub_urls = soup.find("ul", class_='category-list')
-        for a in sub_urls.find_all('a'):
-            id_ = a.get('href').split("/")[-2]
-            ids.append(id_)
-        return ids
+        if hasattr(soup, "find"):
+            sub_urls = soup.find("ul", class_='category-list')
+            if sub_urls:
+                for a in sub_urls.find_all('a'):
+                    id_ = a.get('href').split("/")[-2]
+                    ids.append(id_)
+        return ids or [str(self.category_id)]
 
     def extract_documents(self, limit: int = 50) -> List[Dict[str, Any]]:
         logger.info(f"Extracting documents from Indico category {self.category_id} (limit: {limit})")

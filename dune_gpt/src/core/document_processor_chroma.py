@@ -20,10 +20,8 @@ class DocumentProcessor:
         self.chunk_size=chunk_size
         logger.info("Initiated chroma")
         self.chroma_manager = chroma.ChromaManager(data) 
-       
- 
-        self.docdb_extractor = DocDBExtractor(self.chroma_manager)
-        self.indico_extractor = IndicoExtractor(self.chroma_manager)
+        self.docdb_extractor = None
+        self.indico_extractor = None
 
     def process_all_documents(
         self,
@@ -50,6 +48,8 @@ class DocumentProcessor:
             try:
                 logger.info("Processing DocDB documents")
                 if docdb_limit == -1: return []
+                if self.docdb_extractor is None:
+                    self.docdb_extractor = DocDBExtractor(self.chroma_manager)
                 # 1) What versions (and thus IDs) do we already have?
                 indexed_versions = self.chroma_manager.get_docdb_versions()
                 indexed_ids: Set[int] = { int(did) for did in indexed_versions.keys() }
@@ -100,6 +100,8 @@ class DocumentProcessor:
                 
                 logger.info("Processing Indico documents")
                 if indico_limit==-1: return []
+                if self.indico_extractor is None:
+                    self.indico_extractor = IndicoExtractor(self.chroma_manager)
 
                 for num_events, indico_records, docs_parsed in self.indico_extractor.extract_documents(start=start_ind, limit=indico_limit, chunk_size=self.chunk_size):
                     logger.info(f"Indico records returns {len(indico_records)} from {num_events} events")

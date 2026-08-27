@@ -3,6 +3,7 @@
 DUNE-GPT CLI: Command-line interface for document processing and management
 """
 import time
+import json
 from dotenv import load_dotenv
 import os
 import click
@@ -17,7 +18,7 @@ load_dotenv()
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
 
-from config import STORE, validate_config, create_directories, DOC_LIMIT_DOCDB, DOC_LIMIT_INDICO, CHROMA_PATH, CHUNK_SIZE
+from config import STORE, validate_config, create_directories, DOC_LIMIT_DOCDB, DOC_LIMIT_INDICO, CHROMA_PATH, CHUNK_SIZE, EMBEDDING_MODEL
 if STORE == 'faiss':
     from src.core.document_processor_faiss import DocumentProcessor
 elif STORE == 'chroma':
@@ -223,10 +224,128 @@ def serve():
         click.echo(f"Error: {e}", err=True)
         sys.exit(1)
 
-@cli.command()
-def index():
+@cli.command("inspect-index")
+def inspect_index():
     job = IndexingJob(DB_PATH)
     job.run()
+
+@cli.command("index-local")
+@click.option(
+    "--benchmark-config",
+    type=str,
+    default=None,
+    help="Optional JSON config for local benchmarking/indexing.",
+)
+@click.option(
+    "--cache-path",
+    type=str,
+    default=None,
+    help="Path containing cached raw attachment manifests and files.",
+)
+@click.option(
+    "--source",
+    type=click.Choice(["both", "docdb", "indico"]),
+    default=None,
+    help="Which cached source to index.",
+)
+@click.option(
+    "--limit",
+    type=int,
+    default=None,
+    help="Optional maximum number of cached attachments to inspect.",
+)
+@click.option(
+    "--chunk-size",
+    type=int,
+    default=None,
+    help="Chunk size for local benchmark indexing.",
+)
+@click.option(
+    "--chunk-strategy",
+    type=click.Choice(["word", "char"]),
+    default=None,
+    help="Chunking strategy for local benchmark indexing.",
+)
+@click.option(
+    "--chunk-overlap",
+    type=int,
+    default=None,
+    help="Chunk overlap for local benchmark indexing, in words or chars depending on strategy.",
+)
+@click.option(
+    "--embedding-model",
+    type=str,
+    default=None,
+    help="SentenceTransformers embedding model for this benchmark run.",
+)
+@click.option(
+    "--data-path",
+    type=str,
+    default=None,
+    help="Chroma persistence path. Defaults to DB_PATH from .env/config.",
+)
+def index_local(benchmark_config, cache_path, source, limit, chunk_size, chunk_strategy, chunk_overlap, embedding_model, data_path):
+    """Embed and index cached local attachments without crawling DocDB/Indico."""
+    start = time.time()
+    try:
+        validate_config()
+        from src.core.local_attachment_processor import LocalAttachmentProcessor
+
+        config_data = {}
+        if benchmark_config:
+            config_path = Path(benchmark_config)
+            if not config_path.is_absolute():
+                config_path = Path(__file__).parent / config_path
+            with config_path.open("r", encoding="utf-8") as f:
+                config_data = json.load(f)
+
+        cache_path = cache_path or config_data.get("cache_path", "benchmarking/raw_attachments")
+        source = source or config_data.get("source", "both")
+        limit = limit if limit is not None else config_data.get("limit")
+        chunk_size = chunk_size or int(config_data.get("chunk_size", CHUNK_SIZE))
+        chunk_strategy = chunk_strategy or config_data.get("chunk_strategy", "word")
+        chunk_overlap = chunk_overlap if chunk_overlap is not None else int(config_data.get("chunk_overlap", 0))
+        embedding_model = embedding_model or config_data.get("embedding_model")
+        chroma_path = data_path or config_data.get("data_path") or os.getenv("DB_PATH", "data")
+
+        logger.info(f"Indexing local cached attachments from {cache_path}")
+        logger.info(f"Chroma path: {chroma_path}")
+        logger.info(f"chunk size is {chunk_size}")
+        logger.info(f"chunk strategy is {chunk_strategy}")
+        logger.info(f"chunk overlap is {chunk_overlap}")
+        logger.info(f"embedding model is {embedding_model or 'config default'}")
+
+        processor = LocalAttachmentProcessor(
+            chroma_path,
+            cache_path,
+            int(chunk_size),
+            chunk_strategy=chunk_strategy,
+            chunk_overlap=int(chunk_overlap),
+            embedding_model=embedding_model or EMBEDDING_MODEL,
+        )
+        results = processor.process(source=source, limit=limit)
+
+        click.echo(f"\n{'='*50}")
+        click.echo("LOCAL INDEXING RESULTS")
+        click.echo(f"{'='*50}")
+        click.echo(f"Attachments inspected: {results['attachments_seen']}")
+        click.echo(f"Attachments with extracted text: {results['attachments_with_text']}")
+        click.echo(f"Chunks created: {results['chunks_created']}")
+        click.echo(f"Embeddings added: {results['embeddings_added']}")
+
+        stats = processor.get_index_stats()
+        click.echo(f"\nCurrent index statistics:")
+        click.echo(f"Total Events/Attachments: {stats['total_documents']}")
+        click.echo(f"Total Embeddings: {stats['total_embeddings']}")
+        click.echo(f"Total Number of Attachments in Metadata: {stats['total_number_attachments_in_metadata']}")
+
+        processor.cleanup()
+        logger.info(f"Local indexing completed successfully taking {time.time() - start} seconds")
+
+    except Exception as e:
+        logger.error(f"Local indexing failed: {e}")
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
     
 @cli.command()
 def health():

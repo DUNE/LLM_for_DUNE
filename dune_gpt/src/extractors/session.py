@@ -159,7 +159,7 @@ class Session(ABC):
         if self._auth_initialized:
             return
 
-        test_url = f"{self.base_url}/categ/{self.category_id}"
+        test_url = f"{self.base_url}/export/categ/{self.category_id}.json"
         r = self.session.get(test_url, timeout=30)
         logger.error(f"esure access {r}")
 

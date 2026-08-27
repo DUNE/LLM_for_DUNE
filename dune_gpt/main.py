@@ -28,13 +28,14 @@ else:
     raise Exception(f"DUNE-GPT requires Faiss or Chroma. Got {STORE}")
 from src.api.fermilab_client import FermilabAPIClient
 from src.api.argo_client import ArgoAPIClient
+from src.api.litellm_client import LiteLLMClient
 from src.auth.fermilab_auth import fermilab_auth
 from src.utils.logger import get_logger
 print("ALL IMPORTS IMPORTED")
 logger = get_logger(__name__)
 
 # Global variables
-llm_client = None  # FermilabAPIClient or ArgoAPIClient
+llm_client = None  # FermilabAPIClient, ArgoAPIClient, or LiteLLMClient
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -61,9 +62,14 @@ async def lifespan(app: FastAPI):
         if not ARGO_API_USERNAME or not ARGO_API_KEY:
             raise RuntimeError("LLM_PROVIDER=argo but ARGO_API_USERNAME/ARGO_API_KEY not set")
         llm_client = ArgoAPIClient(ARGO_API_USERNAME, ARGO_API_KEY)
-    else:
+    elif LLM_PROVIDER == "fermilab":
         logger.info("Using Fermilab API client (LLM_PROVIDER=fermilab)")
         llm_client = FermilabAPIClient()
+    elif LLM_PROVIDER == "litellm":
+        logger.info("Using LiteLLM API client (LLM_PROVIDER=litellm)")
+        llm_client = LiteLLMClient()
+    else:
+        raise RuntimeError(f"Unknown LLM_PROVIDER: {LLM_PROVIDER}")
     
     # Check if index is empty
     stats = db_manager.get_stats()

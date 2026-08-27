@@ -1,0 +1,8 @@
+filter_ratio,without_reranker_ERS,without_reranker_latency_ms,with_reranker_ERS,with_reranker_latency_ms
+"slides:6,document:0",0.765971,69.765,0.771657,6504.464
+"slides:5,document:1",0.857237,69.765,0.822109,6504.464
+"slides:4,document:2",0.857237,69.765,0.822019,6504.464
+"slides:3,document:3",0.857176,69.765,0.817350,6504.464
+"slides:2,document:4",0.860279,69.765,0.821868,6504.464
+"slides:1,document:5",0.845339,69.765,0.811989,6504.464
+"slides:0,document:6",0.751062,69.765,0.769820,6504.464

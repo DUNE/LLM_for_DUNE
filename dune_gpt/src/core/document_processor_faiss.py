@@ -19,9 +19,8 @@ class DocumentProcessor:
     def __init__(self, data, chunk_size):
         self.chunk_size=chunk_size
         self.faiss_manager = FAISSManager(data)
- 
-        self.docdb_extractor = DocDBExtractor(self.faiss_manager)
-        self.indico_extractor = IndicoExtractor(self.faiss_manager)
+        self.docdb_extractor = None
+        self.indico_extractor = None
 
     def process_all_documents(
         self,
@@ -45,6 +44,9 @@ class DocumentProcessor:
         def docdb_extraction(name):
             try:
                 logger.info("Processing DocDB documents")
+                if docdb_limit == -1: return []
+                if self.docdb_extractor is None:
+                    self.docdb_extractor = DocDBExtractor(self.faiss_manager)
 
                 # 1) What versions (and thus IDs) do we already have?
                 indexed_versions = self.faiss_manager.get_docdb_versions()
@@ -138,6 +140,9 @@ class DocumentProcessor:
             try:
                 
                 logger.info("Processing Indico documents")
+                if indico_limit == -1: return []
+                if self.indico_extractor is None:
+                    self.indico_extractor = IndicoExtractor(self.faiss_manager)
 
                 for num_events, indico_records in self.indico_extractor.extract_documents(start=start_ind, limit=indico_limit, chunk_size=self.chunk_size):
                     logger.info(f"Indico records returns {len(indico_records)}")

@@ -7,11 +7,20 @@ load_dotenv()
 # API Configuration
 MAX_VARIABLE_NUMBER=5461
 
+def parse_bool(value, default=False):
+    if value is None:
+        return default
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() in ("1", "true", "yes", "on")
+
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "fermilab").lower()
 ARGO_API_USERNAME = os.getenv("ARGO_API_USERNAME")
 ARGO_API_KEY = os.getenv("ARGO_API_KEY")
 ARGO_API_URL = os.getenv("ARGO_API_URL", "https://apps.inside.anl.gov/argoapi/api/v1/resource/chat/")
 FERMILAB_API_URL=os.getenv("FERMILAB_API_URL","")
+LITELLM_API_URL = os.getenv("LITELLM_API_URL", "")
+LITELLM_API_KEY = os.getenv("LITELLM_API_KEY", "")
 
 QA_PATH = './benchmarking/QuestionAnswer/QA.csv'
 #'./benchmarking/QuestionAnswer/Cleaned_questions2.csv'
@@ -64,11 +73,11 @@ DOCDB_BASE_URL = "https://docs.dunescience.org/cgi-bin/private/ShowDocument?doci
 
 
 # Indico Configuration
-INDICO_BASE_URL = "https://indico.fnal.gov"
-INDICO_CATEGORY_ID = 443
-INDICO_COOKIES_FILE = "/Users/L00298625/.indico_cookies.json"
+INDICO_BASE_URL = os.getenv("INDICO_BASE_URL", "https://indico.fnal.gov")
+INDICO_CATEGORY_ID = int(os.getenv("INDICO_CATEGORY_ID", "443"))
+INDICO_COOKIES_FILE = os.getenv("INDICO_COOKIES_FILE", str(BASE_DIR / ".indico_cookies.json"))
 # Whether to bootstrap cookies with a real browser (Playwright) on first run
-INDICO_USE_BROWSER_LOGIN = os.getenv("INDICO_USE_BROWSER_LOGIN", False)
+INDICO_USE_BROWSER_LOGIN = parse_bool(os.getenv("INDICO_USE_BROWSER_LOGIN"), False)
 
 # Which Playwright browser to use if INDICO_USE_BROWSER_LOGIN is true
 INDICO_BROWSER = os.getenv("INDICO_BROWSER", "chromium")
@@ -76,11 +85,13 @@ INDICO_BROWSER = os.getenv("INDICO_BROWSER", "chromium")
 # Application Configuration
 HOST = os.getenv("HOST", "127.0.0.1")
 PORT = int(os.getenv("PORT", "8000"))
-DEBUG = os.getenv("DEBUG", "false").lower() == "true"
+DEBUG = parse_bool(os.getenv("DEBUG"), False)
 
 # Logging Configuration
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+DEBUG_DUMP = parse_bool(os.getenv("DEBUG_DUMP"), False)
+DEBUG_DUMP_DIR = os.getenv("DEBUG_DUMP_DIR", str(BASE_DIR / "debug" / "runs"))
 
 # Query Configuration
 DEFAULT_TOP_K = int(os.getenv("DEFAULT_TOP_K", "3"))
@@ -93,11 +104,23 @@ LLM_MODEL = os.getenv("LLM_MODEL", "gpt4o")
 def validate_config():
     """Validate that all required environment variables are set"""
     required_vars = [
-        ("ARGO_API_USERNAME", ARGO_API_USERNAME),
-        ("ARGO_API_KEY", ARGO_API_KEY),
         ("DUNE_DOCDB_USERNAME", DUNE_DOCDB_USERNAME),
         ("DUNE_DOCDB_PASSWORD", DUNE_DOCDB_PASSWORD),
     ]
+
+    if LLM_PROVIDER == "argo":
+        required_vars.extend([
+            ("ARGO_API_USERNAME", ARGO_API_USERNAME),
+            ("ARGO_API_KEY", ARGO_API_KEY),
+        ])
+    elif LLM_PROVIDER == "fermilab":
+        required_vars.append(("FERMILAB_API_URL", FERMILAB_API_URL))
+    elif LLM_PROVIDER == "litellm":
+        required_vars.append(("LITELLM_API_URL", LITELLM_API_URL))
+    else:
+        raise EnvironmentError(
+            f"Invalid LLM_PROVIDER: {LLM_PROVIDER}. Expected argo, fermilab, or litellm."
+        )
     
     # Add Fermilab auth requirements if authentication is enabled
     if ENABLE_AUTHENTICATION:

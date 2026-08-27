@@ -10,3 +10,20 @@ env/
 
 # Local data (Chroma / FAISS / sqlite)
 data/
+Chroma-multiqa/
+
+# Model/cache directories
+.hf_cache/
+.sentence_transformers_cache/
+
+# Benchmarking local corpora, indexes, and run outputs
+benchmarking/chroma_experiments/
+benchmarking/matrix_runs/
+benchmarking/retriever_runs/
+benchmarking/raw_attachments/
+benchmarking/plots/
+benchmarking/results/
+benchmarking/qa_sets/
+
+# Debug artifacts
+debug/runs/

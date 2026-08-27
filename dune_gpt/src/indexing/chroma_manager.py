@@ -25,11 +25,13 @@ CHROMA_DB_NAME='DUNE_VECTOR_DB'
 class ChromaManager:
     """Manager for FAISS index operations"""
 
-    def __init__(self, data):
+    def __init__(self, data, embedding_model: str = EMBEDDING_MODEL, load_reranker: bool = True):
         # Prevent thread‐related segfaults
         self.bm25_cache=None
         self._configure_threading()
-        self.reranker=CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2', max_length=512)
+        self.reranker = None
+        if load_reranker:
+            self.reranker=CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2', max_length=512)
 
         self.chroma_client = chromadb.PersistentClient(path=data, settings=Settings())
         print("Collections available:", self.chroma_client.list_collections())
@@ -37,7 +39,8 @@ class ChromaManager:
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         logger.info(f"Using device: {self.device}")
 
-        self.model = OriginalEmbedder(EMBEDDING_MODEL)
+        self.embedding_model = embedding_model
+        self.model = OriginalEmbedder(self.embedding_model)
         logger.info("Creating collection")
         try:
             self.chroma_collection = self.chroma_client.get_or_create_collection(
@@ -45,14 +48,34 @@ class ChromaManager:
                 embedding_function=self.model
             )
         except Exception as e:
-            logger.error(f"Error initiating chroma {e}")
+            if "embedding function" in str(e).lower():
+                existing_collection = self.chroma_client.get_collection(name=CHROMA_DB_NAME)
+                existing_count = existing_collection.count()
+                if existing_count == 0:
+                    logger.warning(
+                        f"Deleting empty Chroma collection '{CHROMA_DB_NAME}' after embedding function conflict"
+                    )
+                    self.chroma_client.delete_collection(name=CHROMA_DB_NAME)
+                    self.chroma_collection = self.chroma_client.get_or_create_collection(
+                        name=CHROMA_DB_NAME,
+                        embedding_function=self.model
+                    )
+                else:
+                    raise RuntimeError(
+                        f"Chroma collection '{CHROMA_DB_NAME}' has {existing_count} existing records "
+                        "with a different embedding function. Back it up and delete/rebuild the collection "
+                        "before indexing with this embedding model."
+                    ) from e
+            else:
+                logger.error(f"Error initiating chroma {e}")
+                raise
 
         logger.info(f"Using Chroma collection '{CHROMA_DB_NAME}' (count deferred)")
         
         # Setup device & model
 
 
-        logger.info(f"Loaded sentence transformer {EMBEDDING_MODEL}")
+        logger.info(f"Loaded sentence transformer {self.embedding_model}")
 
         self.indico_ids = defaultdict()
         self.docdb_versions = defaultdict()
@@ -60,8 +83,10 @@ class ChromaManager:
         self.docdb_metadata_modified = defaultdict()
         self.metadata= defaultdict()
         self.documents= defaultdict()
+        self.doc_ids = []
         self.events_ids=set()
         self.num_events=len(self.events_ids)
+        self.chroma_ntotal = self.chroma_collection.count()
 
 
         # Ensure directories exist
@@ -328,6 +353,8 @@ class ChromaManager:
         
 
     def reranker_search(self, query, merged_docids, top_k):
+        if self.reranker is None:
+            raise RuntimeError("Reranker was not loaded for this ChromaManager instance.")
         documents=[]
         try:
             documents = [self.documents[doc_id] for doc_id in merged_docids]
