@@ -8,9 +8,10 @@ from slack_sdk.models.blocks import (
 )
 
 
-def create_negative_feedback_modal(channel_id: str, message_ts: str) -> View:
+def create_negative_feedback_modal(channel_id: str, thread_ts: str, message_ts: str) -> View:
     metadata = {
         "channel_id": channel_id,
+        "thread_ts": thread_ts,
         "message_ts": message_ts,
     }
 

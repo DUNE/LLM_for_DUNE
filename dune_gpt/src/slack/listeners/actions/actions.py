@@ -27,6 +27,7 @@ def handle_feedback(
     """
     try:
         ack()
+        thread_ts = body["message"]["thread_ts"]
         message_ts = body["message"]["ts"]
         channel_id = body["channel"]["id"]
         user_id = body["user"]["id"]
@@ -48,10 +49,10 @@ def handle_feedback(
         else:
             client.views_open(
                 trigger_id=trigger_id,
-                view=create_negative_feedback_modal(channel_id, message_ts),
+                view=create_negative_feedback_modal(channel_id, thread_ts, message_ts),
             )
 
-        logger.debug(f"Handled feedback: type={feedback_type}, message_ts={message_ts}")
+        logger.debug(f"Handled feedback: type={feedback_type}")
     except Exception as e:
         logger.error(f"Failed to handle a feedback event: {e}")
 
@@ -73,7 +74,6 @@ def handle_reason_selection(
 
         selected_options = action.get("selected_options", [])
 
-        print(selected_options)
         blocks = []
 
         for block in view["blocks"]:
@@ -107,6 +107,7 @@ def handle_reason_selection(
             view=View(
                 type="modal",
                 callback_id=view["callback_id"],
+                private_metadata=view["private_metadata"],
                 title=view["title"],
                 submit=view["submit"],
                 close=view["close"],

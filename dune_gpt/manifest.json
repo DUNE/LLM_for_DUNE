@@ -21,7 +21,7 @@
     "scopes": {
       "bot": [
         "users:read",
-        "assistant:write",
+        "users:read.email",
         "assistant:write",
         "im:history",
         "chat:write"

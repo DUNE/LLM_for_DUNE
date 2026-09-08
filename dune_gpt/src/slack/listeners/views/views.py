@@ -50,6 +50,7 @@ def handle_negative_feedback_submission(
         metadata = json.loads(metadata_str) if metadata_str else {}
 
         channel_id = metadata.get("channel_id")
+        thread_ts = metadata.get("thread_ts")
         message_ts = metadata.get("message_ts")
 
         user_query = None
@@ -58,12 +59,15 @@ def handle_negative_feedback_submission(
         if channel_id and message_ts:
             replies = client.conversations_replies(
                 channel=channel_id,
-                ts=message_ts,
+                ts=thread_ts,
                 latest=message_ts,
                 inclusive=True,
                 limit=2,
             )
             messages = replies.get("messages", [])
+
+            user_query = messages[1].get("text")
+            ai_response = messages[2].get("text")
 
         log_to_google_sheet(
             user_id=name,
