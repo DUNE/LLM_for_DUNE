@@ -54,7 +54,7 @@ class DocDBExtractor(BaseExtractor):
         self,
         faiss= None,
         max_retries: int = 5,
-        timeout_sec: int = 10,
+        timeout_sec: int = 30,
         max_pool: int = 20,
         max_file_bytes: int = 50 * 1024 * 1024,  # 50 MB
         max_workers_pages: int = 6,
