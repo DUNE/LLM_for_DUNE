@@ -191,7 +191,7 @@ class DocDBExtractor(BaseExtractor):
             # If 200 but inconclusive, lean 'exists' so we don't cap too low
             return "inconclusive"
         except requests.RequestException as e:
-            logger.warning(f"Error checking doc {docid}: {e}")
+            logger.exception(f"Error checking doc {docid}: {e}")
             return "error"
     
 
@@ -243,7 +243,7 @@ class DocDBExtractor(BaseExtractor):
     def extract_document_links_and_metadata(self, webpage_url: str) -> Tuple[List[str], List[Dict[str, Any]]]:
         """Extract RetrieveFile links and per-link metadata from a ShowDocument page (latest revision)."""
         try:
-            logger.info(f"Parsing {webpage_url}")
+            logger.debug(f"Parsing {webpage_url}")
             
             response = self.session.get(webpage_url)
             if not response.ok:
@@ -405,7 +405,7 @@ class DocDBExtractor(BaseExtractor):
             if docid % 4 == 0:
                 time.sleep(3)
             status = self.check_document_page(docid)
-            logger.warning(f"Status for {docid} = {status}")
+            logger.debug(f"Status for {docid} = {status}")
             
 
             if status == "exists":
@@ -440,7 +440,7 @@ class DocDBExtractor(BaseExtractor):
                         continue
 
                     # otherwise it's truly a page with attachments → queue it
-                    logger.info(f"Logging {page_url} to store")
+                    logger.debug(f"Logging {page_url} to store")
                     existing_pages.append(page_url)
                   
                     consecutive_seen_indexed = 0
@@ -527,7 +527,7 @@ class DocDBExtractor(BaseExtractor):
                 try:
                     result = fut.result()
                     if not result:
-                        logger.error(f"Couldn't fetch content from {link}")
+                        logger.warning(f"Couldn't fetch content from {link}")
                         continue
                     content, headers = result
                    
@@ -555,7 +555,7 @@ class DocDBExtractor(BaseExtractor):
 
                         existing_ids[doc_id] = f"{root_id}_{child_id+1}"
                 
-                    logger.info(f"Finished extracting from {link}")
+                    logger.debug(f"Finished extracting from {link}")
                 except Exception as e:
                     logger.error(f"Error downloading document {link}: {e}")
 
@@ -570,7 +570,7 @@ class DocDBExtractor(BaseExtractor):
                 cleaned_text = doc['cleaned_text']
 
                 
-                logger.info(f"doc is = {doc['document_id']}")
+                logger.debug(f"doc is = {doc['document_id']}")
                 
 
                 
@@ -602,10 +602,10 @@ class DocDBExtractor(BaseExtractor):
                     })
 
                 if cleaned_text:
-                    logger.info(f"Processed DocDB event: {doc['document_id']} -  Title: {metadata['title']} Chunk size: {len(doc['cleaned_text'].split())}")
+                    logger.debug(f"Processed DocDB event: {doc['document_id']} -  Title: {metadata['title']} Chunk size: {len(doc['cleaned_text'].split())}")
                 
                 else:
-                    logger.info(f"Not logging anything because metadata-only (no text) for DocDB {doc['document_id']} - {metadata['title']}")
+                    logger.debug(f"Not logging anything because metadata-only (no text) for DocDB {doc['document_id']} - {metadata['title']}")
 
                 # Log attachment details: doc_id, filename, version, title, URL
                 fname = metadata.get('filename', '<no filename>')
@@ -613,13 +613,13 @@ class DocDBExtractor(BaseExtractor):
                 url = metadata.get('url', '')
 
                 if cleaned_text:
-                    logger.info(
+                    logger.debug(
                         f"Processed attachment: doc={doc['document_id']} "
                         f"file={fname} version={version} "
                         f"title=\"{metadata['title']}\"\n"
                     )
                 else:
-                    logger.info(
+                    logger.debug(
                         f"Skipped text-extraction (metadata-only): doc={doc['document_id']} "
                         f"file={fname} version={version} "
                         f"title=\"{metadata['title']}\"\n"

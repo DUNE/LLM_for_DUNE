@@ -36,10 +36,10 @@ class ChromaManager:
         print("Collections available:", self.chroma_client.list_collections())
 
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        logger.info(f"Using device: {self.device}")
+        logger.debug(f"Using device: {self.device}")
 
         self.model = OriginalEmbedder(EMBEDDING_MODEL)
-        logger.info("Creating collection")
+        logger.debug("Creating collection")
         try:
             self.chroma_collection = self.chroma_client.get_or_create_collection(
                 name=CHROMA_DB_NAME,
@@ -48,12 +48,12 @@ class ChromaManager:
         except Exception as e:
             logger.error(f"Error initiating chroma {e}")
 
-        logger.info(f"Using Chroma collection '{CHROMA_DB_NAME}' (count deferred)")
+        logger.debug(f"Using Chroma collection '{CHROMA_DB_NAME}' (count deferred)")
         
         # Setup device & model
 
 
-        logger.info(f"Loaded sentence transformer {EMBEDDING_MODEL}")
+        logger.debug(f"Loaded sentence transformer {EMBEDDING_MODEL}")
 
         self.indico_ids = defaultdict()
         self.docdb_versions = defaultdict()
@@ -83,7 +83,7 @@ class ChromaManager:
                     self.docdb_content_modified[id]  = md['content_last_modified_date']
                     self.docdb_metadata_modified[id] = md['metadata_last_modified_date']
                 except:
-                    logger.info(f"error with {id}")
+                    logger.error(f"error with {id}")
                     continue
             self.metadata[id] = md
             self.documents[id]=doc
@@ -116,7 +116,7 @@ class ChromaManager:
             if documents[ids_to_idx_map[i]].get('cleaned_text', None):
                 up_ids.append(i)
             else:
-                logger.error(f"Cannot add {i} because didn't extract text from it")
+                logger.warning(f"Cannot add {i} because didn't extract text from it")
 
         for id_ in up_ids:
             md = {}
@@ -133,7 +133,7 @@ class ChromaManager:
         length = 0
         for d in doc_texts:
             length += len(d)
-        logger.info(f'Storing document of length {length} in chunks')
+        logger.debug(f'Storing document of length {length} in chunks')
 
         if length == 0: return 0
         
@@ -157,7 +157,7 @@ class ChromaManager:
                 logger.error(f"Invalid argument mode={mode}. Must be 'add' or 'update")
                 raise ValueError
 
-        logger.info(f"Added {len(up_ids)} to Chroma")
+        logger.debug(f"Added {len(up_ids)} to Chroma")
         return len(up_ids)
 
 

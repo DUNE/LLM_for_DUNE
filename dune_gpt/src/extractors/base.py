@@ -65,7 +65,7 @@ class BaseExtractor(ABC):
                     logger.warning(f"Unauthorized to download (HEAD): {link}")
                     raise requests.RequestException(f"HEAD returned {head.status_code}")
                 if head.status_code == 404:
-                    logger.info(f"File not found (404): {link}")
+                    logger.warning(f"File not found (404): {link}")
                     return None, None
                 if head.status_code >= 400:
                     raise requests.RequestException(f"HEAD returned {head.status_code}")
@@ -73,7 +73,7 @@ class BaseExtractor(ABC):
                 size_hdr = head.headers.get("content-length", None)
                 size = int(size_hdr) if (size_hdr and size_hdr.isdigit()) else 0
             except requests.RequestException:
-                logger.info(f"HEAD failed, falling back to GET for {link}")
+                logger.debug(f"HEAD failed, falling back to GET for {link}")
                 size = 0  # Unknown size, proceed to GET
 
             # GET request with browser User-Agent
@@ -83,10 +83,10 @@ class BaseExtractor(ABC):
                 logger.warning(f"Unauthorized to download (GET): {link}")
                 return None, None
             if resp.status_code == 404:
-                logger.info(f"File not found (404): {link}")
+                logger.warning(f"File not found (404): {link}")
                 return None, None
             if resp.status_code >= 400:
-                logger.warning(f"GET failed ({resp.status_code}) for {link}")
+                logger.error(f"GET failed ({resp.status_code}) for {link}")
                 return None, None
 
             # Use content-length if HEAD succeeded, else unknown
@@ -96,7 +96,7 @@ class BaseExtractor(ABC):
 
             # Read content (cap if size unknown)
             if size and size <= max_file_bytes:
-                logger.info("Reading file")
+                logger.debug("Reading file")
                 content = resp.content
             else:
                 content = resp.raw.read(max_file_bytes + 1)
@@ -107,7 +107,7 @@ class BaseExtractor(ABC):
             return content, resp.headers
 
         except requests.RequestException as e:
-            logger.warning(f"Error downloading {link}: {e}")
+            logger.error(f"Error downloading {link}: {e}")
             return None, None
 
     def classify_pdf_visual_robust(self, pdf_path):
@@ -133,7 +133,7 @@ class BaseExtractor(ABC):
         raw_text = ''
         document_type=''
         if 'application/pdf' in content_type:
-            logger.warning("Getting from pdf")
+            logger.debug("Getting from pdf")
             raw_text, document_type = self.extract_text_from_pdf(content)
 
 

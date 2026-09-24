@@ -83,7 +83,7 @@ def index(docdb_limit, indico_limit, start_idx_ddb, start_idx_ind, docdb_latest_
     start=time.time()
     try:
         logger.info("Starting document indexing process")
-        logger.info(f"chunk size is {CHUNK_SIZE}")
+        logger.debug(f"chunk size is {CHUNK_SIZE}")
 
         # Validate configuration
         validate_config()
@@ -96,9 +96,9 @@ def index(docdb_limit, indico_limit, start_idx_ddb, start_idx_ind, docdb_latest_
         data_path = os.getenv("DB_PATH", data_path)
 
         # Initialize document processor
-        logger.info("Init processor")
+        logger.debug("Init processor")
         processor = DocumentProcessor(data_path, int(CHUNK_SIZE))
-        logger.info("Processing all docs")
+        logger.debug("Processing all docs")
         # Process documents; pass the new latest_hint through
         results = processor.process_all_documents(
             start_ddb=start_idx_ddb,
@@ -134,7 +134,7 @@ def index(docdb_limit, indico_limit, start_idx_ddb, start_idx_ind, docdb_latest_
         logger.info(f"Document indexing completed successfully taking {end-start} seconds")
 
     except Exception as e:
-        logger.error(f"Indexing failed: {e}")
+        logger.critical(f"Indexing failed: {e}")
         click.echo(f"Error: {e}", err=True)
         sys.exit(1)
 
@@ -155,7 +155,7 @@ def stats():
         faiss_manager.cleanup()
 
     except Exception as e:
-        logger.error(f"Error getting stats: {e}")
+        logger.critical(f"Error getting stats: {e}")
         click.echo(f"Error: {e}", err=True)
         sys.exit(1)
 
@@ -208,7 +208,7 @@ def query(question, top_k):
         faiss_manager.cleanup()
 
     except Exception as e:
-        logger.error(f"Query failed: {e}")
+        logger.critical(f"Query failed: {e}")
         click.echo(f"Error: {e}", err=True)
         sys.exit(1)
 
@@ -219,7 +219,7 @@ def serve():
         from main import main
         main()
     except Exception as e:
-        logger.error(f"Server startup failed: {e}")
+        logger.critical(f"Server startup failed: {e}")
         click.echo(f"Error: {e}", err=True)
         sys.exit(1)
 
@@ -275,7 +275,7 @@ def health():
             click.echo(f"✗ Argo API: {e}")
 
     except Exception as e:
-        logger.error(f"Health check failed: {e}")
+        logger.critical(f"Health check failed: {e}")
         click.echo(f"Error: {e}", err=True)
         sys.exit(1)
 

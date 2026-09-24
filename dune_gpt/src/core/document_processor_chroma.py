@@ -1,4 +1,3 @@
-
 from datetime import datetime
 import time
 import threading
@@ -18,7 +17,7 @@ class DocumentProcessor:
 
     def __init__(self, data, chunk_size):
         self.chunk_size=chunk_size
-        logger.info("Initiated chroma")
+        logger.debug("Initiated chroma")
         self.chroma_manager = chroma.ChromaManager(data) 
        
  
@@ -74,14 +73,14 @@ class DocumentProcessor:
             try:
                 with log_lock:
                     
-                    logger.info(f"documents_batch size = {len(documents_batch)}")
+                    logger.debug(f"documents_batch size = {len(documents_batch)}")
                     added = self.chroma_manager.add_documents(documents_batch, num_processed)
                     results['docdb_parsed']+=num_parsed
                     results["docdb_processed"] += num_processed
                     results["total_embeddings_added"] += added
 
 
-                    logger.info(
+                    logger.debug(
                         f"Added DocDB batch: docs={len(documents_batch)}, vectors_added={added}"
                     )
 
@@ -102,7 +101,7 @@ class DocumentProcessor:
                 if indico_limit==-1: return []
 
                 for num_events, indico_records, docs_parsed in self.indico_extractor.extract_documents(start=start_ind, limit=indico_limit, chunk_size=self.chunk_size):
-                    logger.info(f"Indico records returns {len(indico_records)} from {num_events} events")
+                    logger.debug(f"Indico records returns {len(indico_records)} from {num_events} events")
                    
 
                     log_to_db_indico(indico_records,num_events, docs_parsed)
@@ -122,7 +121,7 @@ class DocumentProcessor:
                 
                 results["total_embeddings_added"] += added
                 
-                logger.info(f"Added Indico to Chroma: added {added} new vectors to index")
+                logger.debug(f"Added Indico to Chroma: added {added} new vectors to index")
                 return added
             
         docdb_thread = threading.Thread(target=docdb_extraction, args=('docdb',))
