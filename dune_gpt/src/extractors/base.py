@@ -99,10 +99,19 @@ class BaseExtractor(ABC):
                 logger.debug("Reading file")
                 content = resp.content
             else:
-                content = resp.raw.read(max_file_bytes + 1)
-                if len(content) > max_file_bytes:
-                    logger.info(f"Skipping file exceeding max size while streaming: {link}")
-                    return None, None
+                chunks = []
+                downloaded_bytes = 0
+
+                for chunk in resp.iter_content(chunk_size=8192):
+                    if chunk:
+                        chunks.append(chunk)
+                        downloaded_bytes += len(chunk)
+
+                        if downloaded_bytes > max_file_bytes:
+                            logger.info(f"Skipping file exceeding max size while streaming: {link}")
+                            return None, None
+
+                content = b"".join(chunks)
 
             return content, resp.headers
 
