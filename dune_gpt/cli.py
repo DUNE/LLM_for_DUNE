@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-DUNE-GPT CLI: Command-line interface for document processing and management
+ASKDune CLI: Command-line interface for entry processing and management
 """
 import time
 from dotenv import load_dotenv
@@ -21,7 +21,7 @@ from config import STORE, validate_config, create_directories, DOC_LIMIT_DOCDB, 
 if STORE == 'faiss':
     from src.core.document_processor_faiss import DocumentProcessor
 elif STORE == 'chroma':
-    from src.core.document_processor_chroma import DocumentProcessor
+    from src.core.document_processor_chroma import EntryProcessor
 else:
     raise Exception(f"Invalid Store. Must be FAISS or CHROMA. Got {store}")
 
@@ -31,7 +31,7 @@ logger = get_logger(__name__)
 
 @click.group()
 def cli():
-    """DUNE-GPT: RAG-based LLM for DUNE scientific documentation"""
+    """ASKDune: RAG-based LLM for DUNE scientific documentation"""
     pass
 
 @cli.command()
@@ -45,14 +45,14 @@ def cli():
     '--indico-limit',
     default=DOC_LIMIT_INDICO,
     show_default=True,
-    help=f'Number of Indico documents to process'
+    help=f'Number of Indico events to process'
 )
 @click.option(
     '--docdb-latest-hint',
     type=int,
     default=None,
     metavar='DOCID',
-    help='Optional DocDB docid to start probing from (speeds up latest‐ID detection)'
+    help='Optional DocDB document ID to start probing from (speeds up latest‐ID detection)'
 )
 
 @click.option(
@@ -60,15 +60,15 @@ def cli():
     type=int,
     default=0,
     metavar='DOCID',
-    help='Optional DocDB docid to start probing from (speeds up latest‐ID detection)'
+    help='Optional DocDB document ID to start probing from (speeds up latest‐ID detection)'
 )
 
 @click.option(
     '--start_idx_ind',
     type=int,
     default=0,
-    metavar='DOCID',
-    help='Optional DocDB docid to start probing from (speeds up latest‐ID detection)'
+    metavar='CATEGORYID',
+    help='Optional Indico category ID to start probing from (speeds up latest‐ID detection)'
 )
 
 @click.option(
@@ -77,12 +77,12 @@ def cli():
     default='data',
 )
 
-@click.option('--force', is_flag=True, help='Force reprocessing of existing documents')
+@click.option('--force', is_flag=True, help='Force reprocessing of existing entries')
 def index(docdb_limit, indico_limit, start_idx_ddb, start_idx_ind, docdb_latest_hint,  data_path, force):
-    """Extract, embed, and index documents from DocDB and Indico"""
+    """Extract, embed, and index entries from DocDB and Indico"""
     start=time.time()
     try:
-        logger.info("Starting document indexing process")
+        logger.info("Starting entry indexing process")
         logger.debug(f"chunk size is {CHUNK_SIZE}")
 
         # Validate configuration
@@ -95,12 +95,12 @@ def index(docdb_limit, indico_limit, start_idx_ddb, start_idx_ind, docdb_latest_
         indico_limit = int(os.getenv('DOCUMENT_LIMIT', indico_limit))
         data_path = os.getenv("DB_PATH", data_path)
 
-        # Initialize document processor
+        # Initialize entry processor
         logger.debug("Init processor")
-        processor = DocumentProcessor(data_path, int(CHUNK_SIZE))
-        logger.debug("Processing all docs")
-        # Process documents; pass the new latest_hint through
-        results = processor.process_all_documents(
+        processor = EntryProcessor(data_path, int(CHUNK_SIZE))
+        logger.debug("Processing all entries")
+        # Process entries; pass the new latest_hint through
+        results = processor.process_all_entries(
             start_ddb=start_idx_ddb,
             start_ind=start_idx_ind,
             docdb_limit=docdb_limit,
@@ -112,26 +112,28 @@ def index(docdb_limit, indico_limit, start_idx_ddb, start_idx_ind, docdb_latest_
         click.echo(f"\n{'='*50}")
         click.echo("INDEXING RESULTS")
         click.echo(f"{'='*50}")
-        click.echo(f"DocDB Events parsed: {results['docdb_parsed']}")
-        click.echo(f"Indico Events parsed: {results['indico_parsed']}")
-        click.echo(f"DocDB Events processed: {results['docdb_processed']}")
-        click.echo(f"Indico Events processed: {results['indico_processed']}")
-        click.echo(f"Total new events added: {results['indico_processed'] + results['docdb_processed']}")
-        click.echo(f"Total new embeddings added: {results['total_embeddings_added']}")
+        click.echo(f"DocDB Chunks parsed: {results['docdb_chunks_parsed']}")
+        click.echo(f"Indico Chunks parsed: {results['indico_chunks_parsed']}")
+        click.echo(f"DocDB Documents processed: {results['docdb_documents_processed']}")
+        click.echo(f"Indico Events processed: {results['indico_events_processed']}")
+        click.echo(f"Total new entries added: {results['indico_events_processed'] + results['docdb_documents_processed']}")
+        click.echo(f"Total new chunks added: {results['total_chunks_added']}")
 
         # Show index stats
         stats = processor.get_index_stats()
         click.echo(f"\nCurrent index statistics:")
-        click.echo(f"Total Events: {stats['total_documents']}")
+        click.echo(f"Total Entries: {stats['total_entries']}")
         click.echo(f"Total Embeddings: {stats['total_embeddings']}")
-        click.echo(f"Total Number of Attachments in Metadata: {stats['total_number_attachments_in_metadata']}")
+        click.echo(f"Total Attachments: {stats['total_attachments']}")
+        click.echo(f"Total Disk Size (bytes): {stats['disk_size']}")
+        
         # Cleanup
         processor.cleanup()
         end=time.time()
 
 
 
-        logger.info(f"Document indexing completed successfully taking {end-start} seconds")
+        logger.info(f"Entry indexing completed successfully taking {end-start} seconds")
 
     except Exception as e:
         logger.critical(f"Indexing failed: {e}")

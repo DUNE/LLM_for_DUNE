@@ -12,8 +12,8 @@ from src.utils.logger import get_logger
 import src.indexing.chroma_manager as chroma
 logger = get_logger(__name__)
 
-class DocumentProcessor:
-    """Orchestrates document extraction, processing, and indexing"""
+class EntryProcessor:
+    """Orchestrates entry extraction, processing, and indexing"""
 
     def __init__(self, data, chunk_size):
         self.chunk_size=chunk_size
@@ -24,7 +24,7 @@ class DocumentProcessor:
         self.docdb_extractor = DocDBExtractor(self.chroma_manager)
         self.indico_extractor = IndicoExtractor(self.chroma_manager)
 
-    def process_all_documents(
+    def process_all_entries(
         self,
         start_ddb=0,
         start_ind=0,
@@ -32,30 +32,31 @@ class DocumentProcessor:
         indico_limit: int = DOC_LIMIT_INDICO,
         force: bool = False,
     ) -> Dict[str, int]:
-        logger.info("Starting document processing pipeline")
+        logger.info("Starting entry processing pipeline")
         results = {
-            "docdb_parsed":0,
-            "indico_parsed":0,
-            "docdb_processed": 0,
-            "indico_processed": 0,
-            "total_embeddings_added": 0
+            "docdb_chunks_parsed": 0,
+            "indico_chunks_parsed": 0,
+            "docdb_documents_processed": 0,
+            "indico_events_processed": 0,
+            "total_chunks_added": 0
         }
 
         #
         # --- DocDB portion ---
         #
-        documents_batch: List[Dict[str, Any]] = []
         def docdb_extraction(name):
             try:
                 logger.info("Processing DocDB documents")
                 if docdb_limit == -1: return []
-                # 1) What versions (and thus IDs) do we already have?
+                
                 indexed_versions = self.chroma_manager.get_docdb_versions()
-                indexed_ids: Set[int] = { int(did) for did in indexed_versions.keys() }
+                indexed_document_ids: Set[int] = { int(did) for did in indexed_versions.keys() }
 
                 
-                for docs_processed, raw_records, docs_parsed in self.docdb_extractor.extract_documents(start=start_ddb, limit=docdb_limit,
-                                                                    indexed_doc_ids=indexed_ids,
+                for documents_processed, chunks, chunks_parsed in self.docdb_extractor.extract_documents(
+                                                                    start=start_ddb, 
+                                                                    limit=docdb_limit,
+                                                                    indexed_document_ids=indexed_document_ids,
                                                                     mode="incremental",
                                                                     stop_after_seen=100,
                                                                     max_missing=1000,
@@ -63,65 +64,57 @@ class DocumentProcessor:
                                                                     existing_versions=indexed_versions
                                                                 ):
                     
-                    log_to_db_docdb(raw_records, num_processed=docs_processed, num_parsed=docs_parsed)
+                    log_to_db_docdb(chunks, num_documents_processed=documents_processed, num_chunks_parsed=chunks_parsed)
                     
             except Exception as e:
-                logger.error(f"Error in extracting documents from dune docdb {e}"  )
+                logger.error(f"Error in extracting documents from dune docdb {e}")
             return []
         
-        def log_to_db_docdb(documents_batch, num_processed, num_parsed):
+        def log_to_db_docdb(chunks_batch, num_documents_processed, num_chunks_parsed):
             try:
                 with log_lock:
                     
-                    logger.debug(f"documents_batch size = {len(documents_batch)}")
-                    added = self.chroma_manager.add_documents(documents_batch, num_processed)
-                    results['docdb_parsed']+=num_parsed
-                    results["docdb_processed"] += num_processed
-                    results["total_embeddings_added"] += added
+                    logger.debug(f"chunks_batch size = {len(chunks_batch)}")
+                    added = self.chroma_manager.add_entries(chunks_batch)
+                    results['docdb_chunks_parsed'] += num_chunks_parsed
+                    results["docdb_documents_processed"] += num_documents_processed
+                    results["total_chunks_added"] += added
 
 
                     logger.debug(
-                        f"Added DocDB batch: docs={len(documents_batch)}, vectors_added={added}"
+                        f"Added DocDB batch: documents={num_documents_processed}, chunks_added={added}"
                     )
 
-                            
-
-
             except Exception as e:
-                logger.error(f"Error processing documents: {e}")
+                logger.error(f"Error processing DocDB chunks: {e}")
 
         #
         # --- Indico portion ---
         #
-        indico_to_add=[None]
         def indico_extraction(name):
             try:
                 
-                logger.info("Processing Indico documents")
+                logger.info("Processing Indico events")
                 if indico_limit==-1: return []
 
-                for num_events, indico_records, docs_parsed in self.indico_extractor.extract_documents(start=start_ind, limit=indico_limit, chunk_size=self.chunk_size):
-                    logger.debug(f"Indico records returns {len(indico_records)} from {num_events} events")
+                for events_processed, chunks, chunks_parsed in self.indico_extractor.extract_documents(start=start_ind, limit=indico_limit, chunk_size=self.chunk_size):
+                    logger.debug(f"Indico records returns {len(chunks)} chunks from {events_processed} events")
                    
 
-                    log_to_db_indico(indico_records,num_events, docs_parsed)
+                    log_to_db_indico(chunks, events_processed, chunks_parsed)
                     
-
-
-                    
-
             except Exception as e:
-                logger.error(f"Error processing Indico documents: {e}")
+                logger.error(f"Error processing Indico events: {e}")
 
-        def log_to_db_indico(docs,num_events, num_parsed):
+        def log_to_db_indico(chunks_batch, num_events_processed, num_chunks_parsed):
             with log_lock:
-                added = self.chroma_manager.add_documents(docs,num_events)
-                results['indico_parsed'] += num_parsed
-                results["indico_processed"] += num_events
+                added = self.chroma_manager.add_entries(chunks_batch)
+                results['indico_chunks_parsed'] += num_chunks_parsed
+                results["indico_events_processed"] += num_events_processed
                 
-                results["total_embeddings_added"] += added
+                results["total_chunks_added"] += added
                 
-                logger.debug(f"Added Indico to Chroma: added {added} new vectors to index")
+                logger.debug(f"Added Indico to Chroma: added {added} new chunks to index")
                 return added
             
         docdb_thread = threading.Thread(target=docdb_extraction, args=('docdb',))
@@ -137,7 +130,7 @@ class DocumentProcessor:
 
 
         # Final summary & return
-        logger.info(f"Document processing completed. Total new docs added: {results['total_embeddings_added']}")
+        logger.info(f"Entry processing completed. Total new chunks added: {results['total_chunks_added']}")
 
 
         return results

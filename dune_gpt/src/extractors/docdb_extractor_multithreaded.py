@@ -468,7 +468,7 @@ class DocDBExtractor(BaseExtractor):
         self,
         start: int=0,
         limit: int = -1,
-        indexed_doc_ids: Optional[Set[int]] = None,
+        indexed_document_ids: Optional[Set[int]] = None,
         mode: str = "incremental",
         stop_after_seen: int = 100,
         max_missing: int = 1000,
@@ -480,7 +480,7 @@ class DocDBExtractor(BaseExtractor):
         pages, parsed = self._enumerate_pages_latest_first(
             start=start,
             limit_pages=limit,
-            indexed_doc_ids=indexed_doc_ids,
+            indexed_doc_ids=indexed_document_ids,
             stop_after_seen=stop_after_seen,
             max_missing=max_missing,
             mode=mode,

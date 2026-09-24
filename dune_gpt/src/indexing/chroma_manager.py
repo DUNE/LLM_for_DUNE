@@ -24,15 +24,18 @@ from langchain_core.runnables import chain
 logger = get_logger(__name__)
 CHROMA_DB_NAME='DUNE_VECTOR_DB'
 class ChromaManager:
-    """Manager for FAISS index operations"""
+    """Manager for ChromaDB index operations"""
 
-    def __init__(self, data):
+    def __init__(self, db_path):
         # Prevent thread‐related segfaults
         self.bm25_cache=None
         self._configure_threading()
+
+        self.db_path = db_path
+
         self.reranker=CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2', max_length=512)
 
-        self.chroma_client = chromadb.PersistentClient(path=data, settings=Settings())
+        self.chroma_client = chromadb.PersistentClient(path=self.db_path, settings=Settings())
         print("Collections available:", self.chroma_client.list_collections())
 
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -60,21 +63,20 @@ class ChromaManager:
         self.docdb_content_modified = defaultdict()
         self.docdb_metadata_modified = defaultdict()
         self.metadata= defaultdict()
-        self.documents= defaultdict()
-        self.events_ids=set()
-        self.num_events=len(self.events_ids)
-        self.chroma_ntotal = 0
-        self.doc_ids = []
+        self.embedding_contents= defaultdict()
+        self.entry_ids=set()
+        self.attachment_ids=set()
+        self.embedding_ids = []
 
         # Ensure directories exist
-        create_directories(data)
+        create_directories(self.db_path)
 
         self.fetch_ddb_ind_data()
 
     
     def fetch_ddb_ind_data(self):
         results = self.chroma_collection.get(include=["documents", "metadatas", "uris"])
-        for id, md, doc in zip(results['ids'], results['metadatas'],results['documents'] ):
+        for id, md, text in zip(results['ids'], results['metadatas'], results['documents'] ):
             if md.get('source') == 'indico':
                 self.indico_ids[id.split('_')[0].split("/")[0]]=True
             elif md.get('source') == 'docdb':
@@ -86,12 +88,19 @@ class ChromaManager:
                     logger.error(f"error with {id}")
                     continue
             self.metadata[id] = md
-            self.documents[id]=doc
+            self.embedding_contents[id]=text
 
+            entry_id = id.split("_")[0]
+            self.entry_ids.add(entry_id)
 
-            event_id = id.split("_")[0]
-            self.events_ids.add(event_id)
-        self.doc_ids = list(self.metadata.keys())
+            id_parts = id.split('_')
+            if len(id_parts) >= 2:
+                unique_attachment_id = f"{id_parts[0]}_{id_parts[1]}"
+            else:
+                unique_attachment_id = id
+            self.attachment_ids.add(unique_attachment_id)
+
+        self.embedding_ids = list(self.metadata.keys())
     
     
     def _configure_threading(self):
@@ -104,36 +113,36 @@ class ChromaManager:
     def generate_embeddings(self, texts: List[str]) -> np.ndarray:
         return self.model.encode(texts, convert_to_numpy=True).astype(np.float32)
 
-    def add_to_chroma(self, documents, ids, ids_to_idx_map, mode):
+    def add_to_chroma(self, chunks, ids, ids_to_idx_map, mode):
         '''
-        Updates self.doc_ids and adds/updates chroma with new entries
+        Updates self.embedding_ids and adds/updates chroma with new chunks
         '''
 
         metadatas= []
-        doc_texts=[]
+        embedding_texts=[]
         up_ids=[]
         for i in ids:
-            if documents[ids_to_idx_map[i]].get('cleaned_text', None):
+            if chunks[ids_to_idx_map[i]].get('cleaned_text', None):
                 up_ids.append(i)
             else:
                 logger.warning(f"Cannot add {i} because didn't extract text from it")
 
         for id_ in up_ids:
             md = {}
-            doc_idx = ids_to_idx_map[id_]
-            metadata_of_doc_to_update = documents[doc_idx]
-            doc_texts.append(metadata_of_doc_to_update['cleaned_text'])
+            chunk_idx = ids_to_idx_map[id_]
+            metadata_of_chunk_to_update = chunks[chunk_idx]
+            embedding_texts.append(metadata_of_chunk_to_update['cleaned_text'])
 
-            for k,v in metadata_of_doc_to_update.items():
+            for k,v in metadata_of_chunk_to_update.items():
                 if k not in ['cleaned_text', 'raw_text', 'document_id']:
                     md[k] = v
             metadatas.append(md)
 
 
         length = 0
-        for d in doc_texts:
-            length += len(d)
-        logger.debug(f'Storing document of length {length} in chunks')
+        for text in embedding_texts:
+            length += len(text)
+        logger.debug(f'Storing chunks of total length {length}')
 
         if length == 0: return 0
         
@@ -142,17 +151,16 @@ class ChromaManager:
             if mode == 'update':
                 self.chroma_collection.update(
                     ids = up_ids[i:i+MAX_VARIABLE_NUMBER],
-                    documents = doc_texts[i:i+MAX_VARIABLE_NUMBER],
+                    documents = embedding_texts[i:i+MAX_VARIABLE_NUMBER],
                     metadatas = metadatas[i:i+MAX_VARIABLE_NUMBER],
                 )
 
             elif mode == 'add':
                 self.chroma_collection.add(
                     ids = up_ids[i:i+MAX_VARIABLE_NUMBER],
-                    documents = doc_texts[i:i+MAX_VARIABLE_NUMBER],
+                    documents = embedding_texts[i:i+MAX_VARIABLE_NUMBER],
                     metadatas = metadatas[i:i+MAX_VARIABLE_NUMBER],
                 )
-                self.chroma_ntotal += len(up_ids[i:i+MAX_VARIABLE_NUMBER])
             else:
                 logger.error(f"Invalid argument mode={mode}. Must be 'add' or 'update")
                 raise ValueError
@@ -161,72 +169,81 @@ class ChromaManager:
         return len(up_ids)
 
 
-    def  update_indico_docdb_record(self, documents):
+    def update_indico_docdb_record(self, chunks):
         """
-        Updates global variables recording the status of the database with resepct to specific metadata of each document
+        Updates global variables recording the status of the database with respect to specific metadata of each chunk
         """
 
         try:
-            for doc in documents:
-                source = doc.get("source", '')
-                did = doc['document_id']
+            for chunk in chunks:
+                source = chunk.get("source", '')
+                did = chunk['document_id']
                 if source == 'docdb':
-                    self.docdb_versions[did.split('_')[0].split("/")[0]] = doc['docdb_version']
-                    self.docdb_content_modified[did] = doc.get('content_last_modified_date', 'Unknown Content Date')
-                    self.docdb_metadata_modified[did] = doc.get('metadata_last_modified_date', 'Unknown Metadata Date')
+                    self.docdb_versions[did.split('_')[0].split("/")[0]] = chunk['docdb_version']
+                    self.docdb_content_modified[did] = chunk.get('content_last_modified_date', 'Unknown Content Date')
+                    self.docdb_metadata_modified[did] = chunk.get('metadata_last_modified_date', 'Unknown Metadata Date')
 
                 elif source == 'indico':
                     self.indico_ids[did.split("_")[0].split("/")[0]]=True
+
+                entry_id = did.split("_")[0]
+                self.entry_ids.add(entry_id)
+
+                id_parts = did.split('_')
+                if len(id_parts) >= 2:
+                    unique_attachment_id = f"{id_parts[0]}_{id_parts[1]}"
+                else:
+                    unique_attachment_id = did
+                self.attachment_ids.add(unique_attachment_id)
+
         except Exception as e:
-            logger.error(f"Error in updating list of doc_ids with Indico/DocDB: {e}")
+            logger.error(f"Error in updating list of embedding IDs with Indico/DocDB: {e}")
 
-    def add_documents(self, documents: List[Dict[str, Any]], num_events: int) -> int:
+    def add_entries(self, chunks: List[Dict[str, Any]]) -> int:
         """
-        Adds new and updates existing documents to ChromaDB (embedding model defined in Chroma instantiation)
+        Adds new and updates existing chunks to ChromaDB
         """
-        self.num_events+=num_events
-        
-        map_ids_to_idx = {d['document_id']:idx for idx,d in enumerate(documents)}
+        map_ids_to_idx = {chunk['document_id']:idx for idx,chunk in enumerate(chunks)}
 
-        self.update_indico_docdb_record(documents)
+        self.update_indico_docdb_record(chunks)
 
         ids = set(map_ids_to_idx.keys())
-        existing_ids = set(self.doc_ids)
+        existing_ids = set(self.embedding_ids)
 
         ids_to_update = list(existing_ids.intersection(ids))
-        added = self.add_to_chroma(documents=documents, ids=ids_to_update, ids_to_idx_map=map_ids_to_idx, mode='update')
+        added = self.add_to_chroma(chunks=chunks, ids=ids_to_update, ids_to_idx_map=map_ids_to_idx, mode='update')
 
         ids_to_add = ids - existing_ids
 
-        if ids_to_add is not None:
-            added += self.add_to_chroma(documents= documents, ids= ids_to_add, ids_to_idx_map=map_ids_to_idx, mode='add')
+        if ids_to_add:
+            added += self.add_to_chroma(chunks= chunks, ids= list(ids_to_add), ids_to_idx_map=map_ids_to_idx, mode='add')
 
-        self.doc_ids = list(existing_ids.union(ids))
+        self.embedding_ids = list(existing_ids.union(ids))
         return added
                 
-    def get_indico_ids(self) -> Dict[int, int]:
+    def get_indico_ids(self) -> Dict[str, bool]:
         """
-        Return a map { doc_id: max_version_indexed } for all DocDB docs.
+        Return a map { entry_id: True } for all Indico events.
         """
         return self.indico_ids
 
 
-    def get_docdb_versions(self) -> Dict[int, int]:
+    def get_docdb_versions(self) -> Dict[str, int]:
         """
-        Return a map { doc_id: max_version_indexed } for all DocDB docs.
+        Return a map { entry_id: max_version_indexed } for all DocDB entries.
         """
         return self.docdb_versions
     
-    def get_content_modification_dates(self) -> Dict[int, str]:
+    def get_content_modification_dates(self) -> Dict[str, str]:
         return self.docdb_content_modified
 
-    def get_metadata_modification_dates(self) -> Dict[int, str]:
+    def get_metadata_modification_dates(self) -> Dict[str, str]:
         return self.docdb_metadata_modified
 
 
     def without_reranker_search(self, query: str, top_k: int = 3) -> Tuple[List[str], List[str]]:
         """
-            Finds the docID_number associated with the retrieved text, then goes back to the docID to find header info
+            Finds the embedding_id associated with the retrieved text, then extracts header info from metadata
         """
         results = self.chroma_collection.query(query_texts=[query],  n_results=top_k)
         snippets, refs = [], []
@@ -235,20 +252,20 @@ class ChromaManager:
             title = md.get("meeting_name", "")
             if link:
                 refs.append(link)
-        for docs in results['documents'][0]:
-            snippets.append(docs)
+        for text in results['documents'][0]:
+            snippets.append(text)
 
         return snippets, refs
 
     def search_old(self, query: str, top_k: int = 3) -> Tuple[List[str], List[str]]:
         """
-            Finds the docID_number associated with the retrieved text, then goes back to the docID to find header info
+            Finds the embedding_id associated with the retrieved text, then extracts header info from metadata
         """
         results = self.chroma_collection.query(query_texts=[query],  n_results=top_k*6)
 
         scores = []
         scores = self.reranker.predict(
-            [(query, doc) for doc in results["documents"][0]],
+            [(query, text) for text in results["documents"][0]],
             batch_size=6)
 
         top_k_indices = np.argsort(scores)[-top_k:][::-1]
@@ -262,31 +279,31 @@ class ChromaManager:
             snippets.append(results['documents'][0][i])
         return snippets, refs
 
-    def tokenize(self, doc):
-        return re.findall(r"\w+", doc.lower())
+    def tokenize(self, text):
+        return re.findall(r"\w+", text.lower())
     
-    def build_bm25_index(self, documents):
-        tokenized_docs = [self.tokenize(doc) for doc in documents]
-        self.bm25_cache = BM25Okapi(tokenized_docs)
+    def build_bm25_index(self, embedding_texts):
+        tokenized_texts = [self.tokenize(text) for text in embedding_texts]
+        self.bm25_cache = BM25Okapi(tokenized_texts)
         
-    def keyword_search(self, query, k_docs):
+    def keyword_search(self, query, k_embeddings):
         """
-        Performs keyword search returning k_docs chunks
+        Performs keyword search returning k_embeddings chunks
         """
         all_entries = self.chroma_collection.get()
         if not self.bm25_cache:
             self.build_bm25_index(all_entries['documents'])
         
         bm25_scores = self.bm25_cache.get_scores(query.split())
-        top_indices = np.argsort(bm25_scores)[::-1][:k_docs]
+        top_indices = np.argsort(bm25_scores)[::-1][:k_embeddings]
         results = [(all_entries['ids'][idx], bm25_scores[idx]) for idx in top_indices]
         return results
 
-    def semantic_search(self, query, doc_type, k_docs):
+    def semantic_search(self, query, doc_type, k_embeddings):
 
         results = self.chroma_collection.query(
             query_texts=[query],
-            n_results=k_docs,
+            n_results=k_embeddings,
             where={'document_type': doc_type}
         )
         if not results['ids'][0]:
@@ -298,9 +315,9 @@ class ChromaManager:
         
         return list(zip(results['ids'][0], similarities))
     
-    def merge(self, keyword_doc_ids,semantic_doc_ids):
+    def merge(self, keyword_embedding_ids, semantic_embedding_ids):
         """
-            Merges doc_ids extracted from text and slide semantic search and keyword search
+            Merges embedding_ids extracted from semantic search and keyword search
         """
 
         def normalize_scores(results):
@@ -310,11 +327,11 @@ class ChromaManager:
             min_score, max_score = min(scores), max(scores)
             score_range = max_score - min_score if max_score > min_score else 1
             return {
-                doc_id: (score - min_score) / score_range 
-                for doc_id, score in results
+                embedding_id: (score - min_score) / score_range 
+                for embedding_id, score in results
             }
-        keyword_scores = normalize_scores(keyword_doc_ids)
-        semantic_scores = normalize_scores(semantic_doc_ids)
+        keyword_scores = normalize_scores(keyword_embedding_ids)
+        semantic_scores = normalize_scores(semantic_embedding_ids)
         all_selected_ids = keyword_scores.keys() | semantic_scores.keys()
         combined_score=defaultdict()
         for id_ in all_selected_ids:
@@ -331,62 +348,69 @@ class ChromaManager:
 
         
 
-    def reranker_search(self, query, merged_docids, top_k):
-        documents=[]
+    def reranker_search(self, query, merged_embedding_ids, top_k):
+        embedding_texts=[]
         try:
-            documents = [self.documents[doc_id] for doc_id in merged_docids]
+            embedding_texts = [self.embedding_contents[embedding_id] for embedding_id in merged_embedding_ids]
         except:
-            print("No documents to rerank")
+            print("No embeddings to rerank")
             return []
                 
         # Create query-document pairs
-        pairs = [[query, doc] for doc in documents]
+        pairs = [[query, text] for text in embedding_texts]
         
         # Get cross-encoder scores
         ce_scores = self.reranker.predict(pairs)
         
         # Return sorted by score
-        results = list(zip(merged_docids, ce_scores))
+        results = list(zip(merged_embedding_ids, ce_scores))
         results.sort(key=lambda x: x[1], reverse=True)
         
         return results[:top_k]
 
 
-    def get_links(self, reranked_docids):
-        return [self.metadata[id_[0]]['event_url'] for id_ in reranked_docids]
+    def get_links(self, reranked_embedding_ids):
+        return [self.metadata[id_[0]]['event_url'] for id_ in reranked_embedding_ids]
 
-    def get_content(self, reranked_docids):
-        return [self.documents[id_[0]] for id_ in reranked_docids]
+    def get_content(self, reranked_embedding_ids):
+        return [self.embedding_contents[id_[0]] for id_ in reranked_embedding_ids]
 
-    def search(self, query: str,top_k: int = 3, k_docs: int = 2,  keyword=True) -> Tuple[List[str], List[str]]:
+    def search(self, query: str,top_k: int = 3, k_embeddings: int = 2,  keyword=True) -> Tuple[List[str], List[str]]:
         """
-            Performs keyword and semantic search (k_docs chunks each), reranking each output and selecting the best top_k
+            Performs keyword and semantic search (k_embeddings chunks each), reranking each output and selecting the best top_k
         """
       
         if keyword:
-            keyword_doc_ids = self.keyword_search(query, 3*k_docs)
+            keyword_embedding_ids = self.keyword_search(query, 3*k_embeddings)
         else:
-            keyword_doc_ids = []
+            keyword_embedding_ids = []
         
-        semantic_doc_ids = self.semantic_search(query, 'document', k_docs)
-        semantic_doc_ids.extend(self.semantic_search(query, 'slides', k_docs))
-        merged_docids = self.merge(keyword_doc_ids,semantic_doc_ids )
+        semantic_embedding_ids = self.semantic_search(query, 'document', k_embeddings)
+        semantic_embedding_ids.extend(self.semantic_search(query, 'slides', k_embeddings))
+        merged_embedding_ids = self.merge(keyword_embedding_ids, semantic_embedding_ids)
 
-        reranked_docids = self.reranker_search(query, merged_docids, top_k)
+        reranked_embedding_ids = self.reranker_search(query, merged_embedding_ids, top_k)
 
-        links = self.get_links(reranked_docids)
-        content = self.get_content(reranked_docids)
+        links = self.get_links(reranked_embedding_ids)
+        content = self.get_content(reranked_embedding_ids)
         return content, links
 
     def save_all(self):
-        """Persist metadata, doc_ids, and FAISS index."""
+        """Persist metadata, embedding_ids, and ChromaDB index."""
         pass
 
     def get_stats(self) -> Dict[str, int]:
+        disk_size = 0
+        for path, dirs, files in os.walk(self.db_path):
+            for f in files:
+                fp = os.path.join(path, f)
+                disk_size += os.path.getsize(fp)
+
         return {
-            "total_documents": self.num_events,
+            "total_entries": len(self.entry_ids),
+            "total_attachments": len(self.attachment_ids),
             "total_embeddings": self.chroma_collection.count(),
-            "total_number_attachments_in_metadata": self.chroma_ntotal,
+            "disk_size": disk_size
         }
 
     def cleanup(self):
@@ -394,13 +418,13 @@ class ChromaManager:
             torch.cuda.empty_cache()
         self.model = None
         self.chroma_collection = None
-        self.chroma_ntotal=0
+        self.entry_ids.clear()
+        self.attachment_ids.clear()
         self.indico_ids = None
         self.docdb_versions = None
         self.docdb_content_modified = None
         self.docdb_metadata_modified = None
-
-        self.doc_ids = None
+        self.embedding_ids = None
 
     def as_retriever(self, **kwargs) -> dict:
         @chain
