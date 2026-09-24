@@ -34,8 +34,8 @@ class EntryProcessor:
     ) -> Dict[str, int]:
         logger.info("Starting entry processing pipeline")
         results = {
-            "docdb_chunks_parsed": 0,
-            "indico_chunks_parsed": 0,
+            "docdb_documents_retrieved": 0,
+            "indico_events_retrieved": 0,
             "docdb_documents_processed": 0,
             "indico_events_processed": 0,
             "total_chunks_added": 0
@@ -53,7 +53,7 @@ class EntryProcessor:
                 indexed_document_ids: Set[int] = { int(did) for did in indexed_versions.keys() }
 
                 
-                for documents_processed, chunks, chunks_parsed in self.docdb_extractor.extract_documents(
+                for documents_processed, chunks, documents_retrieved in self.docdb_extractor.extract_documents(
                                                                     start=start_ddb, 
                                                                     limit=docdb_limit,
                                                                     indexed_document_ids=indexed_document_ids,
@@ -64,19 +64,19 @@ class EntryProcessor:
                                                                     existing_versions=indexed_versions
                                                                 ):
                     
-                    log_to_db_docdb(chunks, num_documents_processed=documents_processed, num_chunks_parsed=chunks_parsed)
+                    log_to_db_docdb(chunks, num_documents_processed=documents_processed, num_documents_retrieved=documents_retrieved)
                     
             except Exception as e:
                 logger.error(f"Error in extracting documents from dune docdb {e}")
             return []
         
-        def log_to_db_docdb(chunks_batch, num_documents_processed, num_chunks_parsed):
+        def log_to_db_docdb(chunks_batch, num_documents_processed, num_documents_retrieved):
             try:
                 with log_lock:
                     
                     logger.debug(f"chunks_batch size = {len(chunks_batch)}")
                     added = self.chroma_manager.add_entries(chunks_batch)
-                    results['docdb_chunks_parsed'] += num_chunks_parsed
+                    results['docdb_documents_retrieved'] += num_documents_retrieved
                     results["docdb_documents_processed"] += num_documents_processed
                     results["total_chunks_added"] += added
 
@@ -97,19 +97,19 @@ class EntryProcessor:
                 logger.info("Processing Indico events")
                 if indico_limit==-1: return []
 
-                for events_processed, chunks, chunks_parsed in self.indico_extractor.extract_documents(start=start_ind, limit=indico_limit, chunk_size=self.chunk_size):
+                for events_processed, chunks, events_retrieved in self.indico_extractor.extract_documents(start=start_ind, limit=indico_limit, chunk_size=self.chunk_size):
                     logger.debug(f"Indico records returns {len(chunks)} chunks from {events_processed} events")
                    
 
-                    log_to_db_indico(chunks, events_processed, chunks_parsed)
+                    log_to_db_indico(chunks, events_processed, events_retrieved)
                     
             except Exception as e:
                 logger.error(f"Error processing Indico events: {e}")
 
-        def log_to_db_indico(chunks_batch, num_events_processed, num_chunks_parsed):
+        def log_to_db_indico(chunks_batch, num_events_processed, num_events_retrieved):
             with log_lock:
                 added = self.chroma_manager.add_entries(chunks_batch)
-                results['indico_chunks_parsed'] += num_chunks_parsed
+                results['indico_events_retrieved'] += num_events_retrieved
                 results["indico_events_processed"] += num_events_processed
                 
                 results["total_chunks_added"] += added
