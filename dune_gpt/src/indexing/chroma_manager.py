@@ -93,12 +93,13 @@ class ChromaManager:
             entry_id = id.split("_")[0]
             self.entry_ids.add(entry_id)
 
-            id_parts = id.split('_')
-            if len(id_parts) >= 2:
-                unique_attachment_id = f"{id_parts[0]}_{id_parts[1]}"
+            filename = md.get("filename")
+
+            if filename:
+                unique_attachment_id = f"{entry_id}_{filename}"
+                self.attachment_ids.add(unique_attachment_id)
             else:
-                unique_attachment_id = id
-            self.attachment_ids.add(unique_attachment_id)
+                logger.warning(f"Missing filename for chunk {did}. Skipping.")
 
         self.embedding_ids = list(self.metadata.keys())
     
@@ -189,12 +190,13 @@ class ChromaManager:
                 entry_id = did.split("_")[0]
                 self.entry_ids.add(entry_id)
 
-                id_parts = did.split('_')
-                if len(id_parts) >= 2:
-                    unique_attachment_id = f"{id_parts[0]}_{id_parts[1]}"
+                filename = chunk.get("filename")
+
+                if filename:
+                    unique_attachment_id = f"{entry_id}_{filename}"
+                    self.attachment_ids.add(unique_attachment_id)
                 else:
-                    unique_attachment_id = did
-                self.attachment_ids.add(unique_attachment_id)
+                    logger.warning(f"Missing filename for chunk {did}. Skipping.")
 
         except Exception as e:
             logger.error(f"Error in updating list of embedding IDs with Indico/DocDB: {e}")

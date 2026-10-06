@@ -66,11 +66,12 @@ async def lifespan(app: FastAPI):
         llm_client = FermilabAPIClient()
     
     # Check if index is empty
-    stats = db_manager.get_stats()
-    if stats["total_documents"] == 0:
-        logger.warning("Vector store index is empty. Run the indexing process first.")
+    total_embeddings = db_manager.get_stats().get("total_embeddings", 0)
+    
+    if not total_embeddings:
+        logger.warning("Vector store is empty. Run the indexing process first.")
     else:
-        logger.info(f"Vector store index loaded with {stats['total_documents']} documents")
+        logger.info(f"Vector store loaded with {total_embeddings} embeddings.")
     
     yield
     
