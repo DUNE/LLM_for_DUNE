@@ -1,4 +1,4 @@
-# DUNE-GPT
+# AskDUNE
 
 A Retrieval-Augmented Generation (RAG) based LLM application for DUNE scientific documentation. This application integrates DUNE internal databases (DocDB and Indico) with a semantic search system powered by FAISS and an LLM via the Argo API.
 
