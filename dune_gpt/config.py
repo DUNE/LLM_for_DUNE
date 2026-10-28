@@ -17,10 +17,21 @@ FERMILAB_API_KEY = os.getenv("FERMILAB_API_URL", "EMPTY")
 QA_PATH = './benchmarking/QuestionAnswer/QA.csv'
 #'./benchmarking/QuestionAnswer/Cleaned_questions2.csv'
 
-# DB Path
+# Production database — used by the AskDUNE web server
 DB_PATH = os.getenv("DB_PATH")
 if not DB_PATH:
     raise RuntimeError("DB_PATH is not set in environment (.env)")
+
+# Indexing database — used by indexing jobs
+INDEXING_DB_PATH = os.getenv("INDEXING_DB_PATH")
+if not INDEXING_DB_PATH:
+    raise RuntimeError("INDEXING_DB_PATH is not set in environment (.env)")
+
+# Safety check: production and indexing must use different directories
+if os.path.realpath(DB_PATH) == os.path.realpath(INDEXING_DB_PATH):
+    raise RuntimeError(
+        "DB_PATH and INDEXING_DB_PATH must point to different directories"
+    )
 
 # Database Configuration
 DUNE_DOCDB_USERNAME = os.getenv("DUNE_DOCDB_USERNAME")
@@ -30,16 +41,20 @@ INDICO_API_TOKEN = os.getenv("INDICO_API_TOKEN", "secret-indico_token")
 
 # Fermilab Authentication Configuration
 FERMILAB_CLIENT_ID = os.getenv("FERMILAB_CLIENT_ID")
-print(f"Got FERMILAB_CLIENT_ID={FERMILAB_CLIENT_ID}")
 FERMILAB_CLIENT_SECRET = os.getenv("FERMILAB_CLIENT_SECRET")
-FERMILAB_SESSION_SECRET = os.getenv("FERMILAB_SESSION_SECRET", "super-secret-session-key-change-in-production")
-FERMILAB_SCOPE = os.getenv("FERMILAB_SCOPE", "openid email profile")
+FERMILAB_SCOPE = os.getenv("FERMILAB_SCOPE", "openid email profile fnalgroups")
 FERMILAB_REDIRECT_URI = os.getenv("FERMILAB_REDIRECT_URI", "http://127.0.0.1:8000/auth")
 ENABLE_AUTHENTICATION = os.getenv("ENABLE_AUTHENTICATION", "true").lower() == "true"
 FERMI_SSO_USERNAME = os.getenv("FERMI_SSO_USERNAME")
 print(f"Got FERMI_SSO_USERNAME={FERMI_SSO_USERNAME}")
 
 FERMI_SSO_PASSWORD = os.getenv("FERMI_SSO_PASSWORD")
+FERMILAB_SESSION_SECRET = os.getenv("FERMILAB_SESSION_SECRET")
+
+if ENABLE_AUTHENTICATION and not FERMILAB_SESSION_SECRET:
+    raise RuntimeError(
+        "FERMILAB_SESSION_SECRET must be configured when authentication is enabled."
+    )
 
 # Document limits for processing
 DOC_LIMIT_DOCDB = int(os.getenv("DOC_LIMIT_DOCDB", "50"))
@@ -47,7 +62,7 @@ DOC_LIMIT_INDICO = int(os.getenv("DOC_LIMIT_INDICO", "50"))
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE",4000))
 
 STORE = os.getenv("VECTOR_STORE", 'chroma')
-# FAISS Configuration
+# Database Configuration
 CHROMA_PATH=os.getenv('DB_PATH',None)
 FAISS_DIR = BASE_DIR / "data" / "faiss"
 FAISS_INDEX_PATH = FAISS_DIR / "faiss_index.index"
@@ -127,3 +142,21 @@ def create_directories(path):
     """Create necessary directories if they don't exist"""
     FAISS_DIR=BASE_DIR / path
     FAISS_DIR.mkdir(parents=True, exist_ok=True) 
+
+# AskDUNE website feedback configuration
+WEB_FEEDBACK_ENABLED = os.getenv(
+    "WEB_FEEDBACK_ENABLED", "false"
+).lower() == "true"
+
+WEB_FEEDBACK_DIR = os.getenv(
+    "WEB_FEEDBACK_DIR",
+    "/exp/dune/data/users/dune/askdune/web_feedback"
+)
+
+WEB_TEMP_FEEDBACK_ENABLED = os.getenv(
+    "WEB_TEMP_FEEDBACK_ENABLED", "false"
+).lower() == "true"
+
+WEB_FEEDBACK_SHEETS_ENABLED = os.getenv(
+    "WEB_FEEDBACK_SHEETS_ENABLED", "false"
+).lower() == "true"

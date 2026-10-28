@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="static/styles.css">
+
     <title>AskDUNE</title>
 
     <style>
@@ -12,338 +12,1173 @@
             box-sizing: border-box;
         }
 
+        html,
         body {
-            font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            min-height: 100%;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
             min-height: 100vh;
+            color: #222;
+
+            /* Subtle DUNE-inspired background */
+            background:
+                radial-gradient(circle at 85% 15%,
+                    rgba(64, 155, 210, 0.10),
+                    transparent 28%),
+                linear-gradient(135deg, #f8fbfe 0%, #edf5fb 100%);
         }
 
-        h1 {
-            max-width: 800px;
-            margin: 0 0 20px 0;
-            padding: 0 15px;
+        /* =========================
+           HEADER
+           ========================= */
+
+        .top-header {
+            width: 100%;;
+            padding: 20px 32px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
         }
 
-        .header-section {
-            max-width: 800px;
-            margin: 0 0 30px 0;
-            padding: 0 15px;
+        .brand h1 {
+            margin: 0;
+            padding: 0;
+
+            font-size: 40px;
+            line-height: 1;
+            font-weight: 700;
+            letter-spacing: -1.2px;
+
+            color: #171717;
         }
 
-        textarea {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            resize: none;
+        .brand p {
+            margin: 9px 0 0 2px;
+
+            color: #667085;
+            font-size: 15px;
+        }
+
+        #dune-logo {
+            width: 190px;
+            max-width: 30vw;
+            height: auto;
+        }
+
+        /* =========================
+           MAIN CHAT AREA
+           ========================= */
+
+        .chat-wrapper {
+            width: calc(100% - 40px);
+            max-width: 1100px;
+
+            margin: 10px auto 50px auto;
+        }
+
+        .chat-card {
+            background: rgba(255, 255, 255, 0.96);
+
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            border-radius: 16px;
+
+            box-shadow:
+                0 8px 30px rgba(30, 60, 90, 0.07);
+
             overflow: hidden;
-            min-height: 50px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
         }
 
-        button {
-            padding: 8px 16px;
-            font-size: 16px;
-            margin-top: 10px;
-        }
+        /* =========================
+           ANSWER / MESSAGE AREA
+           ========================= */
 
         #answer {
+            min-height: 480px;
+
             display: flex;
             flex-direction: column;
             gap: 15px;
-            padding-bottom: 100px;
-            max-width: 800px;
-            margin: 0 auto;
-            width: 100%;
+
+            padding: 32px;
         }
 
+        /* Initial welcome screen */
+
+        .welcome-message {
+            margin: auto;
+            max-width: 600px;
+
+            text-align: center;
+            color: #667085;
+        }
+
+        .welcome-message h2 {
+            margin: 0 0 10px 0;
+
+            color: #252525;
+            font-size: 26px;
+            font-weight: 600;
+        }
+
+        .welcome-message p {
+            margin: 0;
+
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        /* =========================
+           CHAT BUBBLES
+           ========================= */
+
         .message {
-            max-width: 80%;
-            padding: 12px 16px;
-            border-radius: 15px;
-            margin: 5px 0;
-            line-height: 1.5;
+            max-width: 78%;
+
+            padding: 13px 17px;
+
+            border-radius: 16px;
+
+            line-height: 1.55;
+            font-size: 15px;
+
+            overflow-wrap: break-word;
         }
 
         .user-message {
             align-self: flex-end;
-            background-color: #007bff;
+
+            background-color: #087cf0;
             color: white;
-            border-bottom-right-radius: 2px;
+
+            border-bottom-right-radius: 4px;
         }
 
         .ai-message {
             align-self: flex-start;
-            background-color: #f1f0f0;
+
+            background-color: #f1f3f5;
             color: #333;
-            border-bottom-left-radius: 2px;
+
+            border-bottom-left-radius: 4px;
         }
 
+        .ai-message p:first-child {
+            margin-top: 0;
+        }
+
+        .ai-message p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* =========================
+           SOURCES
+           ========================= */
+
         .sources-list {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #dcdcdc;
+            margin-top: 16px;
+            padding-top: 14px;
             padding-left: 20px;
+
+            border-top: 1px solid #d9dde2;
         }
 
         .sources-list li {
-            margin-bottom: 5px;
-            word-break: break-all;
+            margin-bottom: 7px;
+
+            word-break: break-word;
         }
 
-        form {
-            max-width: 800px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 15px;
-            position: sticky;
-            background: white;
-            border-top: 1px solid #eee;
-            box-sizing: border-box;
+        .sources-list a {
+            color: #075cab;
         }
 
-        /* Spinner */
-        .spinner-container {
+
+	.feedback-bar {
+    	    display: flex;
+    	    align-items: center;
+            gap: 10px;
+    	    flex-wrap: wrap;
+    	    margin-top: 16px;
+    	    padding-top: 10px;
+    	    border-top: 1px solid #e5e7eb;
+    	    font-size: 12px;
+    	    color: #64748b;
+	}
+
+	.feedback-button {
+    	    border: 1px solid #e2e8f0;
+    	    background: #fff;
+    	    border-radius: 6px;
+    	    padding: 5px 9px;
+    	    cursor: pointer;
+    	    font-size: 15px;
+	}
+
+	.feedback-button:hover {
+    	    background: #f1f5f9;
+	}
+
+	.feedback-button:disabled {
+    	    opacity: 0.5;
+    	    cursor: default;
+	}
+
+	.feedback-status {
+    	    font-size: 12px;
+    	    color: #475569;
+	}
+
+
+        /* ---------------------------------
+           Negative feedback popup
+           --------------------------------- */
+
+        .feedback-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 40px;
-            gap: 15px;
+            padding: 20px;
+            z-index: 9999;
         }
 
-        .spinner-icon {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
+        .feedback-modal {
+            background: #ffffff;
+            color: #1e293b;
+            width: 100%;
+            max-width: 460px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
         }
+
+        .feedback-modal h3 {
+            margin: 0 0 8px;
+            font-size: 18px;
+        }
+
+        .feedback-modal p {
+            font-size: 13px;
+            margin: 8px 0 14px;
+        }
+
+        .feedback-reason {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 0;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .feedback-reason input {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
+        .feedback-comment {
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: 14px;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            font: inherit;
+            resize: vertical;
+        }
+
+        .feedback-privacy {
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        .feedback-error {
+            color: #b91c1c;
+        }
+
+        .feedback-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .feedback-actions button {
+            padding: 9px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            cursor: pointer;
+        }
+
+        .feedback-submit {
+            background: #2563eb;
+            border-color: #2563eb !important;
+            color: white;
+        }
+
+        .feedback-actions button:disabled {
+            opacity: 0.6;
+            cursor: default;
+        }
+	
+        /* =========================
+           INPUT AREA
+           ========================= */
+
+        form {
+            width: 100%;
+
+            margin: 0;
+            padding: 20px 24px 22px 24px;
+
+            background: #ffffff;
+
+            border-top: 1px solid #e8eaed;
+        }
+
+        textarea {
+            display: block;
+
+            width: 100%;
+            min-height: 58px;
+            max-height: 180px;
+
+            padding: 15px;
+
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 16px;
+
+            resize: none;
+            overflow-y: auto;
+
+            background: #fff;
+
+            border: 1px solid #d3d8de;
+            border-radius: 9px;
+
+            outline: none;
+
+            transition:
+                border-color 0.15s ease,
+                box-shadow 0.15s ease;
+        }
+
+        textarea:focus {
+            border-color: #1683e8;
+
+            box-shadow:
+                0 0 0 3px rgba(22, 131, 232, 0.10);
+        }
+
+        .input-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        button {
+            margin-top: 12px;
+
+            padding: 10px 23px;
+
+            font-size: 15px;
+            font-weight: 600;
+
+            color: white;
+            background: #087cf0;
+
+            border: none;
+            border-radius: 7px;
+
+            cursor: pointer;
+
+            transition:
+                background-color 0.15s ease,
+                transform 0.05s ease;
+        }
+
+        button:hover {
+            background: #066ed5;
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        /* =========================
+           LOADING
+           ========================= */
 
         .spinner-text {
-            font-size: 14px;
             color: #5f6368;
         }
 
-        a {
-            color: #0645AD;
+        /* =========================
+           FOOTER
+           ========================= */
+
+        .footer {
+            text-align: center;
+
+            margin: 20px 0 35px 0;
+
+            color: #8a929c;
+            font-size: 12px;
         }
 
-        .loader {
-            border: 6px solid #f3f3f3;
-            border-top: 6px solid #555;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin-top: 10px;
-        }
+        /* =========================
+           MOBILE
+           ========================= */
 
-        #dune-logo {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            width: 200px;
-            height: auto;
-            z-index: 9999;
-            max-width: calc(100vw - 40px);
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* Tablet and smaller */
         @media (max-width: 768px) {
-            body {
-                padding: 10px;
+
+            .top-header {
+                min-height: 105px;
+
+                padding: 22px 20px;
             }
 
-            h1 {
-                padding: 0 10px;
+            .brand h1 {
+                font-size: 31px;
             }
 
-            form {
-                padding: 0 10px;
+            .brand p {
+                font-size: 13px;
+            }
+
+            #dune-logo {
+                width: 130px;
+            }
+
+            .chat-wrapper {
+                width: calc(100% - 20px);
+
+                margin-top: 20px;
             }
 
             #answer {
-                padding: 15px 10px;
+                min-height: 300px;
+
+                padding: 20px;
             }
 
-            #dune-logo {
-                width: 120px;
-                top: 10px;
-                right: 10px;
+            .message {
+                max-width: 88%;
+            }
+
+            form {
+                padding: 16px;
             }
         }
 
-        /* Mobile phones */
         @media (max-width: 480px) {
-            h1 {
-                font-size: 1.5rem;
-            }
 
-            textarea {
-                font-size: 14px;
-            }
-
-            button {
-                font-size: 14px;
-                padding: 6px 12px;
+            .brand p {
+                max-width: 180px;
             }
 
             #dune-logo {
-                width: 100px;
+                width: 105px;
             }
-        }
+
+            .welcome-message h2 {
+                font-size: 22px;
+            }
+
+            #answer {
+                min-height: 280px;
+            }
+       	}
+	
+	.header-right {
+    	    display: flex;
+    	    flex-direction: column;
+    	    align-items: center;
+    	    gap: 12px;
+	}
+
+	.logout-link {
+
+    	    display: inline-flex;
+    	    align-items: center;
+    	    justify-content: center;
+
+    	    padding: 7px 16px;
+    	    border: 1px solid #006dcc;
+    	    border-radius: 6px;
+
+    	    color: #006dcc;
+    	    background: white;
+    	    text-decoration: none;
+    	    font-size: 14px;
+    	    font-weight: 600;
+	}
+
+	.logout-link:hover {
+    	    background: #006dcc;
+    	    color: white;
+    	    text-decoration: none;
+	}
+
     </style>
 </head>
 
+
 <body>
-    <h1>AskDUNE</h1>
 
-    {% if auth_enabled %}
-    <div style="margin-bottom: 20px; padding: 10px; background-color: #f0f8ff; border-radius: 5px;">
-        {% if user %}
-        <p>✅ <strong>Authenticated as:</strong> {{ user.email }}</p>
-        <a href="/logout" style="color: #dc3545; text-decoration: none;">🚪 Logout</a>
-        {% else %}
-        <p>🔐 <strong>Authentication Required</strong></p>
-        <a href="/login" style="color: #007bff; text-decoration: none;">🔑 Login with Fermilab</a>
-        {% endif %}
-    </div>
-    {% endif %}
+    <!-- =========================
+         HEADER
+         ========================= -->
 
-    {% if not auth_enabled or user %}
-    <div id="answer">
-    </div>
+    <header class="top-header">
 
-    <form>
-        <textarea id='input' placeholder="Ask a question:" cols="50"></textarea>
-        <button type="submit">Send</button>
-    </form>
+        <div class="brand">
+            <h1>AskDUNE</h1>
+            <p>DUNE Collaboration Knowledge Assistant</p>
+        </div>
 
-    <pre id="body"></pre>
+	<div class="header-right">
+    	    <img
+        	src="static/images/DUNElogo_color.png"
+        	alt="DUNE Logo"
+        	id="dune-logo"
+    	    >
 
+            <a href="/logout" class="logout-link">Logout</a>
+
+	</div>
+
+    </header>
+
+
+    <!-- =========================
+         CHAT
+         ========================= -->
+
+    <main class="chat-wrapper">
+
+        <div class="chat-card">
+
+            <div id="answer">
+
+                <div class="welcome-message" id="welcome-message">
+                    <h2>Welcome to AskDUNE</h2>
+
+                    <p>
+                        Ask questions about DUNE documentation,
+                        meetings, detector systems, and collaboration knowledge.
+                    </p>
+                </div>
+
+            </div>
+
+            <form id="question-form">
+
+                <textarea
+                    id="input"
+                    placeholder="Ask AskDUNE a question..."
+                    rows="1"
+                ></textarea>
+
+                <div class="input-actions">
+
+                    <label for="search-docs" style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; margin-right: 20px; transform: translateY(5px);">
+			<input
+                            type="checkbox"
+                            id="search-docs"
+                            checked
+                        >
+                        Search DUNE documents
+                    </label>
+
+                    <button type="submit">Send</button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+        <div class="footer">
+            AskDUNE &bull; Deep Underground Neutrino Experiment
+        </div>
+
+    </main>
+
+
+    <!-- Markdown renderer -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script>
-        const body = document.getElementById('answer');
-        const submit_btn = document.querySelector('button');
-        const input = document.getElementById('input');
-        const sourcesRow = document.getElementById('sources-row');
 
-        input.addEventListener('input', function () {
-            this.style.height = 'auto';
-            this.style.height = this.scrollHeight + 'px';
+
+    <script>
+
+        const body = document.getElementById("answer");
+        const form = document.getElementById("question-form");
+        const input = document.getElementById("input");
+
+
+        /* ---------------------------------
+           Automatically resize text box
+           --------------------------------- */
+
+        input.addEventListener("input", function () {
+
+            this.style.height = "auto";
+
+            this.style.height =
+                Math.min(this.scrollHeight, 180) + "px";
+
         });
 
-        submit_btn.addEventListener("click", async (e) => {
+
+        /* ---------------------------------
+           Submit question
+           --------------------------------- */
+
+        form.addEventListener("submit", async (e) => {
+
             e.preventDefault();
+
             const userPrompt = input.value.trim();
+
             if (!userPrompt) {
                 return;
             }
 
-            const userDiv = document.createElement('div');
-            userDiv.className = 'message user-message';
-            userDiv.textContent = userPrompt;
+
+            /* Remove welcome message after
+               first question */
+
+            const welcome =
+                document.getElementById("welcome-message");
+
+            if (welcome) {
+                welcome.remove();
+            }
+
+
+            /* User bubble */
+
+            const userDiv =
+                document.createElement("div");
+
+            userDiv.className =
+                "message user-message";
+
+            userDiv.textContent =
+                userPrompt;
+
             body.appendChild(userDiv);
 
-            input.value = '';
-            input.style.height = 'auto';
 
-            const aiDiv = document.createElement('div');
-            aiDiv.className = 'message ai-message';
-            aiDiv.innerHTML = `<div class="spinner-text">Thinking...</div>`;
+            /* Reset text box */
+
+            input.value = "";
+
+            input.style.height = "auto";
+
+
+            /* AI bubble */
+
+            const aiDiv =
+                document.createElement("div");
+
+            aiDiv.className =
+                "message ai-message";
+
+            aiDiv.innerHTML =
+                '<div class="spinner-text">Thinking...</div>';
+
             body.appendChild(aiDiv);
 
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
 
-            const formData = new FormData();
-            formData.append('question', userPrompt);
-
-            const response = await fetch("/ui", {
-                method: "POST",
-                body: formData
+            aiDiv.scrollIntoView({
+                behavior: "smooth",
+                block: "nearest"
             });
 
-            const reader = response.body.getReader();
-            let output = "";
 
-            while (true) {
-                const { done, value } = await reader.read();
-                const chunk = new TextDecoder().decode(value);
+            /* ---------------------------------
+               Send request to AskDUNE backend
 
-                if (chunk.includes('STATUS:')) {
-                    continue;
+               This will return 404 until /ui
+               is connected to askdunegpvm01.
+               --------------------------------- */
+
+            try {
+
+                const formData =
+		    new FormData();
+
+                formData.append(
+                    "question",
+                    userPrompt
+                );
+
+                formData.append(
+                    "search_docs",
+                    document.getElementById("search-docs").checked
+                        ? "true"
+                        : "false"
+                );
+
+
+                const response =
+                    await fetch("/ui", {
+
+                        method: "POST",
+
+                        body: formData
+
+                    });
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "HTTP " + response.status
+                    );
+
                 }
 
-                output += chunk;
+		
+		const responseId = response.headers.get("X-Response-ID");
+                const reader =
+                    response.body.getReader();
 
-                if (output.includes('SOURCES: ')) {
-                    const [answerText, sourcesJson] = output.split('SOURCES: ');
-                    aiDiv.innerHTML = marked.parse(answerText);
+                const decoder =
+                    new TextDecoder();
 
-                    try {
-                        const sources = JSON.parse(sourcesJson);
-                        if (sources && sources.length > 0) {
-                            const sourcesContainer = document.createElement('ul');
-                            sourcesContainer.className = 'sources-list';
+                let output = "";
+                let streamFinished = false;
 
-                            sources.forEach(source => {
-                                addSourceToBubble(source, sourcesContainer);
-                            });
+                while (true) {
 
-                            aiDiv.appendChild(sourcesContainer);
-                        }
-                    } catch (e) {
-                        console.error("Error parsing sources:", e);
+                    const { done, value } = await reader.read();
+
+                    if (done) {
+                        streamFinished = true;
+                        break;
                     }
 
-                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-                    break;
-                } else {
-                    aiDiv.innerHTML = marked.parse(output);
+                    if (!value) {
+                        continue;
+                    }
+
+                    const chunk = decoder.decode(
+                        value,
+                        { stream: true }
+                    );
+
+                    // Remove the backend processing marker.
+                    output += chunk.replace(
+                        "STATUS:PROCESSING",
+                        ""
+                    );
+
+                    // Display the answer progressively.
+                    // Do not display source metadata as answer text.
+                    const splitIndex = output.indexOf("SOURCES: ");
+
+                    const answerText = splitIndex >= 0
+                        ? output.substring(0, splitIndex)
+                        : output;
+
+                    if (answerText.trim()) {
+                        aiDiv.innerHTML = marked.parse(answerText);
+                    }
                 }
 
-                window.scrollTo(0, document.body.scrollHeight);
+                // Flush any remaining decoded characters.
+                output += decoder.decode();
 
-                if (done) {
-                    break;
+                // Process source metadata only after streaming ends.
+                if (streamFinished) {
+
+                    const splitIndex = output.indexOf("SOURCES: ");
+
+                    const answerText = splitIndex >= 0
+                        ? output.substring(0, splitIndex)
+                        : output;
+
+                    aiDiv.innerHTML = marked.parse(answerText);
+
+                    if (splitIndex >= 0) {
+
+                        const sourcesJson = output.substring(
+                            splitIndex + "SOURCES: ".length
+                        );
+
+                        try {
+
+                            const sources = JSON.parse(sourcesJson);
+
+                            if (Array.isArray(sources) && sources.length > 0) {
+
+                                const sourcesHeading =
+                                    document.createElement("div");
+
+                                sourcesHeading.textContent = "Sources";
+                                sourcesHeading.style.fontWeight = "600";
+                                sourcesHeading.style.marginTop = "16px";
+                                sourcesHeading.style.marginBottom = "6px";
+
+                                aiDiv.appendChild(sourcesHeading);
+
+                                const sourcesContainer =
+                                    document.createElement("ol");
+
+                                sourcesContainer.className = "sources-list";
+
+                                sources.forEach(source => {
+                                    addSourceToBubble(
+                                        source,
+                                        sourcesContainer
+                                    );
+                                });
+
+                                aiDiv.appendChild(sourcesContainer);
+                            }
+
+                        } catch (error) {
+
+                            console.error(
+                                "Error parsing sources:",
+                                error
+                            );
+
+                        }
+                    }
                 }
+
+                // Add feedback controls after the answer finishes.
+                if (responseId) {
+                    const feedbackBar = document.createElement("div");
+                    feedbackBar.className = "feedback-bar";
+
+                    const feedbackLabel = document.createElement("span");
+                    feedbackLabel.textContent = "Was this answer helpful?";
+                    feedbackBar.appendChild(feedbackLabel);
+
+                    const upButton = document.createElement("button");
+                    upButton.type = "button";
+                    upButton.className = "feedback-button";
+                    upButton.textContent = "👍";
+                    upButton.title = "Helpful answer";
+                    upButton.setAttribute("aria-label", "Helpful answer");
+
+                    const downButton = document.createElement("button");
+                    downButton.type = "button";
+                    downButton.className = "feedback-button";
+                    downButton.textContent = "👎";
+                    downButton.title = "Not helpful";
+                    downButton.setAttribute("aria-label", "Not helpful");
+
+                    feedbackBar.appendChild(upButton);
+                    feedbackBar.appendChild(downButton);
+
+                    const feedbackStatus = document.createElement("span");
+                    feedbackStatus.className = "feedback-status";
+                    feedbackBar.appendChild(feedbackStatus);
+
+                    aiDiv.appendChild(feedbackBar);
+
+                    upButton.addEventListener("click", async () => {
+                        upButton.disabled = true;
+                        downButton.disabled = true;
+
+                        try {
+                            const feedbackResponse = await fetch(
+                                "/api/web-feedback",
+                                {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/json"
+                                    },
+                                    body: JSON.stringify({
+                                        response_id: responseId,
+                                        rating: "positive"
+                                    })
+                                }
+                            );
+
+                            if (!feedbackResponse.ok) {
+                                throw new Error(
+                                    "Feedback HTTP " + feedbackResponse.status
+                                );
+                            }
+
+                            feedbackStatus.textContent = "Thank you for your feedback!";
+                        } catch (error) {
+                            feedbackStatus.textContent =
+                                "Unable to save feedback. Please try again.";
+                            upButton.disabled = false;
+                            downButton.disabled = false;
+                            console.error("Feedback submission failed:", error);
+                        }
+                    });
+
+                    downButton.addEventListener("click", () => {
+                        showNegativeFeedbackModal(responseId, feedbackStatus);
+                    });
+                }
+
             }
+
+            catch (error) {
+
+                /*
+                 Temporary friendly message
+                 while backend routing is
+                 being configured.
+                */
+
+                aiDiv.innerHTML =
+                    "<strong>Unable to reach the AskDUNE backend.</strong>" +
+                    "<br><br>" +
+                    "The web interface is available, but the backend " +
+                    "connection is not configured yet.";
+
+
+                console.error(
+                    "AskDUNE request failed:",
+                    error
+                );
+
+            }
+
+
+            aiDiv.scrollIntoView({
+                behavior: "smooth",
+                block: "nearest"
+            });
+
         });
 
-        function addSourceToBubble(source, container) {
-            try {
-                const url = source.url || source;
 
-                const listItem = document.createElement('li');
-                const link = document.createElement('a');
-                link.href = url;
-                link.target = '_blank';
-                link.textContent = url;
 
-                listItem.appendChild(link);
-                container.appendChild(listItem);
-            } catch (e) {
-                console.error('Error adding source:', e);
+        /* ---------------------------------
+           Negative feedback popup
+           --------------------------------- */
+
+        function showNegativeFeedbackModal(responseId, feedbackStatus) {
+            if (document.getElementById("negative-feedback-overlay")) {
+                return;
             }
-        }
-    </script>
-    {% endif %}
 
-    <img src="static/images/DUNElogo_color.png" alt="DUNE Logo" id="dune-logo">
+            const reasons = [
+                "Inaccurate response",
+                "Incorrect or irrelevant references",
+                "Outdated information",
+                "Incomplete response",
+                "Answer did not address my question",
+                "Other"
+            ];
+
+            const overlay = document.createElement("div");
+            overlay.id = "negative-feedback-overlay";
+            overlay.className = "feedback-overlay";
+
+            const modal = document.createElement("div");
+            modal.className = "feedback-modal";
+            modal.setAttribute("role", "dialog");
+            modal.setAttribute("aria-modal", "true");
+            modal.setAttribute("aria-label", "AskDUNE feedback");
+
+            const heading = document.createElement("h3");
+            heading.textContent = "What went wrong with this answer?";
+            modal.appendChild(heading);
+
+            const description = document.createElement("p");
+            description.textContent = "Select all that apply.";
+            modal.appendChild(description);
+
+            const checkboxes = [];
+
+            reasons.forEach(reason => {
+                const label = document.createElement("label");
+                label.className = "feedback-reason";
+
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.value = reason;
+
+                const text = document.createElement("span");
+                text.textContent = reason;
+
+                label.appendChild(checkbox);
+                label.appendChild(text);
+                modal.appendChild(label);
+
+                checkboxes.push(checkbox);
+            });
+
+            const comment = document.createElement("textarea");
+            comment.className = "feedback-comment";
+            comment.placeholder = "Additional details (optional)";
+            comment.rows = 3;
+            comment.maxLength = 2000;
+            modal.appendChild(comment);
+
+            const privacyNotice = document.createElement("p");
+            privacyNotice.className = "feedback-privacy";
+            privacyNotice.textContent =
+                "Submitting feedback saves your question, the AskDUNE answer, " +
+                "its references, and any feedback you provide for improving AskDUNE.";
+            modal.appendChild(privacyNotice);
+
+            const errorMessage = document.createElement("p");
+            errorMessage.className = "feedback-error";
+            modal.appendChild(errorMessage);
+
+            const actions = document.createElement("div");
+            actions.className = "feedback-actions";
+
+            const cancelButton = document.createElement("button");
+            cancelButton.type = "button";
+            cancelButton.textContent = "Cancel";
+
+            const submitButton = document.createElement("button");
+            submitButton.type = "button";
+            submitButton.textContent = "Submit feedback";
+            submitButton.className = "feedback-submit";
+
+            actions.appendChild(cancelButton);
+            actions.appendChild(submitButton);
+            modal.appendChild(actions);
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+
+            const closeModal = () => overlay.remove();
+
+            cancelButton.addEventListener("click", closeModal);
+
+            overlay.addEventListener("click", event => {
+                if (event.target === overlay) {
+                    closeModal();
+                }
+            });
+
+            submitButton.addEventListener("click", async () => {
+                const selectedReasons = checkboxes
+                    .filter(checkbox => checkbox.checked)
+                    .map(checkbox => checkbox.value);
+
+                if (selectedReasons.length === 0) {
+                    errorMessage.textContent =
+                        "Please select at least one reason.";
+                    return;
+                }
+
+                submitButton.disabled = true;
+                cancelButton.disabled = true;
+                errorMessage.textContent = "";
+
+                try {
+                    const response = await fetch("/api/web-feedback", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            response_id: responseId,
+                            rating: "negative",
+                            reasons: selectedReasons,
+                            comment: comment.value.trim()
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error("Feedback HTTP " + response.status);
+                    }
+
+                    feedbackStatus.textContent = "Thank you for your feedback!";
+                    closeModal();
+
+                } catch (error) {
+                    errorMessage.textContent =
+                        "Unable to save feedback. Please try again.";
+                    submitButton.disabled = false;
+                    cancelButton.disabled = false;
+                    console.error("Negative feedback failed:", error);
+                }
+            });
+
+            cancelButton.focus();
+        }
+
+
+        /* ---------------------------------
+           Add source links
+           --------------------------------- */
+
+        function addSourceToBubble(
+            source,
+            container
+        ) {
+
+            try {
+
+                const url =
+                    source.url || source;
+
+
+                const listItem =
+                    document.createElement(
+                        "li"
+                    );
+
+
+                const link =
+                    document.createElement(
+                        "a"
+                    );
+
+
+                link.href = url;
+
+                link.target = "_blank";
+
+                link.rel =
+                    "noopener noreferrer";
+
+                link.textContent =
+                    url;
+
+
+                listItem.appendChild(
+                    link
+                );
+
+
+                container.appendChild(
+                    listItem
+                );
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Error adding source:",
+                    error
+                );
+
+            }
+
+        }
+
+    </script>
+
 </body>
 
 </html>

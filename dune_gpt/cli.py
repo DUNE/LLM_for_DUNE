@@ -9,7 +9,7 @@ import click
 from pathlib import Path
 import sys
 from src.indexing.indexer import IndexingJob
-from config import DB_PATH
+from config import DB_PATH, INDEXING_DB_PATH
 
 # this loads variables from your .env file into the environment
 load_dotenv()
@@ -74,7 +74,8 @@ def cli():
 @click.option(
     '--data-path',
     type=str,
-    default='data',
+    default=None,
+    help='Database path for indexing (defaults to INDEXING_DB_PATH)',
 )
 
 @click.option('--force', is_flag=True, help='Force reprocessing of existing entries')
@@ -93,7 +94,17 @@ def index(docdb_limit, indico_limit, start_idx_ddb, start_idx_ind, docdb_latest_
         start_idx_ind = int(os.getenv('IND_START_IDX', start_idx_ind))
         docdb_limit = int(os.getenv('DOCUMENT_LIMIT', docdb_limit))
         indico_limit = int(os.getenv('DOCUMENT_LIMIT', indico_limit))
-        data_path = os.getenv("DB_PATH", data_path)
+        data_path = data_path or INDEXING_DB_PATH
+        
+        if not data_path:
+            raise click.ClickException(
+            "INDEXING_DB_PATH is not configured"
+            )
+
+        if os.path.realpath(data_path) == os.path.realpath(DB_PATH):
+            raise click.ClickException(
+                "Refusing to index into the production database."
+        )
 
         # Initialize entry processor
         logger.debug("Init processor")
@@ -227,9 +238,14 @@ def serve():
 
 @cli.command()
 def index_job():
-    job = IndexingJob(DB_PATH)
+    if not INDEXING_DB_PATH:
+        raise click.ClickException(
+            "INDEXING_DB_PATH is not configured"
+        )
+
+    job = IndexingJob(INDEXING_DB_PATH)
     job.run()
-    
+
 @cli.command()
 def health():
     """Check system health"""

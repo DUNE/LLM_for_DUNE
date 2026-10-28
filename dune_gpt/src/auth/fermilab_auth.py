@@ -75,6 +75,8 @@ class FermilabAuth:
             # Get user info
             user_info = await self.oauth.fermilab.userinfo(token=token)
             user_dict = dict(user_info)
+            #logger.info(f"OAuth userinfo fields: {list(user_dict.keys())}")
+            #logger.info(f"Fermilab groups: {user_dict.get('groups', [])}")
             
             # Store in session
             request.session["user"] = user_dict
@@ -96,19 +98,14 @@ class FermilabAuth:
         logger.info(f"User logged out: {user_email}")
     
     def is_user_authorized(self, user: Dict[str, Any], required_groups: list = None) -> bool:
-        """Check if user is authorized (can be extended for group-based auth)"""
-        if not user:
+        """Check whether an authenticated user belongs to an authorized group."""
+        if not user or not user.get("email"):
             return False
-        
-        # Basic check - user has email
-        if not user.get("email"):
-            return False
-        
-        # TODO: Add group-based authorization if needed
-        # if required_groups:
-        #     user_groups = user.get("groups", [])
-        #     return any(group in user_groups for group in required_groups)
-        
+
+        if required_groups:
+            user_groups = user.get("groups", [])
+            return any(group in user_groups for group in required_groups)
+
         return True
 
 # Global auth instance

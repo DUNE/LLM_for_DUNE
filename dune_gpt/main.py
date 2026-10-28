@@ -10,6 +10,9 @@ from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 import uvicorn
 from typing import Optional, Dict, Any
+from config import WEB_FEEDBACK_ENABLED, WEB_TEMP_FEEDBACK_ENABLED
+from src.web_feedback.registry import create_response, complete_response
+from src.web_feedback.routes import router as web_feedback_router
 
 from config import (
     HOST, PORT, DEBUG, ARGO_API_USERNAME, ARGO_API_KEY,
@@ -107,15 +110,41 @@ async def get_user_if_auth_enabled(request: Request) -> Optional[Dict[str, Any]]
     return await fermilab_auth.get_current_user_optional(request)
 
 async def require_auth_if_enabled(request: Request) -> Optional[Dict[str, Any]]:
-    """Require authentication if enabled"""
+    """Require authentication and DUNE membership if enabled"""
     if not ENABLE_AUTHENTICATION:
         return None
-    return await fermilab_auth.get_current_user(request)
+
+    user = await fermilab_auth.get_current_user(request)
+
+    dune_groups = [
+        "fnal:grp:Experiment-DUNE",
+        "fnal:grp:docdb-dune-dune",
+    ]
+
+    if not fermilab_auth.is_user_authorized(user, dune_groups):
+        logger.warning(
+            f"Access denied for authenticated non-DUNE user: "
+            f"{user.get('email', 'unknown')}"
+        )
+        raise HTTPException(
+            status_code=403,
+            detail="Access to AskDUNE is restricted to DUNE collaboration members."
+        )
+
+    return user
+
+app.state.feedback_auth_dependency = require_auth_if_enabled
+app.include_router(web_feedback_router)
 
 # Exception handler for authentication redirects
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
-    if exc.status_code == status.HTTP_401_UNAUTHORIZED and ENABLE_AUTHENTICATION:
+    if (
+        exc.status_code == status.HTTP_401_UNAUTHORIZED
+        and ENABLE_AUTHENTICATION
+        and not request.url.path.startswith("/api/")
+    ):
+    #if exc.status_code == status.HTTP_401_UNAUTHORIZED and ENABLE_AUTHENTICATION:
         return RedirectResponse(url="/login")
     return JSONResponse(
         status_code=exc.status_code,
@@ -135,18 +164,25 @@ if ENABLE_AUTHENTICATION:
         """Handle OAuth2 callback"""
         logger.info("Processing OAuth2 callback")
         await fermilab_auth.handle_callback(request)
-        return RedirectResponse(url="/ui")
+        return RedirectResponse(url="/")
     
     @app.get("/logout")
     async def logout(request: Request):
         """Logout user"""
         fermilab_auth.logout_user(request)
-        return RedirectResponse(url="/ui")
+        return RedirectResponse(url="/")
 
 @app.get("/", response_class=HTMLResponse)
-async def root(request: Request, user: Optional[Dict[str, Any]] = Depends(get_user_if_auth_enabled)):
-    """Redirect to main UI"""
-    return RedirectResponse(url="/ui")
+async def root(request: Request, user: Optional[Dict[str, Any]] = Depends(require_auth_if_enabled)):
+    """Display the authenticated main UI"""
+    return templates.TemplateResponse("index.html", {
+        "request": request,
+        "question": "",
+        "answer": None,
+        "reference": [],
+        "user": user,
+        "auth_enabled": ENABLE_AUTHENTICATION
+    })
 
 @app.get("/ui", response_class=HTMLResponse)
 async def form_get(request: Request, user: Optional[Dict[str, Any]] = Depends(require_auth_if_enabled)):
@@ -161,31 +197,103 @@ async def form_get(request: Request, user: Optional[Dict[str, Any]] = Depends(re
     })
 
 @app.post("/ui", response_class=HTMLResponse)
-async def form_post(request: Request, question: str = Form(...), user: Optional[Dict[str, Any]] = Depends(require_auth_if_enabled)):
+async def form_post(
+    request: Request,
+    question: str = Form(...),
+    search_docs: bool = Form(True),
+    user: Optional[Dict[str, Any]] = Depends(require_auth_if_enabled)
+):
     """Handle form submission and return results"""
     try:
-        logger.info(f"Question received from {user.get('email', 'anonymous') if user else 'anonymous'}: {question}")
-        # Search Chroma index
-        context_snippets, references = db_manager.search(question, k_docs= K_DOCS, top_k=DEFAULT_TOP_K)
-        context = "\n\n".join(context_snippets)
-        
-        # Get answer from Fermilab API
-        return StreamingResponse(llm_client.chat_completion(question, context, links=references), media_type="text/html")
+        # Log incoming question without recording its content.
+        logger.info("AskDUNE question received")
 
-    
+        # Retrieve DUNE documents only when explicitly requested.
+        if search_docs:
+            context_snippets, references = db_manager.search(
+                question,
+                k_embeddings=K_DOCS,
+                top_k=DEFAULT_TOP_K
+            )
+
+            context = "\n\n".join(context_snippets)
+
+            # Display at most three unique sources.
+            display_references = list(dict.fromkeys(references))[:3]
+
+        else:
+            # General conversation: skip Chroma retrieval.
+            context = ""
+            display_references = []
+
+        # Get answer from Fermilab API.
+        if not WEB_FEEDBACK_ENABLED:
+            return StreamingResponse(
+                llm_client.chat_completion(
+                    question,
+                    context,
+                    links=display_references
+                ),
+                media_type="text/html"
+            )
+
+        # Associate the response with the authenticated SSO user.
+        user_id = (
+            user.get("email")
+            if user and user.get("email")
+            else None
+        )
+
+        response_id = create_response(
+            user_id=user_id,
+            question=question,
+            references=display_references,
+        )
+
+        def tracked_stream():
+            answer_chunks = []
+
+            try:
+                for chunk in llm_client.chat_completion(
+                question,
+                context,
+                links=display_references
+                ):
+                    if (
+                        chunk
+                        and not chunk.startswith("STATUS:")
+                        and not chunk.startswith("SOURCES: ")
+                    ):
+                        answer_chunks.append(chunk)
+
+                    yield chunk
+
+            finally:
+                complete_response(
+                    response_id,
+                    "".join(answer_chunks)
+                )
+
+        return StreamingResponse(
+            tracked_stream(),
+            media_type="text/html",
+            headers={"X-Response-ID": response_id},
+        )
+
     except Exception as e:
-        logger.error(f"Error processing question: {e}")
-        return templates.TemplateResponse("index.html", {
-            "request": request,
-            "question": question,
-            "answer": f"Error processing your question: {str(e)}",
-            "reference": [],
-            "user": user,
-            "auth_enabled": ENABLE_AUTHENTICATION
-        })
+        logger.exception("Error processing AskDUNE question")
+
+        return HTMLResponse(
+            content="An internal error occurred while processing your question.",
+            status_code=500
+        )
 
 @app.get("/api/search")
-async def api_search(q: str, top_k: int = DEFAULT_TOP_K):
+async def api_search(
+    q: str, 
+    top_k: int = DEFAULT_TOP_K,
+    user: Optional[Dict[str, Any]] = Depends(require_auth_if_enabled)
+):
     """API endpoint for search queries"""
     try:
         if not q.strip():
@@ -235,7 +343,9 @@ async def health_check():
         )
 
 @app.get("/api/stats")
-async def get_stats():
+async def get_stats(
+    user: Optional[Dict[str, Any]] = Depends(require_auth_if_enabled)
+):
     """Get application statistics"""
     try:
         return db_manager.get_stats()

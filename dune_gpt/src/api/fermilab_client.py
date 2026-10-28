@@ -26,15 +26,16 @@ class FermilabAPIClient:
         links:list[str]=None,
     ) -> str:
         """Send a chat completion request to Argo API"""
-        print(f"Question is {question} and context length is {len(context.split())}")
-        
+        #print(f"Question is {question} and context length is {len(context.split())}")
+        logger.info(f"LLM request received; context length: {len(context.split())} words")
+
         logger.info(f"Using model {model}")
         payload = {
             "model": model,
             "messages": [
                 {
                     "role": "system", 
-                    "content": "You are a helpful assistant specialized in scientific documentation for the DUNE experiment. Provide succinct answers. If you don't see an answer in the context, preceed your response with 'This answer does not reference Indico nor Dune DocDB."                
+                    "content": "You are a helpful assistant specialized in scientific documentation for the DUNE experiment. Provide succinct answers. If you don't see an answer in the context, preceed your response with 'This answer does not reference Indico nor DUNE DocDB."                
                 },
                 {
                     "role": "user", 
@@ -69,11 +70,18 @@ class FermilabAPIClient:
                             content = chunk['choices'][0]['delta'].get('response_content','')
                         yield content
                         response.append(content)
-            if links:
+
+            full_response = ''.join(response)
+
+            no_reference_statement = (
+                "This answer does not reference Indico nor DUNE DocDB"
+            )
+
+            if links and no_reference_statement.lower() not in full_response.lower():
                 sources = [{'url': url} for url in links]
-                yield f'SOURCES: ' + json.dumps(sources)
-            return ' '.join(response)
-        
+                yield 'SOURCES: ' + json.dumps(sources)
+
+            return full_response
         
         # for Ollama LLM
         # try:
@@ -102,9 +110,12 @@ class FermilabAPIClient:
             # return ' '.join(response)
             
         except requests.Timeout:
-            logger.error(f"Fermilab API request timed out {question}, {len(context.split())}")
-            return f"[ERROR] Request to Fermilab API timed out after {timeout} seconds. {context}"
-        
+            #logger.error(f"Fermilab API request timed out {question}, {len(context.split())}")
+            logger.error(f"Fermilab API request timed out; context length: {len(context.split())} words")
+            return (
+                f"[ERROR] Request to Fermilab API timed out "
+                f"after {timeout} seconds."
+            )
         except requests.RequestException as e:
             logger.error(f"Fermilab API request failed: {e}")
             return f"[ERROR] Failed to get response from Fermilab API: {e}"
@@ -116,13 +127,19 @@ class FermilabAPIClient:
     def health_check(self) -> bool:
         """Check if the Fermilab API is accessible"""
         try:
-            # Simple test request
             test_response = self.chat_completion(
                 question="Hello",
                 context="This is a test",
                 timeout=10
             )
-            return not test_response.startswith("[ERROR]")
+
+            first_chunk = next(test_response, None)
+
+            if first_chunk is None:
+                return False
+
+            return not str(first_chunk).startswith("[ERROR]")
+
         except Exception as e:
-            logger.error(f"Argo API health check failed: {e}")
-            return False 
+            logger.error(f"Fermilab API health check failed: {e}")
+            return False        
