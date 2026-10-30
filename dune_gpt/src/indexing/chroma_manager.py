@@ -1,3 +1,4 @@
+from copy import deepcopy
 from collections import defaultdict
 import os
 import pickle
@@ -26,14 +27,17 @@ CHROMA_DB_NAME='DUNE_VECTOR_DB'
 class ChromaManager:
     """Manager for ChromaDB index operations"""
 
-    def __init__(self, db_path):
+    def __init__(self, db_path, indexing_only=False):
         # Prevent thread‐related segfaults
         self.bm25_cache=None
         self._configure_threading()
 
         self.db_path = db_path
 
-        self.reranker=CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2', max_length=512)
+        self.indexing_only = indexing_only
+        self.reranker = None if indexing_only else CrossEncoder(
+            'cross-encoder/ms-marco-MiniLM-L-6-v2', max_length=512
+        )
 
         self.chroma_client = chromadb.PersistentClient(path=self.db_path, settings=Settings())
         print("Collections available:", self.chroma_client.list_collections())
@@ -71,9 +75,139 @@ class ChromaManager:
         # Ensure directories exist
         create_directories(self.db_path)
 
-        self.fetch_ddb_ind_data()
+        if indexing_only:
+            self.fetch_ddb_ind_data_indexing()
+        else:
+            self.fetch_ddb_ind_data()
 
     
+    def fetch_docdb_versions(self, batch_size: int = 1000) -> Dict[str, int]:
+        """Build a lightweight DocDB index from IDs and metadata only."""
+        if batch_size < 1:
+            raise ValueError("batch_size must be positive")
+
+        versions = {}
+        docdb_index = {}
+        offset = 0
+
+        while True:
+            results = self.chroma_collection.get(
+                where={"source": "docdb"},
+                include=["metadatas"],
+                limit=batch_size,
+                offset=offset,
+            )
+
+            ids = results["ids"]
+            metadatas = results["metadatas"]
+
+            for chunk_id, md in zip(ids, metadatas):
+                try:
+                    docid = str(chunk_id).split("_")[0].split("/")[0]
+                    version = int(md["docdb_version"])
+                except (KeyError, TypeError, ValueError, AttributeError) as exc:
+                    logger.warning(
+                        f"Invalid DocDB metadata for {chunk_id}: {exc}"
+                    )
+                    continue
+
+                entry = docdb_index.setdefault(
+                    docid,
+                    {
+                        "version": version,
+                        "chunk_ids": [],
+                        "attachments": set(),
+                    },
+                )
+
+                entry["version"] = max(entry["version"], version)
+                entry["chunk_ids"].append(chunk_id)
+
+                filename = md.get("filename")
+                if filename:
+                    entry["attachments"].add(str(filename))
+
+                versions[docid] = entry["version"]
+
+            if len(ids) < batch_size:
+                break
+
+            offset += len(ids)
+
+        self.docdb_index = docdb_index
+        return versions
+
+    def fetch_ddb_ind_data_indexing(self, batch_size=1000):
+        """Load only existing IDs and metadata needed for indexing."""
+        if batch_size < 1:
+            raise ValueError("batch_size must be positive")
+
+        self.docdb_index = {}
+        offset = 0
+
+        while True:
+            results = self.chroma_collection.get(
+                include=["metadatas"],
+                limit=batch_size,
+                offset=offset,
+            )
+
+            ids = results["ids"]
+            metadatas = results["metadatas"]
+
+            for chunk_id, md in zip(ids, metadatas):
+                md = md or {}
+                self.embedding_ids.append(chunk_id)
+
+                entry_id = str(chunk_id).split("_")[0]
+                docid = entry_id.split("/")[0]
+                self.entry_ids.add(entry_id)
+
+                filename = md.get("filename")
+                if filename:
+                    self.attachment_ids.add(f"{entry_id}_{filename}")
+
+                if md.get("source") == "indico":
+                    self.indico_ids[docid] = True
+
+                elif md.get("source") == "docdb":
+                    entry = self.docdb_index.setdefault(
+                        docid,
+                        {
+                            "version": 0,
+                            "chunk_ids": [],
+                            "attachments": set(),
+                        },
+                    )
+                    entry["chunk_ids"].append(chunk_id)
+
+                    if filename:
+                        entry["attachments"].add(str(filename))
+
+                    try:
+                        version = int(md["docdb_version"])
+                    except (KeyError, TypeError, ValueError) as exc:
+                        raise ValueError(
+                            f"Invalid DocDB version for existing chunk "
+                            f"{chunk_id}: {exc}"
+                        ) from exc
+
+                    entry["version"] = max(entry["version"], version)
+                    self.docdb_versions[docid] = entry["version"]
+
+            if len(ids) < batch_size:
+                break
+
+            offset += len(ids)
+
+        logger.info(
+            "Lightweight indexing initialization: %d chunks, "
+            "%d DocDB documents, %d Indico events",
+            len(self.embedding_ids),
+            len(self.docdb_index),
+            len(self.indico_ids),
+        )
+
     def fetch_ddb_ind_data(self):
         results = self.chroma_collection.get(include=["documents", "metadatas", "uris"])
         for id, md, text in zip(results['ids'], results['metadatas'], results['documents'] ):
@@ -81,12 +215,18 @@ class ChromaManager:
                 self.indico_ids[id.split('_')[0].split("/")[0]]=True
             elif md.get('source') == 'docdb':
                 try:
-                    self.docdb_versions[id.split('_')[0].split("/")[0]] = md['docdb_version']
+                    docid = id.split("_")[0].split("/")[0]
+                    version = int(md["docdb_version"])
+                    self.docdb_versions[docid] = max(
+                        int(self.docdb_versions.get(docid, 0)),
+                        version,
+                    )
                     self.docdb_content_modified[id]  = md['content_last_modified_date']
                     self.docdb_metadata_modified[id] = md['metadata_last_modified_date']
-                except:
-                    logger.error(f"error with {id}")
-                    continue
+                except (KeyError, TypeError, ValueError) as e:
+                    logger.warning(
+                        f"DocDB metadata incomplete for {id}: {e}"
+                    )
             self.metadata[id] = md
             self.embedding_contents[id]=text
 
@@ -99,7 +239,7 @@ class ChromaManager:
                 unique_attachment_id = f"{entry_id}_{filename}"
                 self.attachment_ids.add(unique_attachment_id)
             else:
-                logger.warning(f"Missing filename for chunk {did}. Skipping.")
+                logger.warning(f"Missing filename for chunk {id}. Skipping attachment tracking.")
 
         self.embedding_ids = list(self.metadata.keys())
     
@@ -196,7 +336,7 @@ class ChromaManager:
                     unique_attachment_id = f"{entry_id}_{filename}"
                     self.attachment_ids.add(unique_attachment_id)
                 else:
-                    logger.warning(f"Missing filename for chunk {did}. Skipping.")
+                    logger.warning(f"Missing filename for chunk {id}. Skipping attachment tracking.")
 
         except Exception as e:
             logger.error(f"Error in updating list of embedding IDs with Indico/DocDB: {e}")
@@ -229,6 +369,503 @@ class ChromaManager:
         """
         return self.indico_ids
 
+
+    def get_docdb_document_backup(self, docid: int) -> Dict[str, Any]:
+        """Back up one DocDB document directly from ChromaDB."""
+        prefix = f"{int(docid)}_"
+        records = {
+            "ids": [],
+            "documents": [],
+            "metadatas": [],
+            "embeddings": [],
+        }
+
+        # Use the lightweight startup index to locate this document's chunks.
+        docdb_index = getattr(self, "docdb_index", None)
+        if docdb_index is None:
+            raise RuntimeError(
+                "DocDB index is not initialized; call fetch_docdb_versions first"
+            )
+
+        entry = docdb_index.get(str(int(docid)))
+        target_ids = list(entry["chunk_ids"]) if entry else []
+
+        if len(target_ids) != len(set(target_ids)):
+            raise RuntimeError(
+                f"DocDB {docid}: duplicate chunk IDs in lightweight index"
+            )
+
+        # Retrieve full records only for the document being replaced.
+        for start in range(0, len(target_ids), MAX_VARIABLE_NUMBER):
+            batch = target_ids[start:start + MAX_VARIABLE_NUMBER]
+            page = self.chroma_collection.get(
+                ids=batch,
+                include=["documents", "metadatas", "embeddings"],
+            )
+
+            if set(page["ids"]) != set(batch):
+                raise RuntimeError(
+                    f"DocDB {docid}: backup retrieval incomplete"
+                )
+
+            for i, record_id in enumerate(page["ids"]):
+                records["ids"].append(record_id)
+                records["documents"].append(page["documents"][i])
+                records["metadatas"].append(page["metadatas"][i])
+                records["embeddings"].append(page["embeddings"][i])
+
+        return records
+
+    def validate_docdb_replacement(
+        self,
+        docid: int,
+        version: int,
+        chunks: List[Dict[str, Any]],
+        backup: Dict[str, Any],
+    ) -> bool:
+        """Validate a complete, strictly newer DocDB replacement."""
+        docid = int(docid)
+        version = int(version)
+
+        if not chunks:
+            raise ValueError(f"DocDB {docid}: no replacement chunks")
+
+        ids = []
+        for chunk in chunks:
+            chunk_id = str(chunk.get("document_id", ""))
+            if not chunk_id.startswith(f"{docid}_"):
+                raise ValueError(f"DocDB {docid}: invalid chunk ID {chunk_id}")
+            if chunk.get("source") != "docdb":
+                raise ValueError(f"DocDB {docid}: incorrect chunk source")
+            if int(chunk.get("docdb_version", -1)) != version:
+                raise ValueError(f"DocDB {docid}: inconsistent chunk version")
+            if not str(chunk.get("cleaned_text", "")).strip():
+                raise ValueError(f"DocDB {docid}: empty chunk")
+            ids.append(chunk_id)
+
+        if len(ids) != len(set(ids)):
+            raise ValueError(f"DocDB {docid}: duplicate chunk IDs")
+
+        old_versions = [
+            int(md["docdb_version"])
+            for md in backup["metadatas"]
+        ]
+
+        if old_versions and version <= max(old_versions):
+            logger.info(
+                f"DocDB {docid}: version {version} is not newer "
+                f"than indexed version {max(old_versions)}. Skipping."
+            )
+            return False
+
+        return True
+
+    def check_docdb_id_collisions(
+        self,
+        chunks: List[Dict[str, Any]],
+        backup: Dict[str, Any],
+    ) -> None:
+        """Reject new chunk IDs already owned by unrelated records."""
+        new_ids = [str(chunk["document_id"]) for chunk in chunks]
+        old_ids = set(backup["ids"])
+
+        for start in range(0, len(new_ids), MAX_VARIABLE_NUMBER):
+            batch = new_ids[start:start + MAX_VARIABLE_NUMBER]
+            existing = self.chroma_collection.get(
+                ids=batch,
+                include=["metadatas"],
+            )
+
+            for record_id, md in zip(
+                existing["ids"], existing["metadatas"]
+            ):
+                if record_id not in old_ids:
+                    raise ValueError(
+                        f"Chunk ID collision with unrelated record: "
+                        f"{record_id}, source={md.get('source')}"
+                    )
+
+    def validate_docdb_backup(
+        self,
+        docid: int,
+        backup: Dict[str, Any],
+    ) -> None:
+        """Check backup integrity before any destructive operation."""
+        ids = backup["ids"]
+        n = len(ids)
+
+        for key in ("documents", "metadatas", "embeddings"):
+            if len(backup[key]) != n:
+                raise ValueError(
+                    f"DocDB {docid}: incomplete backup field {key}"
+                )
+
+        if len(set(ids)) != n:
+            raise ValueError(f"DocDB {docid}: duplicate backup IDs")
+
+        prefix = f"{int(docid)}_"
+
+        for i, record_id in enumerate(ids):
+            md = backup["metadatas"][i]
+
+            if not record_id.startswith(prefix):
+                raise ValueError(
+                    f"DocDB {docid}: unrelated record in backup"
+                )
+
+            if md is None or md.get("source") != "docdb":
+                raise ValueError(
+                    f"DocDB {docid}: invalid backup source"
+                )
+
+            if backup["documents"][i] is None:
+                raise ValueError(
+                    f"DocDB {docid}: missing backed-up document"
+                )
+
+            if backup["embeddings"][i] is None:
+                raise ValueError(
+                    f"DocDB {docid}: missing backed-up embedding"
+                )
+
+    def restore_docdb_backup(
+        self,
+        backup: Dict[str, Any],
+    ) -> None:
+        """Restore previously backed-up chunks and their original embeddings."""
+        ids = backup["ids"]
+        if not ids:
+            return
+
+        for start in range(0, len(ids), MAX_VARIABLE_NUMBER):
+            end = start + MAX_VARIABLE_NUMBER
+            self.chroma_collection.add(
+                ids=ids[start:end],
+                documents=backup["documents"][start:end],
+                metadatas=backup["metadatas"][start:end],
+                embeddings=[
+                    embedding.tolist()
+                    if hasattr(embedding, "tolist")
+                    else list(embedding)
+                    for embedding in backup["embeddings"][start:end]
+                ],
+            )
+
+        expected = {
+            record_id: i for i, record_id in enumerate(ids)
+        }
+        restored = set()
+
+        for start in range(0, len(ids), MAX_VARIABLE_NUMBER):
+            page = self.chroma_collection.get(
+                ids=ids[start:start + MAX_VARIABLE_NUMBER],
+                include=["documents", "metadatas", "embeddings"],
+            )
+
+            for j, record_id in enumerate(page["ids"]):
+                i = expected[record_id]
+                if page["documents"][j] != backup["documents"][i]:
+                    raise RuntimeError(
+                        f"DocDB rollback: text mismatch for {record_id}"
+                    )
+                if page["metadatas"][j] != backup["metadatas"][i]:
+                    raise RuntimeError(
+                        f"DocDB rollback: metadata mismatch for {record_id}"
+                    )
+                if not np.allclose(
+                    page["embeddings"][j],
+                    backup["embeddings"][i],
+                    rtol=1e-5,
+                    atol=1e-7,
+                ):
+                    raise RuntimeError(
+                        f"DocDB rollback: embedding mismatch for {record_id}"
+                    )
+                restored.add(record_id)
+
+        if restored != set(ids):
+            raise RuntimeError(
+                "DocDB rollback failed: not all original chunks were restored"
+            )
+
+    def verify_docdb_backup_completeness(
+        self,
+        docid: int,
+        backup: Dict[str, Any],
+    ) -> None:
+        """Verify the backup against the lightweight DocDB index."""
+        docid = str(int(docid))
+
+        if not hasattr(self, "docdb_index"):
+            raise RuntimeError("Lightweight DocDB index is not initialized")
+
+        entry = self.docdb_index.get(docid)
+        expected_list = list(entry["chunk_ids"]) if entry else []
+        expected_ids = set(expected_list)
+        backed_up_ids = set(backup["ids"])
+
+        if (
+            len(expected_list) != len(expected_ids)
+            or expected_ids != backed_up_ids
+            or len(backup["ids"]) != len(backed_up_ids)
+        ):
+            raise RuntimeError(
+                f"DocDB {docid}: backup incomplete; "
+                f"expected {len(expected_ids)} chunks, "
+                f"backed up {len(backed_up_ids)}"
+            )
+
+    def insert_verified_docdb_chunks(
+        self,
+        chunks: List[Dict[str, Any]],
+    ) -> None:
+        """Insert complete DocDB chunks and verify stored records."""
+        ids = [str(chunk["document_id"]) for chunk in chunks]
+
+        for start in range(0, len(chunks), MAX_VARIABLE_NUMBER):
+            batch = chunks[start:start + MAX_VARIABLE_NUMBER]
+            batch_ids = [str(c["document_id"]) for c in batch]
+            documents = [c["cleaned_text"] for c in batch]
+            metadatas = [
+                {
+                    k: v for k, v in c.items()
+                    if k not in ("document_id", "cleaned_text", "raw_text")
+                }
+                for c in batch
+            ]
+
+            self.chroma_collection.add(
+                ids=batch_ids,
+                documents=documents,
+                metadatas=metadatas,
+            )
+
+        expected = {
+            str(chunk["document_id"]): chunk for chunk in chunks
+        }
+        verified = set()
+
+        for start in range(0, len(ids), MAX_VARIABLE_NUMBER):
+            page = self.chroma_collection.get(
+                ids=ids[start:start + MAX_VARIABLE_NUMBER],
+                include=["documents", "metadatas"],
+            )
+
+            for i, record_id in enumerate(page["ids"]):
+                chunk = expected[record_id]
+                expected_md = {
+                    k: v for k, v in chunk.items()
+                    if k not in ("document_id", "cleaned_text", "raw_text")
+                }
+
+                if page["documents"][i] != chunk["cleaned_text"]:
+                    raise RuntimeError(
+                        f"DocDB insertion: text mismatch for {record_id}"
+                    )
+                if page["metadatas"][i] != expected_md:
+                    raise RuntimeError(
+                        f"DocDB insertion: metadata mismatch for {record_id}"
+                    )
+                verified.add(record_id)
+
+        if verified != set(ids):
+            raise RuntimeError(
+                "DocDB insertion failed: not all chunks were stored"
+            )
+
+    def update_docdb_replacement_cache(
+        self,
+        docid: int,
+        version: int,
+        chunks: List[Dict[str, Any]],
+        backup: Dict[str, Any],
+    ) -> None:
+        """Synchronize in-memory caches after successful DocDB replacement."""
+        docid = str(int(docid))
+        old_ids = set(backup["ids"])
+
+        for record_id in old_ids:
+            self.metadata.pop(record_id, None)
+            self.embedding_contents.pop(record_id, None)
+            self.docdb_content_modified.pop(record_id, None)
+            self.docdb_metadata_modified.pop(record_id, None)
+
+        for chunk in chunks:
+            record_id = str(chunk["document_id"])
+            if not self.indexing_only:
+                self.metadata[record_id] = {
+                    k: v for k, v in chunk.items()
+                    if k not in ("document_id", "cleaned_text", "raw_text")
+                }
+                self.embedding_contents[record_id] = chunk["cleaned_text"]
+            if not self.indexing_only:
+                self.docdb_content_modified[record_id] = chunk.get(
+                    "content_last_modified_date", "Unknown Content Date"
+                )
+                self.docdb_metadata_modified[record_id] = chunk.get(
+                    "metadata_last_modified_date", "Unknown Metadata Date"
+                )
+
+        self.docdb_versions[docid] = int(version)
+        if self.indexing_only:
+            old_id_set = set(old_ids)
+            self.embedding_ids = [
+                record_id for record_id in self.embedding_ids
+                if record_id not in old_id_set
+            ]
+            self.embedding_ids.extend(
+                str(chunk["document_id"]) for chunk in chunks
+            )
+        else:
+            self.embedding_ids = list(self.metadata.keys())
+        self.entry_ids.add(docid)
+
+        self.attachment_ids = {
+            attachment_id
+            for attachment_id in self.attachment_ids
+            if not attachment_id.startswith(f"{docid}_")
+        }
+
+        for chunk in chunks:
+            filename = chunk.get("filename")
+            if filename:
+                self.attachment_ids.add(f"{docid}_{filename}")
+
+        # Synchronize the lightweight DocDB index after replacement.
+        self.docdb_index[docid] = {
+            "version": int(version),
+            "chunk_ids": [str(c["document_id"]) for c in chunks],
+            "attachments": {
+                str(c["filename"])
+                for c in chunks
+                if c.get("filename")
+            },
+        }
+
+        self.bm25_cache = None
+
+    def replace_docdb_document(
+        self,
+        docid: int,
+        version: int,
+        chunks: List[Dict[str, Any]],
+    ) -> bool:
+        """Replace one fully extracted DocDB document, with rollback."""
+        docid = int(docid)
+        version = int(version)
+
+        # Skip unchanged or older versions before retrieving a backup.
+        indexed_version = int(
+            self.docdb_versions.get(str(docid), 0)
+        )
+        if version <= indexed_version:
+            return False
+
+        # No database mutation until every preflight check passes.
+        backup = self.get_docdb_document_backup(docid)
+        self.validate_docdb_backup(docid, backup)
+        self.verify_docdb_backup_completeness(docid, backup)
+
+        if not self.validate_docdb_replacement(
+            docid, version, chunks, backup
+        ):
+            return False
+
+        self.check_docdb_id_collisions(chunks, backup)
+
+        old_ids = list(backup["ids"])
+        new_ids = [str(c["document_id"]) for c in chunks]
+
+        # Snapshot only this document's cache state before mutation.
+        prefix = f"{docid}_"
+        cache_names = (
+            "metadata",
+            "embedding_contents",
+            "docdb_content_modified",
+            "docdb_metadata_modified",
+        )
+        cache_snapshot = {}
+        for name in cache_names:
+            cache = getattr(self, name)
+            cache_snapshot[name] = {
+                key: value
+                for key, value in cache.items()
+                if key.startswith(prefix)
+            }
+
+        # Preserve the lightweight index entry for rollback.
+        previous_docdb_index_entry = deepcopy(
+            self.docdb_index.get(str(docid))
+        )
+        previous_version = self.docdb_versions.get(str(docid))
+        previous_embedding_ids = self.embedding_ids
+        previous_entry_ids = set(self.entry_ids)
+        previous_attachment_ids = set(self.attachment_ids)
+        previous_bm25_cache = self.bm25_cache
+
+        try:
+            # Delete the old version before inserting the new version.
+            for start in range(0, len(old_ids), MAX_VARIABLE_NUMBER):
+                self.chroma_collection.delete(
+                    ids=old_ids[start:start + MAX_VARIABLE_NUMBER]
+                )
+
+            self.insert_verified_docdb_chunks(chunks)
+            self.update_docdb_replacement_cache(
+                docid, version, chunks, backup
+            )
+
+        except Exception as original_error:
+            try:
+                # Remove both partial new records and surviving old records.
+                # This allows restoration even when IDs overlap.
+                cleanup_ids = list(set(old_ids + new_ids))
+                for start in range(
+                    0, len(cleanup_ids), MAX_VARIABLE_NUMBER
+                ):
+                    self.chroma_collection.delete(
+                        ids=cleanup_ids[start:start + MAX_VARIABLE_NUMBER]
+                    )
+
+                if old_ids:
+                    self.restore_docdb_backup(backup)
+
+                # Restore this document's in-memory cache entries.
+                for name in cache_names:
+                    cache = getattr(self, name)
+                    for key in list(cache):
+                        if key.startswith(prefix):
+                            cache.pop(key, None)
+                    cache.update(cache_snapshot[name])
+
+                if previous_version is None:
+                    self.docdb_versions.pop(str(docid), None)
+                else:
+                    self.docdb_versions[str(docid)] = previous_version
+
+                if previous_docdb_index_entry is None:
+                    self.docdb_index.pop(str(docid), None)
+                else:
+                    self.docdb_index[str(docid)] = previous_docdb_index_entry
+
+                self.embedding_ids = previous_embedding_ids
+                self.entry_ids = previous_entry_ids
+                self.attachment_ids = previous_attachment_ids
+                self.bm25_cache = previous_bm25_cache
+
+            except Exception as rollback_error:
+                raise RuntimeError(
+                    f"CRITICAL: DocDB {docid} replacement failed and "
+                    f"rollback failed. Original error: {original_error}; "
+                    f"rollback error: {rollback_error}"
+                ) from rollback_error
+
+            raise RuntimeError(
+                f"DocDB {docid} replacement failed; "
+                f"original version restored: {original_error}"
+            ) from original_error
+
+        return True
 
     def get_docdb_versions(self) -> Dict[str, int]:
         """
@@ -400,6 +1037,26 @@ class ChromaManager:
     def save_all(self):
         """Persist metadata, embedding_ids, and ChromaDB index."""
         pass
+
+    def get_docdb_index_stats(self) -> Dict[str, int]:
+        """Return cumulative DocDB counts without loading document contents."""
+        if not self.indexing_only:
+            raise RuntimeError(
+                "DocDB index statistics require indexing-only mode"
+            )
+
+        return {
+            "total_docdb_pages": len(self.docdb_index),
+            "total_docdb_attachments": sum(
+                len(entry["attachments"])
+                for entry in self.docdb_index.values()
+            ),
+            "total_docdb_chunks": sum(
+                len(entry["chunk_ids"])
+                for entry in self.docdb_index.values()
+            ),
+            "total_chromadb_chunks": self.chroma_collection.count(),
+        }
 
     def get_stats(self) -> Dict[str, int]:
         disk_size = 0

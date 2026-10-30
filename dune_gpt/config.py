@@ -18,19 +18,18 @@ QA_PATH = './benchmarking/QuestionAnswer/QA.csv'
 #'./benchmarking/QuestionAnswer/Cleaned_questions2.csv'
 
 # Production database — used by the AskDUNE web server
-DB_PATH = os.getenv("DB_PATH")
-if not DB_PATH:
-    raise RuntimeError("DB_PATH is not set in environment (.env)")
+PROD_DB_PATH = os.getenv("PROD_DB_PATH") or os.getenv("DB_PATH")
+if not PROD_DB_PATH:
+    raise RuntimeError("PROD_DB_PATH is not set in environment (.env)")
 
 # Indexing database — used by indexing jobs
 INDEXING_DB_PATH = os.getenv("INDEXING_DB_PATH")
-if not INDEXING_DB_PATH:
-    raise RuntimeError("INDEXING_DB_PATH is not set in environment (.env)")
 
 # Safety check: production and indexing must use different directories
-if os.path.realpath(DB_PATH) == os.path.realpath(INDEXING_DB_PATH):
+# whenever an indexing database is configured.
+if INDEXING_DB_PATH and os.path.realpath(PROD_DB_PATH) == os.path.realpath(INDEXING_DB_PATH):
     raise RuntimeError(
-        "DB_PATH and INDEXING_DB_PATH must point to different directories"
+        "PROD_DB_PATH and INDEXING_DB_PATH must point to different directories"
     )
 
 # Database Configuration
@@ -63,7 +62,7 @@ CHUNK_SIZE = int(os.getenv("CHUNK_SIZE",4000))
 
 STORE = os.getenv("VECTOR_STORE", 'chroma')
 # Database Configuration
-CHROMA_PATH=os.getenv('DB_PATH',None)
+CHROMA_PATH = PROD_DB_PATH
 FAISS_DIR = BASE_DIR / "data" / "faiss"
 FAISS_INDEX_PATH = FAISS_DIR / "faiss_index.index"
 METADATA_PATH = FAISS_DIR / "metadata_store.pkl"

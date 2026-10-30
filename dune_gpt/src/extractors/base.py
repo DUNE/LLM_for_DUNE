@@ -6,20 +6,28 @@ import spacy
 from src.utils.logger import get_logger
 from io import BytesIO
 import requests
+import pymupdf
 logger = get_logger(__name__)
+
+PDF_TEXT_FLAGS = (
+    pymupdf.TEXTFLAGS_TEXT
+    & ~pymupdf.TEXT_PRESERVE_LIGATURES
+    | pymupdf.TEXT_DEHYPHENATE
+)
 
 class BaseExtractor(ABC):
     """Base class for document extractors"""
 
     def __init__(self):
         super().__init__()
-        self.nlp = spacy.load("en_core_web_sm")
+        self.nlp = spacy.load("en_core_web_sm") # Unused variable
+
+        pymupdf.set_messages(pylogging=True, pylogging_logger=logger)
 
     @abstractmethod
     def extract_documents(self, limit: int = 50) -> List[Dict[str, Any]]:
         """Extract documents from the source"""
         pass
-
 
     def get_chunks(self, text, chunk_size):
         if not text: return []
@@ -33,6 +41,7 @@ class BaseExtractor(ABC):
             end += chunk_size
         return chunks
 
+    # Unused function
     def section_get_chunks(self, text, chunk_size):
         from langchain_experimental.text_splitter import SemanticChunker
         from langchain.embeddings import HuggingFaceEmbeddings
@@ -119,32 +128,12 @@ class BaseExtractor(ABC):
             logger.error(f"Error downloading {link}: {e}")
             return None, None
 
-    def classify_pdf_visual_robust(self, pdf_path):
-        """Robust visual classification that handles colored slides"""
-
-        from pdf2image import convert_from_bytes
-
-        # Convert first page ONLY
-        try:
-            images = convert_from_bytes(pdf_path, first_page=1, last_page=1, dpi=100)
-        except Exception as e:
-            logger.error(f"{e} : Couldn't convert from bytes to images")
-        width,height = images[0].size
-        ratio = width/height
-        if ratio > 1.25 and ratio < 1.40 or ratio > 1.7 and ratio < 1.85:
-            return 'slides'
-        else:
-            return 'document'
-
-
-
     def get_raw_text(self, content_type, content):
         raw_text = ''
         document_type=''
         if 'application/pdf' in content_type:
             logger.debug("Getting from pdf")
             raw_text, document_type = self.extract_text_from_pdf(content)
-
 
             return raw_text, document_type
 
@@ -167,6 +156,7 @@ class BaseExtractor(ABC):
             logger.warning(f"Unsupported content type ({content_type})")
         return raw_text, document_type
 
+    # Unused function
     def clean_text(self, text: str) -> str:
         """Clean and normalize text"""
         if not text:
@@ -179,22 +169,35 @@ class BaseExtractor(ABC):
         doc = self.nlp(text)
         return ' '.join([token.lemma_ for token in doc if not token.is_stop and not token.is_punct])
 
-    def extract_text_from_pdf(self, pdf_content: bytes) -> str: #docdb 126 failing check y  ERROR - Error extracting text from PDF: unsupported operand type(s) for *: 'PSLiteral' and 'float'
+    def extract_text_from_pdf(self, pdf_content: bytes) -> tuple[str, str]:
         """Extract text from PDF content"""
-        import pdfplumber
-        document_type = ''
-        text = ''
-        try:
-            with pdfplumber.open(BytesIO(pdf_content)) as pdf:
-                for page in pdf.pages:
-                    page_text = page.extract_text()
-                    if page_text:
-                        text += page_text.replace('\n•', '\n- ') + '\n'
-            document_type = self.classify_pdf_visual_robust(pdf_content)
-        except Exception as e:
-            logger.error(f"Error extracting text from PDF: {e}")
+        if not pdf_content:
+            return "", ""
 
-        return text, document_type
+        try:
+            with pymupdf.open(stream=pdf_content, filetype="pdf") as doc:
+                if doc.page_count == 0:
+                    return "", ""
+
+                rect = doc[0].rect
+                document_type = "slides" if rect.width >= rect.height else "document"
+
+                try:
+                    text = doc.to_markdown()
+                except Exception:
+                    logger.warning(
+                        "Markdown extraction failed; falling back to plain text.",
+                    )
+
+                    text = "\n\n".join(
+                        page.get_text(flags=PDF_TEXT_FLAGS, sort=True) for page in doc
+                    )
+
+                return text, document_type
+
+        except Exception:
+            logger.exception("Error extracting text from PDF")
+            return "", ""
 
     def extract_text_from_pptx(self, pptx_content: bytes) -> str:
         """Extract text from PPTX content"""
@@ -248,17 +251,25 @@ class BaseExtractor(ABC):
             logger.error(f"Error extracting text from XLSX: {e}")
         return text, 'slides'
 
-    def extract_text_from_image(self, image_content: bytes) -> str:
-        """Extract text from images (JPEG/PNG) using OCR"""
-        return '', ''
-        #follow up have this be an llm call to interpret the image in the form of text
-        from PIL import Image
-        import pytesseract
+    def extract_text_from_image(self, image_content: bytes) -> tuple[str, str]:
+        """Extract text from JPEG/PNG images using RapidOCR."""
+        if not image_content:
+            return "", "image"
 
-        text = ''
-        try:
-            image = Image.open(BytesIO(image_content))
-            text = pytesseract.image_to_string(image)
-        except Exception as e:
-            logger.error(f"Error extracting text from image: {e}")
-        return text
+        from rapidocr_onnxruntime import RapidOCR
+
+        if not hasattr(self, "_image_ocr_engine"):
+            self._image_ocr_engine = RapidOCR()
+
+        result, _ = self._image_ocr_engine(image_content)
+
+        if not result:
+            return "", "image"
+
+        text = "\n".join(
+            str(item[1]).strip()
+            for item in result
+            if len(item) > 1 and str(item[1]).strip()
+        )
+
+        return text, "image"

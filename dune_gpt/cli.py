@@ -9,7 +9,7 @@ import click
 from pathlib import Path
 import sys
 from src.indexing.indexer import IndexingJob
-from config import DB_PATH, INDEXING_DB_PATH
+from config import PROD_DB_PATH, INDEXING_DB_PATH
 
 # this loads variables from your .env file into the environment
 load_dotenv()
@@ -22,6 +22,7 @@ if STORE == 'faiss':
     from src.core.document_processor_faiss import DocumentProcessor
 elif STORE == 'chroma':
     from src.core.document_processor_chroma import EntryProcessor
+    from src.indexing.indexing_statistics import format_indexing_report
 else:
     raise Exception(f"Invalid Store. Must be FAISS or CHROMA. Got {store}")
 
@@ -88,24 +89,19 @@ def index(docdb_limit, indico_limit, start_idx_ddb, start_idx_ind, docdb_latest_
 
         # Validate configuration
         validate_config()
+        data_path = data_path or INDEXING_DB_PATH
+        if not data_path:
+            raise click.ClickException("INDEXING_DB_PATH is not configured")
+        if os.path.realpath(data_path) == os.path.realpath(PROD_DB_PATH):
+            raise click.ClickException(
+                "Refusing to index into the configured PROD_DB_PATH."
+            )
         create_directories(data_path)
         
         start_idx_ddb = int(os.getenv('DDB_START_IDX', start_idx_ddb))
         start_idx_ind = int(os.getenv('IND_START_IDX', start_idx_ind))
         docdb_limit = int(os.getenv('DOCUMENT_LIMIT', docdb_limit))
         indico_limit = int(os.getenv('DOCUMENT_LIMIT', indico_limit))
-        data_path = data_path or INDEXING_DB_PATH
-        
-        if not data_path:
-            raise click.ClickException(
-            "INDEXING_DB_PATH is not configured"
-            )
-
-        if os.path.realpath(data_path) == os.path.realpath(DB_PATH):
-            raise click.ClickException(
-                "Refusing to index into the production database."
-        )
-
         # Initialize entry processor
         logger.debug("Init processor")
         processor = EntryProcessor(data_path, int(CHUNK_SIZE))
@@ -119,25 +115,6 @@ def index(docdb_limit, indico_limit, start_idx_ddb, start_idx_ind, docdb_latest_
             force=force
         )
 
-        # Display results
-        click.echo(f"\n{'='*50}")
-        click.echo("INDEXING RESULTS")
-        click.echo(f"{'='*50}")
-        click.echo(f"DocDB Documents retrieved: {results['docdb_documents_retrieved']}")
-        click.echo(f"Indico Events retrieved: {results['indico_events_retrieved']}")
-        click.echo(f"DocDB Documents processed: {results['docdb_documents_processed']}")
-        click.echo(f"Indico Events processed: {results['indico_events_processed']}")
-        click.echo(f"Total new entries added: {results['indico_events_processed'] + results['docdb_documents_processed']}")
-        click.echo(f"Total new chunks added: {results['total_chunks_added']}")
-
-        # Show index stats
-        stats = processor.get_index_stats()
-        click.echo(f"\nCurrent index statistics:")
-        click.echo(f"Total Entries: {stats['total_entries']}")
-        click.echo(f"Total Embeddings: {stats['total_embeddings']}")
-        click.echo(f"Total Attachments: {stats['total_attachments']}")
-        click.echo(f"Total Disk Size (bytes): {stats['disk_size']}")
-        
         # Cleanup
         processor.cleanup()
         end=time.time()
@@ -145,6 +122,7 @@ def index(docdb_limit, indico_limit, start_idx_ddb, start_idx_ind, docdb_latest_
 
 
         logger.info(f"Entry indexing completed successfully taking {end-start} seconds")
+        click.echo(format_indexing_report(results))
 
     except Exception as e:
         logger.critical(f"Indexing failed: {e}")
