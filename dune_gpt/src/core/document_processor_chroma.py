@@ -76,8 +76,8 @@ class EntryProcessor:
                     
                     logger.debug(f"chunks_batch size = {len(chunks_batch)}")
                     added = self.chroma_manager.add_entries(chunks_batch)
-                    results['docdb_documents_retrieved'] += num_documents_retrieved
-                    results["docdb_documents_processed"] += num_documents_processed
+                    results['docdb_documents_retrieved'] = num_documents_retrieved
+                    results["docdb_documents_processed"] = num_documents_processed
                     results["total_chunks_added"] += added
 
 

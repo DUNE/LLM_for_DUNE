@@ -28,12 +28,12 @@ dependencies = [
     "numpy==2.4.1",
     "openpyxl>=3.1.5",
     "pathlib2>=2.3.7",
-    "pdf2image>=1.17.0",
-    "pdfplumber==0.9.0",
     "pillow>=12.2.0",
     "playwright==1.46.0",
     "pydantic>=2.9.0,<3",
     "pyee==11.1.0",
+    "pymupdf>=2.0",
+    "pymupdf4llm>=2.0",
     "pysqlite3-binary==0.5.4.post2",
     "pytesseract>=0.3.13",
     "pytest>=7.4.0",
@@ -43,6 +43,7 @@ dependencies = [
     "python-multipart>=0.0.27",
     "python-pptx==0.6.21",
     "rank-bm25==0.2.2",
+    "rapidocr-onnxruntime>=1.4.4",
     "requests>=2.32.3",
     "sentence-transformers>=3.0.0",
     "slack-bolt>=1.28.0",
@@ -54,4 +55,9 @@ dependencies = [
     "transformers>=4.30.0",
     "typing-extensions>=4.5.0",
     "uvicorn[standard]==0.24.0",
+]
+
+[dependency-groups]
+dev = [
+    "memray>=1.20.0",
 ]

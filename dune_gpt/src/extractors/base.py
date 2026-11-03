@@ -6,20 +6,27 @@ import spacy
 from src.utils.logger import get_logger
 from io import BytesIO
 import requests
+import pymupdf
+import pandas as pd
 logger = get_logger(__name__)
+
+PDF_TEXT_FLAGS = (
+    pymupdf.TEXTFLAGS_TEXT & ~pymupdf.TEXT_PRESERVE_LIGATURES | pymupdf.TEXT_DEHYPHENATE
+)
 
 class BaseExtractor(ABC):
     """Base class for document extractors"""
 
     def __init__(self):
         super().__init__()
-        self.nlp = spacy.load("en_core_web_sm")
+        self.nlp = spacy.load("en_core_web_sm") # Unused member variable
+
+        pymupdf.set_messages(pylogging=True, pylogging_logger=logger)
 
     @abstractmethod
     def extract_documents(self, limit: int = 50) -> List[Dict[str, Any]]:
         """Extract documents from the source"""
         pass
-
 
     def get_chunks(self, text, chunk_size):
         if not text: return []
@@ -33,6 +40,7 @@ class BaseExtractor(ABC):
             end += chunk_size
         return chunks
 
+    # Unused method
     def section_get_chunks(self, text, chunk_size):
         from langchain_experimental.text_splitter import SemanticChunker
         from langchain.embeddings import HuggingFaceEmbeddings
@@ -55,7 +63,7 @@ class BaseExtractor(ABC):
         """Download a file with size check; returns (content, headers) or None if skipped/failure."""
         if not link:
             logger.error(f"Invalid link: {link}")
-            return None, None
+            return None
         try:
             assert not isinstance(session, str), type(session)
             # First try HEAD to get size
@@ -66,7 +74,7 @@ class BaseExtractor(ABC):
                     raise requests.RequestException(f"HEAD returned {head.status_code}")
                 if head.status_code == 404:
                     logger.warning(f"File not found (404): {link}")
-                    return None, None
+                    return None
                 if head.status_code >= 400:
                     raise requests.RequestException(f"HEAD returned {head.status_code}")
 
@@ -81,18 +89,18 @@ class BaseExtractor(ABC):
             resp = session.get(link, headers=headers, stream=True)
             if resp.status_code in (401, 403):
                 logger.warning(f"Unauthorized to download (GET): {link}")
-                return None, None
+                return None
             if resp.status_code == 404:
                 logger.warning(f"File not found (404): {link}")
-                return None, None
+                return None
             if resp.status_code >= 400:
                 logger.error(f"GET failed ({resp.status_code}) for {link}")
-                return None, None
+                return None
 
             # Use content-length if HEAD succeeded, else unknown
             if size and size > max_file_bytes:
                 logger.info(f"Skipping large file ({size} bytes > {max_file_bytes}): {link}")
-                return None, None
+                return None
 
             # Read content (cap if size unknown)
             if size and size <= max_file_bytes:
@@ -109,7 +117,7 @@ class BaseExtractor(ABC):
 
                         if downloaded_bytes > max_file_bytes:
                             logger.info(f"Skipping file exceeding max size while streaming: {link}")
-                            return None, None
+                            return None
 
                 content = b"".join(chunks)
 
@@ -117,26 +125,7 @@ class BaseExtractor(ABC):
 
         except requests.RequestException as e:
             logger.error(f"Error downloading {link}: {e}")
-            return None, None
-
-    def classify_pdf_visual_robust(self, pdf_path):
-        """Robust visual classification that handles colored slides"""
-
-        from pdf2image import convert_from_bytes
-
-        # Convert first page ONLY
-        try:
-            images = convert_from_bytes(pdf_path, first_page=1, last_page=1, dpi=100)
-        except Exception as e:
-            logger.error(f"{e} : Couldn't convert from bytes to images")
-        width,height = images[0].size
-        ratio = width/height
-        if ratio > 1.25 and ratio < 1.40 or ratio > 1.7 and ratio < 1.85:
-            return 'slides'
-        else:
-            return 'document'
-
-
+            return None
 
     def get_raw_text(self, content_type, content):
         raw_text = ''
@@ -144,7 +133,6 @@ class BaseExtractor(ABC):
         if 'application/pdf' in content_type:
             logger.debug("Getting from pdf")
             raw_text, document_type = self.extract_text_from_pdf(content)
-
 
             return raw_text, document_type
 
@@ -167,6 +155,7 @@ class BaseExtractor(ABC):
             logger.warning(f"Unsupported content type ({content_type})")
         return raw_text, document_type
 
+    # Unused method
     def clean_text(self, text: str) -> str:
         """Clean and normalize text"""
         if not text:
@@ -179,22 +168,35 @@ class BaseExtractor(ABC):
         doc = self.nlp(text)
         return ' '.join([token.lemma_ for token in doc if not token.is_stop and not token.is_punct])
 
-    def extract_text_from_pdf(self, pdf_content: bytes) -> str: #docdb 126 failing check y  ERROR - Error extracting text from PDF: unsupported operand type(s) for *: 'PSLiteral' and 'float'
-        """Extract text from PDF content"""
-        import pdfplumber
-        document_type = ''
-        text = ''
-        try:
-            with pdfplumber.open(BytesIO(pdf_content)) as pdf:
-                for page in pdf.pages:
-                    page_text = page.extract_text()
-                    if page_text:
-                        text += page_text.replace('\n•', '\n- ') + '\n'
-            document_type = self.classify_pdf_visual_robust(pdf_content)
-        except Exception as e:
-            logger.error(f"Error extracting text from PDF: {e}")
+    def extract_text_from_pdf(self, file_bytes: bytes) -> tuple[str, str]:
+        """Extract text from PDF"""
+        if not file_bytes:
+            return "", ""
 
-        return text, document_type
+        try:
+            with pymupdf.open(stream=file_bytes, filetype="pdf") as doc:
+                if doc.page_count == 0:
+                    return "", ""
+
+                rect = doc[0].rect
+                doc_type = "slides" if rect.width >= rect.height else "document"
+
+                try:
+                    text = doc.to_markdown()
+                except Exception:
+                    logger.warning(
+                        "Markdown extraction failed; falling back to plain text.",
+                    )
+
+                    text = "\n\n".join(
+                        page.get_text(flags=PDF_TEXT_FLAGS, sort=True) for page in doc
+                    )
+
+                return text, doc_type
+
+        except Exception:
+            logger.exception("Error extracting text from PDF")
+            return "", ""
 
     def extract_text_from_pptx(self, pptx_content: bytes) -> str:
         """Extract text from PPTX content"""
@@ -232,26 +234,34 @@ class BaseExtractor(ABC):
             logger.error(f"Error extracting text from TXT: {e}")
         return "", ''
 
-    def extract_text_from_xlsx(self, xlsx_content: bytes) -> str:
-        """Extract text from XLSX/XLS spreadsheet"""
+    def extract_text_from_xlsx(self, file_bytes: bytes) -> tuple[str, str]:
+        """Extract text from XLSX spreadsheet"""
         from openpyxl import load_workbook
 
-        text = ''
+        if not file_bytes or file_bytes.startswith(b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1"):
+            return "", ""
+
         try:
-            workbook = load_workbook(filename=BytesIO(xlsx_content), data_only=True)
-            for sheet in workbook.worksheets:
-                for row in sheet.iter_rows(values_only=True):
-                    row_text = [str(cell) for cell in row if cell is not None]
-                    if row_text:
-                        text += ' '.join(row_text) + '\n'
-        except Exception as e:
-            logger.error(f"Error extracting text from XLSX: {e}")
-        return text, 'slides'
+            with load_workbook(
+                filename=BytesIO(file_bytes), data_only=True, read_only=True
+            ) as workbook:
+                rows = []
+                for sheet in workbook.worksheets:
+                    for row in sheet.iter_rows(values_only=True):
+                        row_text = " ".join(
+                            str(cell) for cell in row if cell is not None
+                        )
+                        if row_text:
+                            rows.append(row_text)
+                return "\n".join(rows)
+        except Exception:
+            logger.exception(f"Error extracting text from XLSX")
+            return "", ""
 
     def extract_text_from_image(self, image_content: bytes) -> str:
         """Extract text from images (JPEG/PNG) using OCR"""
         return '', ''
-        #follow up have this be an llm call to interpret the image in the form of text
+        # follow up have this be an llm call to interpret the image in the form of text
         from PIL import Image
         import pytesseract
 
