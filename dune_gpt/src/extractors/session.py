@@ -161,7 +161,6 @@ class Session(ABC):
 
         test_url = f"{self.base_url}/categ/{self.category_id}"
         r = self.session.get(test_url, timeout=30)
-        logger.error(f"esure access {r}")
 
         if r.status_code == 200:
             self._auth_initialized = True

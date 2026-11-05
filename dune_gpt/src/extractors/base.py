@@ -235,21 +235,68 @@ class BaseExtractor(ABC):
             logger.error(f"Error extracting text from TXT: {e}")
         return "", ''
 
-    def extract_text_from_xlsx(self, xlsx_content: bytes) -> str:
-        """Extract text from XLSX/XLS spreadsheet"""
-        from openpyxl import load_workbook
-
-        text = ''
+    def extract_text_from_xlsx(self, content: bytes) -> tuple[str, str]:
+        """Extract legacy XLS and modern XLSX spreadsheets as searchable text."""
         try:
-            workbook = load_workbook(filename=BytesIO(xlsx_content), data_only=True)
-            for sheet in workbook.worksheets:
-                for row in sheet.iter_rows(values_only=True):
-                    row_text = [str(cell) for cell in row if cell is not None]
-                    if row_text:
-                        text += ' '.join(row_text) + '\n'
-        except Exception as e:
-            logger.error(f"Error extracting text from XLSX: {e}")
-        return text, 'slides'
+            if not content:
+                raise ValueError("Empty spreadsheet")
+
+            lines = []
+
+            # Legacy Excel 97-2003 binary format
+            if content.startswith(bytes.fromhex("D0CF11E0A1B11AE1")):
+                import xlrd
+
+                workbook = xlrd.open_workbook(file_contents=content)
+
+                for sheet in workbook.sheets():
+                    lines.append(f"Sheet: {sheet.name}")
+                    for row_index in range(sheet.nrows):
+                        values = [
+                            str(sheet.cell_value(row_index, col_index))
+                            for col_index in range(sheet.ncols)
+                            if sheet.cell_type(row_index, col_index)
+                            not in (xlrd.XL_CELL_EMPTY, xlrd.XL_CELL_BLANK)
+                        ]
+                        if values:
+                            lines.append(" | ".join(values))
+
+            # Modern XLSX ZIP format
+            elif content.startswith(b"PK"):
+                from openpyxl import load_workbook
+
+                workbook = load_workbook(
+                    filename=BytesIO(content),
+                    data_only=True,
+                    read_only=True,
+                )
+                try:
+                    for sheet in workbook.worksheets:
+                        lines.append(f"Sheet: {sheet.title}")
+                        for row in sheet.iter_rows(values_only=True):
+                            values = [
+                                str(cell)
+                                for cell in row
+                                if cell is not None
+                            ]
+                            if values:
+                                lines.append(" | ".join(values))
+                finally:
+                    workbook.close()
+
+            else:
+                raise ValueError("Unrecognized Excel file format")
+
+            text = "\n".join(lines).strip()
+            if not text:
+                logger.warning("Spreadsheet contains no extractable text")
+                return "", ""
+
+            return text, "spreadsheet"
+
+        except Exception as exc:
+            logger.warning("Skipping unreadable spreadsheet: %s", exc)
+            return "", ""
 
     def extract_text_from_image(self, image_content: bytes) -> tuple[str, str]:
         """Extract text from JPEG/PNG images using RapidOCR."""

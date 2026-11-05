@@ -29,6 +29,7 @@ pytesseract
 pillow
 python-docx
 openpyxl
+xlrd==2.0.2
 rank-bm25==0.2.2
 
 # CLI

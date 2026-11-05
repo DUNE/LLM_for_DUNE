@@ -1,3 +1,4 @@
+from pathlib import Path
 import collections
 import functools
 import json
@@ -79,6 +80,7 @@ class DocDBExtractor(BaseExtractor):
         self.run_stats = {
             "pages_checked": 0,
             "pages_missing": 0,
+            "pages_no_attachments": 0,
             "pages_unchanged": 0,
             "pages_failed": 0,
             "pages_prepared": 0,
@@ -259,7 +261,9 @@ class DocDBExtractor(BaseExtractor):
             if html is None:
                 response = self.session.get(webpage_url)
                 if not response.ok:
-                    return [], []
+                    raise RuntimeError(
+                        f"DocDB metadata request failed: HTTP {response.status_code}"
+                    )
                 html = response.text
 
             soup = BeautifulSoup(html, 'html.parser')
@@ -376,7 +380,7 @@ class DocDBExtractor(BaseExtractor):
 
         except Exception as e:
             logger.error(f"Error extracting from {webpage_url}: {e}")
-            return [], []
+            raise
 
     def iter_changed_docdb_pages(
         self,
@@ -426,10 +430,10 @@ class DocDBExtractor(BaseExtractor):
                 )
 
                 if not links and not metadata:
-                    self.run_stats["pages_failed"] += 1
-                    logger.warning(
-                        f"DocDB {docid} has no attachments or metadata "
-                        f"could not be extracted. Skipping."
+                    self.run_stats["pages_no_attachments"] += 1
+                    logger.info(
+                        f"DocDB {docid}: page exists but has no attachments. "
+                        f"Skipping."
                     )
                 elif len(links) != len(metadata):
                     self.run_stats["pages_failed"] += 1
@@ -642,18 +646,35 @@ class DocDBExtractor(BaseExtractor):
 
                 content, headers = result
                 content_type = self._detect_type(link, headers)
+                filename = str(md.get("filename") or "")
+                extension = Path(filename).suffix.lower()
+
+                if extension in (".xls", ".xlsx"):
+                    content_type = {
+                        ".xls": "application/vnd.ms-excel",
+                        ".xlsx": (
+                            "application/vnd.openxmlformats-officedocument."
+                            "spreadsheetml.sheet"
+                        ),
+                    }[extension]
+
                 raw_text, document_type = self.get_raw_text(
                     content_type=content_type,
                     content=content,
                 )
 
                 if not raw_text or not raw_text.strip():
-                    logger.warning(
-                        f"DocDB {docid}: attachment "
-                        f"{md.get('filename', link)} has no extractable text; "
-                        f"skipping this attachment."
+                    if extension in (".xls", ".xlsx"):
+                        logger.warning(
+                            f"DocDB {docid}: skipping unreadable or empty "
+                            f"spreadsheet {filename}"
+                        )
+                        continue
+
+                    raise RuntimeError(
+                        f"Attachment {md.get('filename', link)} "
+                        f"has no extractable text"
                     )
-                    continue
 
                 chunks = self.get_chunks(
                     raw_text.split(), chunk_size=chunk_size
