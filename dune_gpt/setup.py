@@ -4,6 +4,8 @@ DUNE-GPT Setup Script
 """
 
 import subprocess
+import shutil
+import shlex
 import sys
 import os
 from pathlib import Path
@@ -25,8 +27,8 @@ def run_command(command, description):
 
 def check_python_version():
     """Check if Python version is compatible"""
-    if sys.version_info < (3, 10):
-        print(f"❌ Python 3.10+ required. You have {sys.version}")
+    if sys.version_info < (3, 11):
+        print(f"❌ Python 3.11+ required. You have {sys.version}")
         return False
     print(f"✅ Python version OK: {sys.version}")
     return True
@@ -46,31 +48,28 @@ def setup_environment():
     
     if not env_file.exists() and env_example.exists():
         print("🔄 Creating .env file from template...")
-        env_example.read_text().replace(
+        template = env_example.read_text().replace(
             "your_username_here", os.getenv("USER", "your_username_here")
         )
         with open(env_file, "w") as f:
-            f.write(env_example.read_text())
+            f.write(template)
         print("✅ Created .env file. Please edit it with your credentials.")
     
-    # Install requirements
-    if not run_command("pip install -r requirements.txt", "Installing Python dependencies"):
+    # Install requirements into the active Python environment
+    python_executable = shlex.quote(sys.executable)
+    uv_executable = shutil.which("uv")
+
+    if uv_executable:
+        command = (
+            f"{shlex.quote(uv_executable)} pip install "
+            f"--python {python_executable} -r requirements.txt"
+        )
+    else:
+        command = f"{python_executable} -m pip install -r requirements.txt"
+
+    if not run_command(command, "Installing Python dependencies"):
         return False
     
-    # Download spaCy model
-    if not run_command("python -m spacy download en_core_web_sm", "Downloading spaCy model"):
-        return False
-    
-    # Create data directories
-    data_dir = Path("data/faiss")
-    data_dir.mkdir(parents=True, exist_ok=True)
-    print("✅ Created data directories")
-    
-    # Migrate existing FAISS data if available
-    if Path("FAISS").exists():
-        print("🔄 Found existing FAISS data. Running migration...")
-        if run_command("python migrate_data.py", "Migrating FAISS data"):
-            print("✅ Data migration completed")
     
     # Make CLI executable
     try:

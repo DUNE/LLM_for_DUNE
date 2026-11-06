@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 from typing import List, Dict, Any, Optional, Tuple
 import re
 from scipy import ndimage
-import spacy
 from src.utils.logger import get_logger
 from io import BytesIO
 import requests
@@ -20,7 +19,6 @@ class BaseExtractor(ABC):
 
     def __init__(self):
         super().__init__()
-        self.nlp = spacy.load("en_core_web_sm") # Unused variable
 
         pymupdf.set_messages(pylogging=True, pylogging_logger=logger)
 
@@ -39,25 +37,6 @@ class BaseExtractor(ABC):
             start=end
 
             end += chunk_size
-        return chunks
-
-    # Unused function
-    def section_get_chunks(self, text, chunk_size):
-        from langchain_experimental.text_splitter import SemanticChunker
-        from langchain.embeddings import HuggingFaceEmbeddings
-        from langchain.schema import Document
-
-        embedding = HuggingFaceEmbeddings(
-            model_name="sentence-transformers/all-MiniLM-L6-v2",
-            model_kwargs={"device": "cpu"}  # or "cuda"
-        )
-        text_splitter = SemanticChunker(embedding)
-        text = Document(page_content=' '.join(text))
-        try:
-            chunks = text_splitter.split_documents([text])
-            print(len(chunks))
-        except Exception as e:
-            logger.error(f"Error in splitting {e}")
         return chunks
 
     def _download_file(self, link, session, max_file_bytes) -> Optional[Tuple[bytes, Dict[str, str]]]:
@@ -155,19 +134,6 @@ class BaseExtractor(ABC):
         else:
             logger.warning(f"Unsupported content type ({content_type})")
         return raw_text, document_type
-
-    # Unused function
-    def clean_text(self, text: str) -> str:
-        """Clean and normalize text"""
-        if not text:
-            return ""
-
-        # Basic cleaning
-        text = re.sub(r'\s+', ' ', text).strip().lower()
-
-        # NLP processing
-        doc = self.nlp(text)
-        return ' '.join([token.lemma_ for token in doc if not token.is_stop and not token.is_punct])
 
     def extract_text_from_pdf(self, pdf_content: bytes) -> tuple[str, str]:
         """Extract text from PDF content"""

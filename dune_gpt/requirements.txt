@@ -2,7 +2,7 @@
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
 jinja2==3.1.2
-python-multipart
+python-multipart>=0.0.27
 pysqlite3-binary==0.5.4.post2
 markdown>=3.4
 
@@ -13,22 +13,21 @@ requests>=2.32.3
 numpy==2.4.1
 sentence-transformers>=3.0.0
 torch>=2.0.0
-torchvision
-torchaudio
 transformers>=4.30.0
-spacy>=3.7.0
 
 # Vector Database
-faiss-cpu>=1.7.4  # Use faiss-gpu if GPU available
 
 # Document Processing
+pymupdf>=2.0
+pymupdf4llm>=2.0
+rapidocr-onnxruntime>=1.4.4
+
 pdfplumber==0.9.0
 python-pptx==0.6.21
 beautifulsoup4==4.12.2
-pytesseract
-pillow
-python-docx
-openpyxl
+pillow>=12.2.0
+python-docx>=1.2.0
+openpyxl>=3.1.5
 xlrd==2.0.2
 rank-bm25==0.2.2
 
@@ -42,9 +41,8 @@ authlib==1.2.1
 python-dotenv==1.0.0
 
 # Utilities
-pathlib2>=2.3.7
 typing-extensions>=4.5.0
-itsdangerous
+itsdangerous>=2.2.0
 pydantic>=2.9.0,<3
 
 # Development (optional)
@@ -53,7 +51,6 @@ pytest-asyncio>=0.21.0
 black>=23.0.0
 flake8>=6.0.0
 
-pdf2image
 
 # Web Automation
 playwright==1.46.0
@@ -66,28 +63,18 @@ cloudscraper>=1.2.70
 chromadb==1.4.1
 
 # Slack
-slack-bolt
+slack-bolt>=1.28.0
 slack-cli-hooks<1.0.0
-markdown_to_mrkdwn
+markdown-to-mrkdwn>=0.3.2
 
-langchain_core
-langchain_openai
+langchain-core>=1.4.0
+langchain-openai>=1.2.2
 
-google-api-python-client
-google-auth-httplib2 
-google-auth-oauthlib
-gspread
-# Slack
-slack-bolt
-slack-cli-hooks<1.0.0
-markdown_to_mrkdwn
+google-api-python-client>=2.197.0
+google-auth-httplib2>=0.4.0
+google-auth-oauthlib>=1.4.0
+gspread>=6.2.1
 
-langchain_core
-langchain_openai
 
-google-api-python-client
-google-auth-httplib2 
-google-auth-oauthlib
-gspread
 
 curl-cffi>=0.16.2

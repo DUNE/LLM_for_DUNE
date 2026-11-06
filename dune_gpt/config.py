@@ -3,7 +3,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 # Base configuration
 BASE_DIR = Path(__file__).parent.absolute()
-load_dotenv() 
+load_dotenv()
 # API Configuration
 MAX_VARIABLE_NUMBER=5461
 
@@ -63,10 +63,6 @@ CHUNK_SIZE = int(os.getenv("CHUNK_SIZE",4000))
 STORE = os.getenv("VECTOR_STORE", 'chroma')
 # Database Configuration
 CHROMA_PATH = PROD_DB_PATH
-FAISS_DIR = BASE_DIR / "data" / "faiss"
-FAISS_INDEX_PATH = FAISS_DIR / "faiss_index.index"
-METADATA_PATH = FAISS_DIR / "metadata_store.pkl"
-DOC_IDS_PATH = FAISS_DIR / "doc_ids.pkl"
 
 # Model Configuration
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "multi-qa-mpnet-base-dot-v1")
@@ -121,16 +117,16 @@ def validate_config():
         ("DUNE_DOCDB_USERNAME", DUNE_DOCDB_USERNAME),
         ("DUNE_DOCDB_PASSWORD", DUNE_DOCDB_PASSWORD),
     ]
-    
+
     # Add Fermilab auth requirements if authentication is enabled
     if ENABLE_AUTHENTICATION:
         required_vars.extend([
             ("FERMILAB_CLIENT_ID", FERMILAB_CLIENT_ID),
             ("FERMILAB_CLIENT_SECRET", FERMILAB_CLIENT_SECRET),
         ])
-    
+
     missing_vars = [var_name for var_name, var_value in required_vars if not var_value]
-    
+
     if missing_vars:
         raise EnvironmentError(
             f"Missing required environment variables: {', '.join(missing_vars)}"
@@ -139,8 +135,8 @@ def validate_config():
 # Create necessary directories
 def create_directories(path):
     """Create necessary directories if they don't exist"""
-    FAISS_DIR=BASE_DIR / path
-    FAISS_DIR.mkdir(parents=True, exist_ok=True) 
+    directory = BASE_DIR / path
+    directory.mkdir(parents=True, exist_ok=True)
 
 # AskDUNE website feedback configuration
 WEB_FEEDBACK_ENABLED = os.getenv(

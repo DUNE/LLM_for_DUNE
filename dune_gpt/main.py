@@ -22,14 +22,9 @@ from config import (
     LLM_PROVIDER
 )
 
-if STORE == 'faiss':
-    from src.indexing.faiss_manager_langchain import FAISSManager
-    db_manager: Optional[FAISSManager] = None
-elif STORE == 'chroma':
-    from src.indexing.chroma_manager import ChromaManager 
-    db_manager: Optional[ChromaManager] = None
-else:
-    raise Exception(f"DUNE-GPT requires Faiss or Chroma. Got {STORE}")
+from src.indexing.chroma_manager import ChromaManager
+
+db_manager: Optional[ChromaManager] = None
 from src.api.fermilab_client import FermilabAPIClient
 from src.api.argo_client import ArgoAPIClient
 from src.auth.fermilab_auth import fermilab_auth
@@ -67,12 +62,11 @@ async def lifespan(app: FastAPI):
         logger.info("Initializing legacy retrieval backend")
         retrieval_backend = None
 
-        if STORE == "faiss":
-            db_manager = FAISSManager(CHROMA_PATH)
-        elif STORE == "chroma":
-            db_manager = ChromaManager(CHROMA_PATH)
-        else:
-            raise RuntimeError(f"Unsupported vector store: {STORE}")
+        if STORE != "chroma":
+            raise RuntimeError(
+                f"Legacy retrieval requires VECTOR_STORE=chroma; got {STORE}"
+            )
+        db_manager = ChromaManager(CHROMA_PATH)
 
     active_retrieval_backend = backend_name
 

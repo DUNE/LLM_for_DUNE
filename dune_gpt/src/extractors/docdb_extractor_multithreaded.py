@@ -13,7 +13,13 @@ import time
 from bs4 import BeautifulSoup
 from requests.adapters import HTTPAdapter
 from requests.auth import HTTPBasicAuth
-from src.extractors.indico_extractor import DEFAULT_COOKIES_PATH, DEFAULT_UA, HAS_CLOUDSCRAPER
+DEFAULT_UA = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) "
+    "Chrome/126.0.0.0 Safari/537.36"
+)
+
+DEFAULT_COOKIES_PATH = os.path.expanduser("~/.indico_cookies.json")
 from urllib3.util.retry import Retry
 from curl_cffi import requests
 
@@ -51,7 +57,7 @@ class DocDBExtractor(BaseExtractor):
 
     def __init__(
         self,
-        faiss= None,
+        db_manager=None,
         max_retries: int = 5,
         timeout_sec: int = 30,
         max_pool: int = 20,
@@ -64,7 +70,7 @@ class DocDBExtractor(BaseExtractor):
         self.password = DUNE_DOCDB_PASSWORD
         if not self.username or not self.password:
             raise ValueError("DocDB credentials not provided")
-        self.faiss=faiss
+        self.db_manager = db_manager
 
         # Example base: "https://docs.dunescience.org/cgi-bin/sso/"
         self.base_url = DOCDB_BASE_URL
