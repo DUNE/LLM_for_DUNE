@@ -5,7 +5,7 @@ This runbook covers **development operations on `askdunegpvm01`** and a safe che
 ## 1. Hosts, paths, and boundaries
 
 - Development host: `askdunegpvm01.fnal.gov` (account `dune`).
-- Repository directory: `/exp/dune/app/users/dune/askdune/dev/docdb-integration/dune_gpt`.
+- Repository directory: `/exp/dune/app/users/dune/askdune/dev/askdune-v1.0.0/askdune/askdune_app`.
 - Production AskDUNE uses port **8000** with Fermilab SSO. **Do not stop, restart, replace, or bind to port 8000** using this runbook.
 - Development server uses port **8001**, bound to `127.0.0.1`, with authentication disabled only for private testing.
 - Preserve both existing indexes: stable legacy development ChromaDB under `../test_data/indexing` and experimental parent-child ChromaDB under `../test_data/parent_child_experiment` (paths relative to the repository). Do not delete, overwrite, or rebuild either without a reviewed plan.
@@ -15,7 +15,7 @@ This runbook covers **development operations on `askdunegpvm01`** and a safe che
 
 ```bash
 ssh askdune
-cd /exp/dune/app/users/dune/askdune/dev/docdb-integration/dune_gpt
+cd /exp/dune/app/users/dune/askdune/dev/askdune-v1.0.0/askdune/askdune_app
 source .venv/bin/activate
 ```
 
@@ -91,8 +91,8 @@ Required precautions:
 Read-only CLI inspection:
 
 ```bash
-python scripts/run_docdb_parent_child.py --help
-python scripts/run_indico_parent_child.py --help
+python scripts/run_docdb_indexing.py --help
+python scripts/run_indico_indexing.py --help
 ```
 
 ## 6. Run a small DocDB indexing batch
@@ -100,7 +100,7 @@ python scripts/run_indico_parent_child.py --help
 **Only after the checks in section 5**:
 
 ```bash
-python scripts/run_docdb_parent_child.py --start 1 --limit 5 --batch-size 32
+python scripts/run_docdb_indexing.py --start 1 --limit 5 --batch-size 32
 ```
 
 `--start` defaults to 1, `--limit` to 5, and `--batch-size` to 32. The pipeline prepares DocDB documents and attachments, embeds smaller children, and tracks active document versions in the DocDB manifest. A repeated run is not a substitute for confirming actual update/version behavior.
@@ -110,7 +110,7 @@ python scripts/run_docdb_parent_child.py --start 1 --limit 5 --batch-size 32
 **Only after the checks in section 5**:
 
 ```bash
-python scripts/run_indico_parent_child.py --start 0 --limit 5 --batch-size 32
+python scripts/run_indico_indexing.py --start 0 --limit 5 --batch-size 32
 ```
 
 For one event, inspect `--help` and use `--event-id` with the intended event identifier. The Indico script skips events whose existing children are all marked complete; its completion logic differs from DocDB version tracking.
@@ -129,7 +129,7 @@ For development logging, optionally redirect a command's output to a timestamped
 
 ```bash
 mkdir -p "$HOME/askdune-dev-logs"
-python scripts/run_docdb_parent_child.py --start 1 --limit 5 --batch-size 32 \
+python scripts/run_docdb_indexing.py --start 1 --limit 5 --batch-size 32 \
   > "$HOME/askdune-dev-logs/docdb-test-$(date +%Y%m%d-%H%M%S).log" 2>&1
 ```
 

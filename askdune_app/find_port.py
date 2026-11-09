@@ -8,4 +8,5 @@ def find_port():
         s.bind(('', 0))  # Bind to a free port provided by the OS
         return s.getsockname()[1]
 
-print(find_port())
+if __name__ == "__main__":
+    print(find_port())

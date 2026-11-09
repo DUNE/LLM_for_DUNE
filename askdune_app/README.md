@@ -44,7 +44,7 @@ Requires Python 3.11, the relevant DUNE document access, and credentials for the
 
 ```bash
 git clone https://github.com/DUNE/LLM_for_DUNE.git
-cd LLM_for_DUNE/dune_gpt
+cd LLM_for_DUNE/askdune_app
 python3.11 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
@@ -75,8 +75,8 @@ Visit `http://127.0.0.1:8001/` locally. For a remote development host, use an SS
 The experimental indexing scripts offer command-line help without writing data:
 
 ```bash
-python scripts/run_docdb_parent_child.py --help
-python scripts/run_indico_parent_child.py --help
+python scripts/run_docdb_indexing.py --help
+python scripts/run_indico_indexing.py --help
 ```
 
 Read [INSTALL.md](INSTALL.md) and [scripts/README.md](scripts/README.md) before running indexing.

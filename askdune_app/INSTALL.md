@@ -14,7 +14,7 @@ This guide describes the current Python development setup. Production deployment
 
 ```bash
 git clone https://github.com/DUNE/LLM_for_DUNE.git
-cd LLM_for_DUNE/dune_gpt
+cd LLM_for_DUNE/askdune_app
 python3.11 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
