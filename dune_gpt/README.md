@@ -111,3 +111,9 @@ Read [INSTALL.md](INSTALL.md) and [scripts/README.md](scripts/README.md) before 
 ## Security and contributions
 
 Never commit `.env`, passwords, API keys, SSO secrets, or private document contents. Preserve existing indexes when developing new retrieval and indexing features. Test changes against isolated development data and document any new configuration variables or retrieval behavior. Production deployment, Docker support, and HTTP endpoint details should be verified against the target environment before being advertised as supported.
+
+## Operational and benchmark command guides
+
+- [Indexing commands, options, and examples](scripts/README.md)
+- [Serving and development operations](OPERATIONS.md)
+- [Parent-child benchmark commands, options, and examples](benchmarking/parent_child_comparison/README.md)

@@ -23,3 +23,36 @@ Supported arguments: `--event-id` (optional), `--limit` (default 5), `--start` (
 Both scripts derive the experimental directory as the sibling `parent_child_experiment` of `INDEXING_DB_PATH` and require that experimental directory to exist and differ from the stable indexing directory. The expected ChromaDB collections include `DUNE_DOCDB_CHILDREN`, `DUNE_DOCDB_VERSION_MANIFEST`, and `DUNE_INDICO_CHILDREN`.
 
 **Before indexing:** inspect the current `.env`, confirm the target directory, ensure source access is authorized, and preserve backups of important indexes. Do not run indexing as a documentation test. CLI `--help` is a read-only way to inspect options.
+
+## Copy-and-run indexing examples
+
+Run these from the repository root after activating `.venv` and verifying the **experimental write destination**. These commands **modify an index**; do not run them merely to test the documentation.
+
+```bash
+# Inspect the actual options supported by the installed scripts (read-only).
+python scripts/run_docdb_parent_child.py --help
+python scripts/run_indico_parent_child.py --help
+
+# DocDB: process up to five documents starting at document ID 1.
+PYTHONPATH=. python -u scripts/run_docdb_parent_child.py \
+  --start 1 --limit 5 --batch-size 32
+
+# Indico: process up to five events starting at offset 0.
+PYTHONPATH=. python -u scripts/run_indico_parent_child.py \
+  --start 0 --limit 5 --batch-size 32
+
+# Indico: target one known event (replace the placeholder with a real ID).
+PYTHONPATH=. python -u scripts/run_indico_parent_child.py --event-id EVENT_ID
+```
+
+| Script | Option | Default | Meaning |
+|---|---|---|---|
+| DocDB | `--start` | `1` | Starting DocDB identifier |
+| DocDB | `--limit` | `5` | Maximum documents to attempt in this batch |
+| DocDB | `--batch-size` | `32` | Embedding/indexing batch size |
+| Indico | `--start` | `0` | Starting event offset |
+| Indico | `--limit` | `5` | Maximum events to attempt |
+| Indico | `--batch-size` | `32` | Embedding/indexing batch size |
+| Indico | `--event-id` | not set | Target a specific event |
+
+These are the options previously reviewed for the experimental scripts; `--help` on the deployed version is authoritative. A successful command does not guarantee that every source was extracted or indexed; inspect its logs and collection counts.

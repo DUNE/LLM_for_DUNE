@@ -176,3 +176,34 @@ git diff --check
 ```
 
 Stage only reviewed source and documentation files. Never stage `.env`, private logs, indexes, or local backups. For architecture and setup details, see `README.md`, `INSTALL.md`, `scripts/README.md`, and `src/retrieval/README.md`.
+
+## Quick reference: serving examples
+
+Run from the repository root with `.venv` active. The example is **development only** and deliberately uses a localhost-only port distinct from production.
+
+```bash
+# Terminal on askdunegpvm01: start private development instance.
+ENABLE_AUTHENTICATION=false RETRIEVAL_BACKEND=unified PYTHONPATH=. \
+  python -m uvicorn main:app --host 127.0.0.1 --port 8001
+
+# Separate terminal on your local machine: forward port 8001.
+ssh -N -L 8001:127.0.0.1:8001 askdune
+
+# Check the development endpoint from the server.
+curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:8001/
+
+# Inspect Uvicorn's installed options without starting the server.
+python -m uvicorn --help
+```
+
+| Setting | Example | Explanation |
+|---|---|---|
+| `PYTHONPATH=.` | `.` | Include the repository root in Python module lookup |
+| `ENABLE_AUTHENTICATION` | `false` | Disable authentication **only for private local development** |
+| `RETRIEVAL_BACKEND` | `unified` | Select the unified retrieval implementation |
+| `main:app` | `main:app` | Import the FastAPI `app` from `main.py` |
+| `--host` | `127.0.0.1` | Accept connections only on the server loopback interface |
+| `--port` | `8001` | Development listener; **8000 is reserved for production** |
+| `-u` (Python) | `python -u` | Unbuffered console output, useful for long-running scripts |
+
+To stop this foreground development instance, use **Ctrl+C in its own terminal**. Do not run a generic kill command and do not assume the live SSO service uses this startup procedure.
