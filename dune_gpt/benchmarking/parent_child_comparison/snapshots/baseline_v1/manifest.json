@@ -1,0 +1,118 @@
+{
+  "benchmark_name": "AskDUNE Parent-Child RAG Baseline",
+  "version": "baseline_v1",
+  "created_utc": "2026-11-09T21:11:27.211366+00:00",
+  "git": {
+    "branch": "docdb-parent-child",
+    "commit": "3efef6911de799bdd925c8e506d928f032c2b99c",
+    "working_tree_status": "M dune_gpt/OPERATIONS.md\n M dune_gpt/README.md\n M dune_gpt/scripts/README.md\n M dune_gpt/scripts/run_docdb_parent_child.py\n M dune_gpt/scripts/run_indico_parent_child.py\n M dune_gpt/src/extractors/docdb_token_chunker.py\n?? dune_gpt/benchmarking/parent_child_comparison/\n?? student-docdb.patch\n?? test_data/"
+  },
+  "dataset": {
+    "questions": 118,
+    "docdb_questions": 55,
+    "indico_questions": 63,
+    "frozen_sources": 214,
+    "docdb_documents": 108,
+    "indico_events": 106
+  },
+  "configuration": {
+    "index_path": "/exp/dune/app/users/dune/askdune/dev/docdb-integration/test_data/benchmark_200",
+    "embedding_model": "intfloat/e5-small-v2",
+    "reranker": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+    "generation_model": "gpt-oss:120b",
+    "judge_model": "gpt-oss:120b",
+    "retrieval": "semantic + BM25 + cross-encoder reranking + metadata bonus",
+    "context_strategy": "parent reconstruction",
+    "top_k": 5,
+    "embedding_candidates": 30
+  },
+  "metrics_percent": {
+    "source_recall_at_5": {
+      "overall": 94.07,
+      "docdb": 96.36,
+      "indico": 92.06
+    },
+    "exact_parent_recall_at_5": {
+      "overall": 90.68,
+      "docdb": 92.73,
+      "indico": 88.89
+    },
+    "evidence_available_to_llm": {
+      "overall": 94.07,
+      "docdb": 94.55,
+      "indico": 93.65
+    },
+    "mean_answer_correctness": {
+      "overall": 94.07,
+      "docdb": 96.36,
+      "indico": 92.06
+    },
+    "fully_correct_answer_rate": {
+      "overall": 94.07,
+      "docdb": 96.36,
+      "indico": 92.06
+    },
+    "citation_support_proxy": {
+      "overall": 92.37,
+      "docdb": 94.55,
+      "indico": 90.48
+    }
+  },
+  "methodology_notes": [
+    "Only accepted questions were included.",
+    "Correctness scores: 0, 0.5, or 1.",
+    "Correctness was evaluated by the same model family used for generation.",
+    "Evidence availability uses normalized literal quote matching.",
+    "Citation support proxy requires a fully correct answer and matched evidence in retrieved contexts.",
+    "Citation support proxy is not claim-level citation verification.",
+    "This is a development benchmark, not an independent held-out evaluation.",
+    "The frozen retrieval index is referenced but not copied into this snapshot.",
+    "Current versions of the indexing scripts, DocDB chunker, and unified retrieval backend are archived under code/."
+  ],
+  "files": {
+    "code/scripts/run_docdb_parent_child.py": {
+      "size_bytes": 5535,
+      "sha256": "fd8d0c2f84c9939745fe7f2fc9402308ed40bfb36c95a4da35982e536327d5b8"
+    },
+    "code/scripts/run_indico_parent_child.py": {
+      "size_bytes": 8256,
+      "sha256": "684958df6fc42e6709870b271782c5d26c26583a7541d48f190abd8c33f7708c"
+    },
+    "code/src/extractors/docdb_token_chunker.py": {
+      "size_bytes": 3901,
+      "sha256": "21adcde3d3b93485b853e7d75032d87ad7322c3a66b81d7b6b3f349a2380c4ed"
+    },
+    "code/src/retrieval/unified_backend.py": {
+      "size_bytes": 1849,
+      "sha256": "849de01f2337b207cc11839a4a345786287ead555b4e50a65da0f74a049929cc"
+    },
+    "data/questions_reviewed.jsonl": {
+      "size_bytes": 144938,
+      "sha256": "d6670256b06f83d8db7fb38bfa9180a7208562ba477358115e4388d920294b62"
+    },
+    "evaluate_correctness.py": {
+      "size_bytes": 4848,
+      "sha256": "33d739c323da2d6bdc3de0a3007b8aa4e8bec7479b2f05a7cef68dc5f6ea2c6c"
+    },
+    "evaluate_generation.py": {
+      "size_bytes": 4929,
+      "sha256": "c6b4f6669de8a694098d442367aec8609c31d1976afafbf428601c8915bf9787"
+    },
+    "results/parent_child_correctness.jsonl": {
+      "size_bytes": 42253,
+      "sha256": "557d6c885f0c4435ee40b26e054b27dd6fbe29ee4479973cd8db285deaac7cae"
+    },
+    "results/parent_child_generation_evidence.jsonl": {
+      "size_bytes": 12997,
+      "sha256": "7a31865de3f15d47ff09b30d4b184f49e917ef9a15bc3757c933c58d91490eb6"
+    },
+    "results/parent_child_generation_full.jsonl": {
+      "size_bytes": 5337404,
+      "sha256": "443992529eec48af1b57e6a96d99c9278b1b9f50866e158f9447cbf75e6c7dbc"
+    },
+    "results/parent_child_retrieval.jsonl": {
+      "size_bytes": 180050,
+      "sha256": "eec65a03e355b3ba9c1ffa38026498d517cf6ddd6c545f30acc0b06d09dc71ab"
+    }
+  }
+}

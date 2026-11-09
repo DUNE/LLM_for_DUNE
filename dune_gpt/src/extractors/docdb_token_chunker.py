@@ -26,6 +26,55 @@ def chunk_docdb_text(text: str, target_tokens: int = 480) -> list[str]:
         raise ValueError("Token budget is too small for the passage prefix")
 
     words = text.split()
+    original_words = words.copy()
+
+    # Split long whitespace-free strings into token-safe pieces.
+    # Handles extracted tables, HTML fragments, and long URLs.
+    safe_words = []
+
+    for word in words:
+        if len(tokenizer.encode(
+            prefix + word,
+            add_special_tokens=True,
+            truncation=False,
+        )) <= max_length:
+            safe_words.append(word)
+            continue
+
+        # Split oversized words without discarding any characters.
+        start = 0
+
+        while start < len(word):
+            low = start + 1
+            high = len(word)
+            best = start
+
+            while low <= high:
+                mid = (low + high) // 2
+                candidate = word[start:mid]
+
+                token_count = len(tokenizer.encode(
+                    prefix + candidate,
+                    add_special_tokens=True,
+                    truncation=False,
+                ))
+
+                if token_count <= max_length:
+                    best = mid
+                    low = mid + 1
+                else:
+                    high = mid - 1
+
+            if best == start:
+                raise ValueError(
+                    "Cannot split long word within token budget"
+                )
+
+            safe_words.append(word[start:best])
+            start = best
+
+    words = safe_words
+
     chunks = []
     current = []
     estimated_tokens = prefix_tokens
@@ -70,7 +119,7 @@ def chunk_docdb_text(text: str, target_tokens: int = 480) -> list[str]:
     if current:
         chunks.append(" ".join(current))
 
-    assert " ".join(chunks) == " ".join(words)
+    assert "".join("".join(chunk.split()) for chunk in chunks) == "".join(original_words)
     assert all(token_length(chunk) <= max_length for chunk in chunks)
 
     return chunks

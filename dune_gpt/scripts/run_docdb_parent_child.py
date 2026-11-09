@@ -8,7 +8,7 @@ from pathlib import Path
 
 import chromadb
 
-from config import EMBEDDING_MODEL, INDEXING_DB_PATH
+from config import EMBEDDING_MODEL, INDEXING_DB_PATH, PROD_DB_PATH
 from src.analytics.index_inventory import chromadb_storage_bytes, collection_stats, print_inventory_comparison
 from src.embedder.embedding_wrappers import OriginalEmbedder
 from src.extractors.docdb_extractor_multithreaded import DocDBExtractor
@@ -22,6 +22,12 @@ def main():
     parser.add_argument("--start", type=int, default=1)
     parser.add_argument("--limit", type=int, default=5)
     parser.add_argument("--batch-size", type=int, default=32)
+    parser.add_argument(
+        "--index-path",
+        type=str,
+        default=None,
+        help="Path to an isolated parent-child ChromaDB index",
+    )
     args = parser.parse_args()
 
     if args.start < 1 or args.limit < 1 or args.batch_size < 1:
@@ -31,7 +37,31 @@ def main():
         raise RuntimeError(f"Unexpected embedding model: {EMBEDDING_MODEL}")
 
     stable_path = Path(INDEXING_DB_PATH).resolve()
-    experiment_path = stable_path.parent / "parent_child_experiment"
+    experiment_path = (
+        Path(args.index_path).resolve()
+        if args.index_path
+        else stable_path.parent / "parent_child_experiment"
+    )
+
+    protected_paths = {
+        stable_path,
+        Path(PROD_DB_PATH).resolve(),
+    }
+
+    if experiment_path in protected_paths:
+        raise RuntimeError(
+            f"Refusing to modify a protected database: {experiment_path}"
+        )
+
+    if args.index_path:
+        benchmark_path = (
+            stable_path.parent / "benchmark_200"
+        ).resolve()
+
+        if experiment_path != benchmark_path:
+            raise RuntimeError(
+                f"Benchmark indexing is restricted to: {benchmark_path}"
+            )
 
     if not experiment_path.is_dir():
         raise RuntimeError(
@@ -84,7 +114,7 @@ def main():
 
         print("Result:", result, flush=True)
 
-        if result.get("status") == "indexed":
+        if result.get("status") in ("indexed", "updated"):
             processed += 1
             parent_tokens += count_parent_tokens(parents)
             child_records = [

@@ -8,7 +8,7 @@ from pathlib import Path
 
 import chromadb
 
-from config import EMBEDDING_MODEL, INDEXING_DB_PATH
+from config import EMBEDDING_MODEL, INDEXING_DB_PATH, PROD_DB_PATH
 
 from src.analytics.index_inventory import chromadb_storage_bytes, collection_stats, print_inventory_comparison
 from src.embedder.embedding_wrappers import OriginalEmbedder
@@ -26,6 +26,12 @@ def main():
     parser.add_argument("--limit", type=int, default=5)
     parser.add_argument("--start", type=int, default=0)
     parser.add_argument("--batch-size", type=int, default=32)
+    parser.add_argument(
+        "--index-path",
+        type=str,
+        default=None,
+        help="Path to an isolated parent-child ChromaDB index",
+    )
     args = parser.parse_args()
 
     if args.limit < 1 or args.start < 0 or args.batch_size < 1:
@@ -40,7 +46,31 @@ def main():
         )
 
     stable_path = Path(INDEXING_DB_PATH).resolve()
-    experiment_path = stable_path.parent / "parent_child_experiment"
+    experiment_path = (
+        Path(args.index_path).resolve()
+        if args.index_path
+        else stable_path.parent / "parent_child_experiment"
+    )
+
+    protected_paths = {
+        stable_path,
+        Path(PROD_DB_PATH).resolve(),
+    }
+
+    if experiment_path in protected_paths:
+        raise RuntimeError(
+            f"Refusing to modify a protected database: {experiment_path}"
+        )
+
+    if args.index_path:
+        benchmark_path = (
+            stable_path.parent / "benchmark_200"
+        ).resolve()
+
+        if experiment_path != benchmark_path:
+            raise RuntimeError(
+                f"Benchmark indexing is restricted to: {benchmark_path}"
+            )
 
     if not experiment_path.is_dir():
         raise RuntimeError(
@@ -91,6 +121,35 @@ def main():
             if event.get("id") is not None
         }.values())
 
+
+        # Exclude completed events before applying the selection limit.
+        # This prevents previously indexed events from occupying batch slots.
+        completed_ids = set()
+
+        existing_records = children.get(include=["metadatas"])
+
+        for metadata in existing_records["metadatas"]:
+            if (
+                metadata
+                and metadata.get("indico_id") is not None
+                and metadata.get("index_status") == "complete"
+            ):
+                completed_ids.add(str(metadata["indico_id"]))
+
+        total_discovered = len(events)
+
+        events = [
+            event
+            for event in events
+            if str(event["id"]) not in completed_ids
+        ]
+
+        print(
+            f"Discovered {total_discovered} unique events; "
+            f"{len(events)} not yet indexed",
+            flush=True,
+        )
+
         events = events[:args.limit]
 
     embedder = None
@@ -99,63 +158,77 @@ def main():
     child_tokens = 0
     skipped_complete = 0
     no_extractable_attachments = 0
+    failed_events = 0
+
 
     for event in events:
         event_id = str(event["id"])
 
-        existing = children.get(
-            where={"indico_id": event_id},
-            include=["metadatas"],
-        )
+        try:
+            existing = children.get(
+                where={"indico_id": event_id},
+                include=["metadatas"],
+            )
 
-        if existing["ids"] and all(
-            m.get("index_status") == "complete"
-            for m in existing["metadatas"]
-        ):
-            print(f"Skipping completed event {event_id}", flush=True)
-            skipped_complete += 1
+            if existing["ids"] and all(
+                m.get("index_status") == "complete"
+                for m in existing["metadatas"]
+            ):
+                print(f"Skipping completed event {event_id}", flush=True)
+                skipped_complete += 1
+                continue
+
+            print(f"Extracting event {event_id}", flush=True)
+
+            attachments = list(
+                extractor.iter_event_attachments(event)
+            )
+
+            parents = []
+            for attachment in attachments:
+                parents.extend(build_indico_parents(attachment))
+
+            if not parents:
+                print(f"No extractable attachments: {event_id}", flush=True)
+                no_extractable_attachments += 1
+                continue
+
+            if embedder is None:
+                embedder = OriginalEmbedder(EMBEDDING_MODEL)
+
+            result = index_indico_event(
+                children,
+                event_id,
+                parents,
+                embedder.embed_documents,
+                target_tokens=480,
+                batch_size=args.batch_size,
+            )
+
+            print("Result:", result, flush=True)
+
+            if result.get("status") == "indexed":
+                processed += 1
+                parent_tokens += count_parent_tokens(parents)
+
+                child_records = [
+                    child
+                    for parent in parents
+                    for child in build_indico_child_records(
+                        parent, target_tokens=480
+                    )
+                ]
+
+                child_tokens += count_child_embedding_tokens(child_records)
+
+        except Exception as exc:
+            failed_events += 1
+            print(
+                f"ERROR indexing Indico event {event_id}: "
+                f"{type(exc).__name__}: {exc}",
+                flush=True,
+            )
             continue
-
-        print(f"Extracting event {event_id}", flush=True)
-
-        attachments = list(
-            extractor.iter_event_attachments(event)
-        )
-
-        parents = []
-        for attachment in attachments:
-            parents.extend(build_indico_parents(attachment))
-
-        if not parents:
-            print(f"No extractable attachments: {event_id}", flush=True)
-            no_extractable_attachments += 1
-            continue
-
-        if embedder is None:
-            embedder = OriginalEmbedder(EMBEDDING_MODEL)
-
-        result = index_indico_event(
-            children,
-            event_id,
-            parents,
-            embedder.embed_documents,
-            target_tokens=480,
-            batch_size=args.batch_size,
-        )
-
-        print("Result:", result, flush=True)
-
-        if result.get("status") == "indexed":
-            processed += 1
-            parent_tokens += count_parent_tokens(parents)
-            child_records = [
-                child
-                for parent in parents
-                for child in build_indico_child_records(
-                    parent, target_tokens=480
-                )
-            ]
-            child_tokens += count_child_embedding_tokens(child_records)
 
     print("\n========== INDICO INDEXING RUN SUMMARY ==========")
     print(f"Requested events:       {1 if args.event_id is not None else args.limit}")
@@ -166,6 +239,7 @@ def main():
     print(f"Events checked:         {len(events)}")
     print(f"Events no attachments:  {no_extractable_attachments}")
     print(f"Events unchanged:       {skipped_complete}")
+    print(f"Events failed:          {failed_events}")
     print(f"Events prepared:        {processed}")
     print(f"Events indexed:         {processed}")
     print(f"Parent text tokens:     {parent_tokens:,}")
