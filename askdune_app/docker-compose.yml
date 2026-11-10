@@ -12,12 +12,11 @@ services:
       - .env
 
     environment:
-      # The service must listen on all container interfaces.
       HOST: "0.0.0.0"
       PORT: "8000"
 
-      # This is the database path inside the container.
-      DB_PATH: "/data/chroma"
+      # Validated unified retrieval index
+      PROD_DB_PATH: "/data/chroma"
 
       # Persist downloaded embedding/reranking models.
       HF_HOME: "/cache/huggingface"
@@ -30,8 +29,8 @@ services:
       - "127.0.0.1:8000:8000"
 
     volumes:
-      # Host Chroma path is configured using HOST_DB_PATH.
-      - "${HOST_DB_PATH}:/data/chroma"
+      # Validated unified index, mounted read-only for serving
+      - "${HOST_DB_PATH}:/data/chroma:ro"
 
       # Do not download the Hugging Face models on every restart.
       - askdune_model_cache:/cache

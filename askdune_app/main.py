@@ -18,13 +18,10 @@ from src.web_feedback.routes import router as web_feedback_router
 from config import (
     HOST, PORT, DEBUG, ARGO_API_USERNAME, ARGO_API_KEY,
     DEFAULT_TOP_K, ENABLE_AUTHENTICATION, FERMILAB_REDIRECT_URI,
-    STORE, validate_config, create_directories, CHROMA_PATH, FERMILAB_SESSION_SECRET, K_DOCS,
+    validate_config, FERMILAB_SESSION_SECRET, K_DOCS,
     LLM_PROVIDER
 )
 
-from src.indexing.chroma_manager import ChromaManager
-
-db_manager: Optional[ChromaManager] = None
 from src.api.fermilab_client import FermilabAPIClient
 from src.api.argo_client import ArgoAPIClient
 from src.auth.fermilab_auth import fermilab_auth
@@ -36,39 +33,23 @@ logger = get_logger(__name__)
 
 # Global variables
 llm_client = None  # FermilabAPIClient or ArgoAPIClient
-retrieval_backend = None  # Optional unified retrieval backend
-active_retrieval_backend = None  # Selected at application startup
+retrieval_backend = None  # Unified parent-child retrieval backend
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage application lifecycle"""
-    global db_manager, llm_client, retrieval_backend, active_retrieval_backend
-    
+    global llm_client, retrieval_backend
+
     # Startup
     logger.info("Starting DUNE-GPT application")
-    
+
     # Validate configuration
     validate_config()
-    create_directories(CHROMA_PATH)
-    
-    # Initialize only the selected retrieval backend.
-    backend_name, unified_index_path = get_retrieval_config()
+    # Initialize unified parent-child retrieval.
+    index_path = get_retrieval_config()
 
-    if backend_name == "unified":
-        logger.info("Initializing unified parent-child retrieval")
-        retrieval_backend = UnifiedRetrievalBackend(unified_index_path)
-        db_manager = None
-    else:
-        logger.info("Initializing legacy retrieval backend")
-        retrieval_backend = None
-
-        if STORE != "chroma":
-            raise RuntimeError(
-                f"Legacy retrieval requires VECTOR_STORE=chroma; got {STORE}"
-            )
-        db_manager = ChromaManager(CHROMA_PATH)
-
-    active_retrieval_backend = backend_name
+    logger.info("Initializing unified parent-child retrieval")
+    retrieval_backend = UnifiedRetrievalBackend(index_path)
 
     if LLM_PROVIDER == "argo":
         logger.info("Using Argo API client (LLM_PROVIDER=argo)")
@@ -78,31 +59,18 @@ async def lifespan(app: FastAPI):
     else:
         logger.info("Using Fermilab API client (LLM_PROVIDER=fermilab)")
         llm_client = FermilabAPIClient()
-    
-    # Report statistics for the selected retrieval backend.
-    if active_retrieval_backend == "unified":
-        logger.info(
-            "Unified index loaded: %d DocDB children, %d Indico children",
-            retrieval_backend.docdb.count(),
-            retrieval_backend.indico.count(),
-        )
-    else:
-        total_embeddings = db_manager.get_stats().get("total_embeddings", 0)
 
-        if not total_embeddings:
-            logger.warning("Vector store is empty. Run the indexing process first.")
-        else:
-            logger.info(
-                "Vector store loaded with %d embeddings.",
-                total_embeddings,
-            )
+    # Report unified retrieval index statistics.
+    logger.info(
+        "Unified index loaded: %d DocDB children, %d Indico children",
+        retrieval_backend.docdb.count(),
+        retrieval_backend.indico.count(),
+    )
 
     yield
-    
+
     # Shutdown
     logger.info("Shutting down DUNE-GPT application")
-    if db_manager:
-        db_manager.cleanup()
 
 # Create FastAPI app
 app = FastAPI(
@@ -179,14 +147,14 @@ if ENABLE_AUTHENTICATION:
         """Initiate Fermilab OAuth2 login"""
         logger.info(f"OAuth2 redirect URI: {FERMILAB_REDIRECT_URI}")
         return await fermilab_auth.authorize_redirect(request, FERMILAB_REDIRECT_URI)
-    
+
     @app.get("/auth", name="auth_callback")
     async def auth_callback(request: Request):
         """Handle OAuth2 callback"""
         logger.info("Processing OAuth2 callback")
         await fermilab_auth.handle_callback(request)
         return RedirectResponse(url="/")
-    
+
     @app.get("/logout")
     async def logout(request: Request):
         """Logout user"""
@@ -199,27 +167,16 @@ def search_documents(
     top_k: int = DEFAULT_TOP_K,
     k_embeddings: int = K_DOCS,
 ) -> tuple[list[str], list[str]]:
-    """Search using the configured retrieval backend."""
+    """Search using unified parent-child retrieval."""
 
-    if active_retrieval_backend is None:
-        raise RuntimeError("Retrieval backend has not been initialized")
+    if retrieval_backend is None:
+        raise RuntimeError("Unified retrieval backend is not initialized")
 
-    if active_retrieval_backend == "unified":
-        if retrieval_backend is None:
-            raise RuntimeError("Unified retrieval backend is not initialized")
-
-        return retrieval_backend.search(
-            question,
-            top_k=top_k,
-            k_embeddings=k_embeddings,
-        )
-
-    return db_manager.search(
+    return retrieval_backend.search(
         question,
         top_k=top_k,
         k_embeddings=k_embeddings,
     )
-
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request, user: Optional[Dict[str, Any]] = Depends(require_auth_if_enabled)):
@@ -345,7 +302,7 @@ async def form_post(
 
 @app.get("/api/search")
 async def api_search(
-    q: str, 
+    q: str,
     top_k: int = DEFAULT_TOP_K,
     user: Optional[Dict[str, Any]] = Depends(require_auth_if_enabled)
 ):
@@ -377,29 +334,20 @@ async def api_search(
         raise HTTPException(status_code=500, detail=str(e))
 
 def get_retrieval_stats() -> dict:
-    """Return statistics for the active retrieval backend."""
+    """Return unified retrieval index statistics."""
 
-    if active_retrieval_backend == "unified":
-        if retrieval_backend is None:
-            raise RuntimeError("Unified retrieval backend is not initialized")
+    if retrieval_backend is None:
+        raise RuntimeError("Unified retrieval backend is not initialized")
 
-        docdb_count = retrieval_backend.docdb.count()
-        indico_count = retrieval_backend.indico.count()
+    docdb_count = retrieval_backend.docdb.count()
+    indico_count = retrieval_backend.indico.count()
 
-        return {
-            "backend": "unified",
-            "docdb_children": docdb_count,
-            "indico_children": indico_count,
-            "total_embeddings": docdb_count + indico_count,
-        }
-
-    if active_retrieval_backend == "legacy":
-        if db_manager is None:
-            raise RuntimeError("Legacy retrieval backend is not initialized")
-        return db_manager.get_stats()
-
-    raise RuntimeError("Retrieval backend has not been initialized")
-
+    return {
+        "backend": "unified",
+        "docdb_children": docdb_count,
+        "indico_children": indico_count,
+        "total_embeddings": docdb_count + indico_count,
+    }
 
 @app.get("/api/health")
 async def health_check():
@@ -414,7 +362,7 @@ async def health_check():
             "llm_provider": LLM_PROVIDER,
             "llm_api": "available" if api_healthy else "unavailable",
         }
-    
+
     except Exception as e:
         logger.error(f"Health check error: {e}")
         return JSONResponse(
@@ -447,4 +395,4 @@ def main():
 
 if __name__ == "__main__":
     print("Calling main")
-    main() 
+    main()

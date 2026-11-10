@@ -194,9 +194,7 @@ def search_unified_parent_contexts(
             identity = (
                 source,
                 str(child["indico_id"]),
-                str(child.get("attachment_id")
-                    or child.get("attachment_url")
-                    or child["parent_id"]),
+                str(child["parent_id"]),
             )
 
         if identity in seen_parents:

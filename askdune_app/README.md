@@ -2,7 +2,7 @@
 
 AskDUNE is a retrieval-augmented generation (RAG) application for the Deep Underground Neutrino Experiment (DUNE). It retrieves scientific documentation from DUNE DocDB and Indico and uses a large language model (LLM) to answer questions with source references.
 
-The application uses FastAPI, supports Fermilab PingFederate single sign-on (SSO), and can use Argonne Argo or Fermilab LLM services.
+The web application uses FastAPI, supports Fermilab PingFederate single sign-on (SSO), and can use Argonne Argo or Fermilab LLM services.
 
 ## Features
 
@@ -14,14 +14,18 @@ The application uses FastAPI, supports Fermilab PingFederate single sign-on (SSO
 - **Reranking:** Cross-encoder relevance scoring plus metadata relevance bonuses.
 - **Ordering:** Relevance, newest first, or oldest first.
 - **References:** Parent-context reconstruction, deduplication, and DocDB/Indico source links.
-- **Compatibility:** Existing ChromaDB retrieval remains available while the unified backend is validated.
+- **Authentication:** Fermilab PingFederate SSO for authenticated web access.
 
 ## Architecture
 
-| Backend | Setting | Description |
-| --- | --- | --- |
-| Legacy | `RETRIEVAL_BACKEND=legacy` | Existing ChromaDB retrieval; default for backward compatibility |
-| Unified | `RETRIEVAL_BACKEND=unified` | Experimental DocDB + Indico parent-child retrieval |
+The AskDUNE FastAPI web application uses the **unified parent-child retrieval backend** for both DocDB and Indico.
+
+The unified backend uses ChromaDB with the following models:
+
+| Component | Model |
+| --- | --- |
+| Embeddings | `intfloat/e5-small-v2` |
+| Reranking | `cross-encoder/ms-marco-MiniLM-L-6-v2` |
 
 ### Unified retrieval pipeline
 
@@ -34,58 +38,107 @@ The application uses FastAPI, supports Fermilab PingFederate single sign-on (SSO
 7. Deduplicate selected parents and reconstruct the larger parent contexts.
 8. Supply context and normalized source references to the answer-generation pipeline.
 
-The unified backend uses ChromaDB, the `intfloat/e5-small-v2` embedding model, and the `cross-encoder/ms-marco-MiniLM-L-6-v2` reranker. DocDB retrieval uses an active-version manifest; Indico retrieval reconstructs parent contexts from indexed event attachments.
+DocDB retrieval uses an active-version manifest. Indico retrieval reconstructs parent contexts from indexed event attachments.
 
-**Important:** The unified index is currently experimental and separate from the legacy and production ChromaDB indexes. Never point experimental indexing jobs at production storage.
+### Index separation
+
+AskDUNE uses separate database paths for serving and indexing:
+
+| Variable | Purpose |
+| --- | --- |
+| `PROD_DB_PATH` | ChromaDB directory containing the validated unified index used by the FastAPI application |
+| `INDEXING_DB_PATH` | Separate ChromaDB directory used to build or update an index |
+| `EMBEDDING_MODEL` | Embedding model used for indexing and retrieval |
+| `RERANKER_MODEL` | Cross-encoder model used for reranking |
+| `K_DOCS` | Number of embedding candidates considered during retrieval |
+
+The indexing scripts refuse to write to the configured `PROD_DB_PATH`.
+
+**Important:** The unified index is still being populated and validated. The existing live production service and its legacy database must remain unchanged until a separate, deliberate migration is completed. Do not point development indexing jobs at production storage.
+
+### Legacy components
+
+The repository retains historical ChromaDB processing utilities, benchmarking scripts, and a separate Slack bot (`app.py`) that still uses legacy retrieval.
+
+These components are not part of the validated unified FastAPI web-serving path. The Slack integration has not yet been migrated to unified retrieval.
 
 ## Quick start
 
-Requires Python 3.11, the relevant DUNE document access, and credentials for the selected LLM provider. Fermilab SSO configuration is required when authentication is enabled.
+Requires Python 3.11, appropriate access to DUNE documentation, and credentials for the selected LLM provider. Fermilab SSO configuration is required when authentication is enabled.
 
 ```bash
 git clone https://github.com/DUNE/LLM_for_DUNE.git
 cd LLM_for_DUNE/askdune_app
+
 python3.11 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
+
 cp env.example .env
 ```
 
-Edit `.env` for your environment. For unified retrieval, set:
+Edit `.env` to configure your environment. The unified retrieval settings include:
 
 ```dotenv
-RETRIEVAL_BACKEND=unified
-EMBEDDING_MODEL=intfloat/e5-small-v2
-UNIFIED_INDEX_PATH=/path/to/parent_child_experiment
-PROD_DB_PATH=/path/to/existing/chromadb
+PROD_DB_PATH=/path/to/validated/unified/index
 INDEXING_DB_PATH=/path/to/separate/indexing
+
+EMBEDDING_MODEL=intfloat/e5-small-v2
+RERANKER_MODEL=cross-encoder/ms-marco-MiniLM-L-6-v2
+
+K_DOCS=30
+DEFAULT_TOP_K=3
 ```
 
-`PROD_DB_PATH` is currently required by `config.py` even when the unified backend is selected. The `UNIFIED_INDEX_PATH` must point to an existing directory. Do not use the same directory for production and indexing.
+`PROD_DB_PATH` must point to an existing, populated unified index compatible with the configured embedding model. The indexing path must be different from the serving path.
 
-To start a **localhost-only development** server (not production):
+### Start a local development server
+
+For localhost-only development with authentication disabled:
 
 ```bash
-ENABLE_AUTHENTICATION=false RETRIEVAL_BACKEND=unified PYTHONPATH=. \
+ENABLE_AUTHENTICATION=false PYTHONPATH=. \
   python -m uvicorn main:app --host 127.0.0.1 --port 8001
 ```
 
-Visit `http://127.0.0.1:8001/` locally. For a remote development host, use an SSH tunnel; do not expose an unauthenticated server on a public interface. Do not replace or restart the production service.
+Visit `http://127.0.0.1:8001/` locally.
 
-The experimental indexing scripts offer command-line help without writing data:
+For a remote development host, use an SSH tunnel. Do not expose an unauthenticated development server on a public interface.
+
+Do not replace or restart the running production service while testing this release.
+
+### Unified indexing
+
+The DocDB and Indico indexing scripts support separate development databases.
+
+To inspect their options without starting indexing:
 
 ```bash
-python scripts/run_docdb_indexing.py --help
-python scripts/run_indico_indexing.py --help
+python -m scripts.run_docdb_indexing --help
+python -m scripts.run_indico_indexing --help
 ```
 
+By default, the scripts use `INDEXING_DB_PATH`. An explicit `--index-path` can be supplied to select another indexing destination. Both scripts reject a destination matching `PROD_DB_PATH`.
+
 Read [INSTALL.md](INSTALL.md) and [scripts/README.md](scripts/README.md) before running indexing.
+
+## Container deployment
+
+The Dockerfile launches the FastAPI application directly using Uvicorn.
+
+Docker Compose is configured to mount a validated unified index at `/data/chroma`, with `PROD_DB_PATH=/data/chroma` inside the container.
+
+The serving index must be populated and validated before deployment. The current Compose configuration and read-only database mount have not yet been runtime-tested.
+
+Container deployment should be validated in an isolated development environment before use in production.
 
 ## Project layout
 
 | Location | Responsibility |
 | --- | --- |
-| `main.py` | FastAPI application and backend selection |
+| `main.py` | FastAPI application and unified retrieval integration |
+| `app.py` | Separate legacy Slack bot integration |
+| `cli.py` | Command-line utilities, including legacy workflows |
 | `config.py`, `env.example` | Application configuration |
 | `src/api/` | Argo and Fermilab LLM clients |
 | `src/auth/` | Fermilab SSO |
@@ -101,19 +154,19 @@ Read [INSTALL.md](INSTALL.md) and [scripts/README.md](scripts/README.md) before 
 ## Documentation
 
 - [Installation and configuration](INSTALL.md)
+- [Serving and development operations](OPERATIONS.md)
 - [Indexing scripts](scripts/README.md)
 - [Extraction](src/extractors/README.md)
 - [Indexing internals](src/indexing/README.md)
 - [Retrieval internals](src/retrieval/README.md)
 - [Core processing](src/core/README.md)
 - [Analytics](src/analytics/README.md)
+- [Parent-child benchmarking](benchmarking/parent_child_comparison/README.md)
 
 ## Security and contributions
 
-Never commit `.env`, passwords, API keys, SSO secrets, or private document contents. Preserve existing indexes when developing new retrieval and indexing features. Test changes against isolated development data and document any new configuration variables or retrieval behavior. Production deployment, Docker support, and HTTP endpoint details should be verified against the target environment before being advertised as supported.
+Never commit `.env`, passwords, API keys, SSO secrets, or private document contents.
 
-## Operational and benchmark command guides
+Keep serving and indexing databases separate. Test new indexing and retrieval changes against isolated development data before considering a production migration.
 
-- [Indexing commands, options, and examples](scripts/README.md)
-- [Serving and development operations](OPERATIONS.md)
-- [Parent-child benchmark commands, options, and examples](benchmarking/parent_child_comparison/README.md)
+The unified web backend has undergone development smoke testing, but container startup, database mount compatibility, and production deployment still require validation.

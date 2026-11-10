@@ -45,42 +45,27 @@ def main():
             f"Unexpected embedding model: {EMBEDDING_MODEL}"
         )
 
-    stable_path = Path(INDEXING_DB_PATH).resolve()
+    if not INDEXING_DB_PATH:
+        raise RuntimeError("INDEXING_DB_PATH is not configured")
+
+    if not PROD_DB_PATH:
+        raise RuntimeError("PROD_DB_PATH is not configured")
+
+    indexing_path = Path(INDEXING_DB_PATH).expanduser().resolve()
+    production_path = Path(PROD_DB_PATH).expanduser().resolve()
+
     experiment_path = (
-        Path(args.index_path).resolve()
+        Path(args.index_path).expanduser().resolve()
         if args.index_path
-        else stable_path.parent / "parent_child_experiment"
+        else indexing_path
     )
 
-    protected_paths = {
-        stable_path,
-        Path(PROD_DB_PATH).resolve(),
-    }
-
-    if experiment_path in protected_paths:
+    if experiment_path == production_path:
         raise RuntimeError(
-            f"Refusing to modify a protected database: {experiment_path}"
+            f"Refusing to index into PROD_DB_PATH: {experiment_path}"
         )
 
-    if args.index_path:
-        benchmark_path = (
-            stable_path.parent / "benchmark_200"
-        ).resolve()
-
-        if experiment_path != benchmark_path:
-            raise RuntimeError(
-                f"Benchmark indexing is restricted to: {benchmark_path}"
-            )
-
-    if not experiment_path.is_dir():
-        raise RuntimeError(
-            f"Experimental database does not exist: {experiment_path}"
-        )
-
-    if experiment_path.resolve() == stable_path:
-        raise RuntimeError(
-            "Refusing to modify the stable development database"
-        )
+    experiment_path.mkdir(parents=True, exist_ok=True)
 
     print("Indexing database:", experiment_path, flush=True)
 

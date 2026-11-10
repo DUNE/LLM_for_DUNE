@@ -1,4 +1,4 @@
-"""Unified DocDB + Indico retrieval backend for AskDUNE development."""
+"""Unified DocDB + Indico retrieval backend for AskDUNE."""
 
 from pathlib import Path
 from typing import Any
@@ -6,6 +6,7 @@ from typing import Any
 import chromadb
 from sentence_transformers import CrossEncoder
 
+from config import EMBEDDING_MODEL, RERANKER_MODEL
 from src.embedder.embedding_wrappers import OriginalEmbedder
 from src.retrieval.parent_child_adapter import format_parent_child_results
 from src.retrieval.unified_retriever import search_unified_parent_contexts
@@ -27,12 +28,12 @@ class UnifiedRetrievalBackend:
         self.indico = self.client.get_collection("DUNE_INDICO_CHILDREN")
 
         self.embedder = OriginalEmbedder(
-            model_name="intfloat/e5-small-v2",
+            model_name=EMBEDDING_MODEL,
             device="cpu",
         )
 
         self.reranker = CrossEncoder(
-            "cross-encoder/ms-marco-MiniLM-L-6-v2",
+            RERANKER_MODEL,
             device="cpu",
         )
 
@@ -44,7 +45,7 @@ class UnifiedRetrievalBackend:
         k_embeddings: int = 30,
         **filters: Any,
     ) -> tuple[list[str], list[str]]:
-        """Return contexts and reference URLs for the existing LLM pipeline."""
+        """Return contexts and reference URLs for the LLM pipeline."""
 
         result = search_unified_parent_contexts(
             self.docdb,

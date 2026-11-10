@@ -1,58 +1,139 @@
-# AskDUNE indexing scripts
+# AskDUNE unified indexing scripts
 
-The current parent-child scripts populate an **isolated experimental** ChromaDB index. They are not production indexing commands. Do not run them against existing production or legacy indexes.
+These scripts build and update the unified parent-child ChromaDB index used by the AskDUNE FastAPI web application.
 
-## DocDB
+DocDB and Indico indexing are performed independently, but their child collections can coexist in the same unified ChromaDB directory.
 
-```bash
-python scripts/run_docdb_indexing.py --help
+**Important:** The scripts write to an indexing database, not the running production database. Do not run indexing against the existing live production index or its legacy ChromaDB storage.
+
+## Configuration
+
+The indexing destination is controlled by `INDEXING_DB_PATH` in `.env` or by the explicit `--index-path` command-line argument.
+
+```dotenv
+PROD_DB_PATH=/path/to/validated/unified/index
+INDEXING_DB_PATH=/path/to/separate/indexing
+
+EMBEDDING_MODEL=intfloat/e5-small-v2
+RERANKER_MODEL=cross-encoder/ms-marco-MiniLM-L-6-v2
 ```
 
-Supported arguments: `--start` (default 1), `--limit` (default 5), and `--batch-size` (default 32). The script requires `EMBEDDING_MODEL=intfloat/e5-small-v2`. It reads existing active versions from the DocDB manifest, prepares documents and attachments, and indexes parent-child records with version tracking. The child target is 480 tokens; the extractor preparation uses a 2,000-character chunk setting.
+| Variable | Purpose |
+| --- | --- |
+| `PROD_DB_PATH` | Serving index; indexing into this path is prohibited |
+| `INDEXING_DB_PATH` | Default destination for indexing |
+| `EMBEDDING_MODEL` | Embedding model used to generate child vectors |
+| `RERANKER_MODEL` | Retrieval reranker; not required for generating embeddings |
 
-## Indico
+The scripts refuse to index into a destination whose resolved path matches `PROD_DB_PATH`. They can create the indexing directory and initialize the required ChromaDB collections.
 
-```bash
-python scripts/run_indico_indexing.py --help
-```
+The path comparison is a safeguard, not a substitute for checking the target directory. Always verify the destination before starting a write operation.
 
-Supported arguments: `--event-id` (optional), `--limit` (default 5), `--start` (default 0), and `--batch-size` (default 32). The script checks Indico access, loads selected events and attachments, builds parent contexts, and indexes children. It skips events whose existing children are all marked `index_status=complete`. This is not the same version-manifest mechanism used for DocDB.
+## DocDB indexing
 
-## Storage safeguards
-
-Both scripts derive the experimental directory as the sibling `parent_child_experiment` of `INDEXING_DB_PATH` and require that experimental directory to exist and differ from the stable indexing directory. The expected ChromaDB collections include `DUNE_DOCDB_CHILDREN`, `DUNE_DOCDB_VERSION_MANIFEST`, and `DUNE_INDICO_CHILDREN`.
-
-**Before indexing:** inspect the current `.env`, confirm the target directory, ensure source access is authorized, and preserve backups of important indexes. Do not run indexing as a documentation test. CLI `--help` is a read-only way to inspect options.
-
-## Copy-and-run indexing examples
-
-Run these from the repository root after activating `.venv` and verifying the **experimental write destination**. These commands **modify an index**; do not run them merely to test the documentation.
+Inspect the available options:
 
 ```bash
-# Inspect the actual options supported by the installed scripts (read-only).
-python scripts/run_docdb_indexing.py --help
-python scripts/run_indico_indexing.py --help
-
-# DocDB: process up to five documents starting at document ID 1.
-PYTHONPATH=. python -u scripts/run_docdb_indexing.py \
-  --start 1 --limit 5 --batch-size 32
-
-# Indico: process up to five events starting at offset 0.
-PYTHONPATH=. python -u scripts/run_indico_indexing.py \
-  --start 0 --limit 5 --batch-size 32
-
-# Indico: target one known event (replace the placeholder with a real ID).
-PYTHONPATH=. python -u scripts/run_indico_indexing.py --event-id EVENT_ID
+python -m scripts.run_docdb_indexing --help
 ```
 
-| Script | Option | Default | Meaning |
-|---|---|---|---|
-| DocDB | `--start` | `1` | Starting DocDB identifier |
-| DocDB | `--limit` | `5` | Maximum documents to attempt in this batch |
-| DocDB | `--batch-size` | `32` | Embedding/indexing batch size |
+The DocDB workflow retrieves documents and attachments, prepares parent contexts and child chunks, generates embeddings, and maintains active-version information.
+
+The relevant ChromaDB collections are:
+
+- `DUNE_DOCDB_CHILDREN`
+- `DUNE_DOCDB_VERSION_MANIFEST`
+
+The version manifest supports detection of unchanged documents and management of updated document versions.
+
+### Example
+
+The following command writes to the configured indexing database:
+
+```bash
+python -m scripts.run_docdb_indexing \
+  --start 1 \
+  --limit 5 \
+  --batch-size 32
+```
+
+To select an explicit destination:
+
+```bash
+python -m scripts.run_docdb_indexing \
+  --index-path /path/to/separate/test_index \
+  --start 1 \
+  --limit 5 \
+  --batch-size 32
+```
+
+## Indico indexing
+
+Inspect the available options:
+
+```bash
+python -m scripts.run_indico_indexing --help
+```
+
+The Indico workflow retrieves selected events and their attachments, prepares parent contexts, generates child embeddings, and writes to:
+
+- `DUNE_INDICO_CHILDREN`
+
+The script can skip events whose existing child records are marked `index_status=complete`. This differs from the DocDB active-version manifest.
+
+### Example: Process a batch of events
+
+```bash
+python -m scripts.run_indico_indexing \
+  --start 0 \
+  --limit 5 \
+  --batch-size 32
+```
+
+### Example: Process a specific event
+
+Replace `EVENT_ID` with a real Indico event identifier:
+
+```bash
+python -m scripts.run_indico_indexing \
+  --event-id EVENT_ID
+```
+
+## Command-line options
+
+| Script | Option | Default | Description |
+| --- | --- | --- | --- |
+| DocDB | `--start` | `1` | Starting DocDB document ID |
+| DocDB | `--limit` | `5` | Maximum documents to attempt |
+| DocDB | `--batch-size` | `32` | Embedding batch size |
+| DocDB | `--index-path` | `INDEXING_DB_PATH` | Explicit indexing destination |
 | Indico | `--start` | `0` | Starting event offset |
 | Indico | `--limit` | `5` | Maximum events to attempt |
-| Indico | `--batch-size` | `32` | Embedding/indexing batch size |
-| Indico | `--event-id` | not set | Target a specific event |
+| Indico | `--batch-size` | `32` | Embedding batch size |
+| Indico | `--event-id` | Not set | Process a specific event |
+| Indico | `--index-path` | `INDEXING_DB_PATH` | Explicit indexing destination |
 
-These are the options previously reviewed for the experimental scripts; `--help` on the deployed version is authoritative. A successful command does not guarantee that every source was extracted or indexed; inspect its logs and collection counts.
+These options reflect the current development workflow. The installed script's `--help` output is authoritative.
+
+## Validation and safety
+
+Before indexing, verify that the intended destination is not the live production database and that the appropriate DocDB or Indico credentials are configured.
+
+After indexing, inspect the logs and collection counts. A successful process exit does not necessarily mean every requested document or attachment was extracted successfully.
+
+Development smoke tests have confirmed that both scripts can populate a separate unified index and skip previously indexed, unchanged records without duplicating their child embeddings. Those tests do not constitute full production validation.
+
+The unified index should be populated and independently validated before it is used as the serving database.
+
+## Development workflow
+
+Use the following sequence when developing or updating the unified index:
+
+1. Configure an isolated `INDEXING_DB_PATH`.
+2. Inspect the indexing options with `--help`.
+3. Run a small DocDB or Indico indexing batch.
+4. Check the logs, collection counts, and representative retrieval results.
+5. Repeat indexing to check for unintended duplicates.
+6. Expand the indexing scope only after the initial results are validated.
+
+The current production AskDUNE service and its database must remain unchanged until an explicitly planned migration.

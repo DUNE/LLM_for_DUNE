@@ -65,8 +65,12 @@ STORE = os.getenv("VECTOR_STORE", 'chroma')
 CHROMA_PATH = PROD_DB_PATH
 
 # Model Configuration
-EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "multi-qa-mpnet-base-dot-v1")
-EMBEDDING_DIM = 768
+EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "intfloat/e5-small-v2")
+RERANKER_MODEL = os.getenv(
+    "RERANKER_MODEL",
+    "cross-encoder/ms-marco-MiniLM-L-6-v2",
+)
+EMBEDDING_DIM = 384
 
 # DocDB Configuration
 DOCDB_BASE_URL = "https://docs.dunescience.org/cgi-bin/sso/"
@@ -95,7 +99,7 @@ LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
 # Query Configuration
 DEFAULT_TOP_K = int(os.getenv("DEFAULT_TOP_K", "3"))
-K_DOCS = int(os.getenv("K_DOCS","2"))
+K_DOCS = int(os.getenv("K_DOCS","30"))
 LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.1"))
 LLM_TOP_P = float(os.getenv("LLM_TOP_P", "0.9"))
 LLM_MODEL = os.getenv("LLM_MODEL", "gpt4o")
