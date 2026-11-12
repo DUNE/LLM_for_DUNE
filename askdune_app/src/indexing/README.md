@@ -63,10 +63,45 @@ Actual indexing commands write to the configured destination and should only be 
 
 See [Indexing scripts](../../scripts/README.md) for CLI options and examples, and [Unified retrieval](../retrieval/README.md) for how indexed records are searched.
 
-## Operational boundaries
+## Production deployment and operational boundaries
 
-The unified index is still undergoing full-scale population and validation.
+AskDUNE v1.0.0 uses unified parent-child retrieval for DocDB and Indico documentation.
 
-The existing live production service uses legacy retrieval and must remain unchanged until a deliberately planned migration.
+The production FastAPI service reads its unified ChromaDB index from `PROD_DB_PATH`.
+As of November 12, 2026, the validated production index contains 22,642 DocDB children and 5,016 Indico children (27,658 total embeddings).
 
-Keep development indexing, validated unified serving data, and legacy production storage separate. Do not overwrite or rebuild existing indexes as part of routine development testing.
+These counts describe the current production snapshot, not all available documents.
+
+### Production and staging directories
+
+- `PROD_DB_PATH`: `/exp/dune/data/users/dune/askdune/data_prod`
+- `INDEXING_DB_PATH`: `/exp/dune/data/users/dune/askdune/data_indexing`
+
+The production index serves live queries and must not be modified by indexing jobs.
+The staging index is used to build and validate replacements independently.
+
+### Full indexing rebuild
+
+A fresh staging rebuild is planned to incorporate updated XLSX extraction and expand DocDB and Indico coverage.
+
+Use `python -m scripts.run_docdb_indexing --help` and `python -m scripts.run_indico_indexing --help` to inspect available options.
+
+Both scripts support `--start`, `--limit`, `--batch-size`, and `--index-path`.
+The Indico script additionally supports `--event-id`.
+
+DocDB `--start` is the first document ID; `--limit` is the number of IDs to examine.
+Indico `--start` is an event-selection offset; `--limit` selects eligible events subject to the discovery behavior.
+
+Do not run independent indexing processes concurrently against the same ChromaDB directory.
+
+### Deployment safeguards
+
+1. Keep the production service running against `data_prod` during staging indexing.
+2. Never index directly into `PROD_DB_PATH`.
+3. Validate staging collections, extraction quality, retrieval, and integrity.
+4. Back up the production database before promoting the new index.
+5. Deploy the validated replacement through a controlled service restart.
+6. Verify `/api/health` and representative queries after deployment.
+
+Legacy indexing components remain available for historical workflows and benchmarking.
+
