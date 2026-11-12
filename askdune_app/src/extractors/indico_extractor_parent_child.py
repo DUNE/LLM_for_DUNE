@@ -164,21 +164,28 @@ class IndicoParentChildExtractor(IndicoExtractor):
         return normalized
 
     def _extract_file(self, candidate, metadata):
-        """Download and extract one file, preserving its metadata."""
+        """Download and extract one attachment.
+
+        Raise an exception when a discovered attachment cannot be
+        extracted, so the event is not incorrectly marked complete.
+        """
         url = candidate["url"]
 
         try:
             content, _ = self._download_file(
                 url, self.session, self.max_file_bytes
             )
+
             if not content:
-                return None
+                raise RuntimeError("Attachment download returned no content")
 
             content_type = candidate.get("content_type") or ""
+
             if not content_type:
                 extension = os.path.splitext(
                     urlparse(url).path
                 )[1].lower()
+
                 content_type = {
                     ".pdf": "application/pdf",
                     ".pptx": (
@@ -197,14 +204,18 @@ class IndicoParentChildExtractor(IndicoExtractor):
                 }.get(extension, "")
 
             if not content_type:
-                return None
+                raise RuntimeError(
+                    "Unsupported or unknown attachment content type"
+                )
 
             raw_text, document_type = self.get_raw_text(
                 content_type, content
             )
 
             if not isinstance(raw_text, str) or not raw_text.strip():
-                return None
+                raise RuntimeError(
+                    "Attachment contains no extractable text"
+                )
 
             return {
                 **metadata,
@@ -215,8 +226,10 @@ class IndicoParentChildExtractor(IndicoExtractor):
             }
 
         except Exception as exc:
-            print(f"Indico attachment extraction failed: {url}: {exc}")
-            return None
+            raise RuntimeError(
+                f"Indico attachment extraction failed: {url}: "
+                f"{type(exc).__name__}: {exc}"
+            ) from exc
 
     def _fetch_category_events(self, categ_id: int, limit: int, start: int):
         """Fetch a bounded category export without modifying the legacy extractor."""

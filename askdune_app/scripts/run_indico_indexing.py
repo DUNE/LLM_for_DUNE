@@ -123,6 +123,12 @@ def main():
 
         total_discovered = len(events)
 
+        skipped_event_ids = [
+            str(event["id"])
+            for event in events
+            if str(event["id"]) in completed_ids
+        ]
+
         events = [
             event
             for event in events
@@ -130,10 +136,18 @@ def main():
         ]
 
         print(
-            f"Discovered {total_discovered} unique events; "
-            f"{len(events)} not yet indexed",
+            f"[INDICO SKIP CHECK] Discovered {total_discovered} unique events; "
+            f"{len(skipped_event_ids)} already indexed; "
+            f"{len(events)} eligible for indexing.",
             flush=True,
         )
+
+        for skipped_id in skipped_event_ids:
+            print(
+                f"[SKIP] Indico event {skipped_id}: "
+                f"already indexed. No extraction or embedding required.",
+                flush=True,
+            )
 
         events = events[:args.limit]
 

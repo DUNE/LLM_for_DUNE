@@ -470,9 +470,12 @@ class DocDBExtractor(BaseExtractor):
                         yield docid, links, metadata
                     else:
                         self.run_stats["pages_unchanged"] += 1
-                        logger.debug(
-                            f"DocDB {docid} version {current_version} "
-                            f"already indexed. Skipping."
+                        print(
+                            f"[SKIP] DocDB {docid}: "
+                            f"current version {current_version}, "
+                            f"indexed version {indexed_version}. "
+                            f"No download, extraction, or embedding required.",
+                            flush=True,
                         )
 
             except PermissionError:

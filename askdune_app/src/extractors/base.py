@@ -203,6 +203,7 @@ class BaseExtractor(ABC):
 
     def extract_text_from_xlsx(self, content: bytes) -> tuple[str, str]:
         """Extract legacy XLS and modern XLSX spreadsheets as searchable text."""
+
         try:
             if not content:
                 raise ValueError("Empty spreadsheet")
@@ -217,6 +218,7 @@ class BaseExtractor(ABC):
 
                 for sheet in workbook.sheets():
                     lines.append(f"Sheet: {sheet.name}")
+
                     for row_index in range(sheet.nrows):
                         values = [
                             str(sheet.cell_value(row_index, col_index))
@@ -224,8 +226,9 @@ class BaseExtractor(ABC):
                             if sheet.cell_type(row_index, col_index)
                             not in (xlrd.XL_CELL_EMPTY, xlrd.XL_CELL_BLANK)
                         ]
+
                         if values:
-                            lines.append(" | ".join(values))
+                            lines.append("\t".join(values))
 
             # Modern XLSX ZIP format
             elif content.startswith(b"PK"):
@@ -236,17 +239,21 @@ class BaseExtractor(ABC):
                     data_only=True,
                     read_only=True,
                 )
+
                 try:
                     for sheet in workbook.worksheets:
                         lines.append(f"Sheet: {sheet.title}")
+
                         for row in sheet.iter_rows(values_only=True):
                             values = [
                                 str(cell)
                                 for cell in row
                                 if cell is not None
                             ]
+
                             if values:
-                                lines.append(" | ".join(values))
+                                lines.append("\t".join(values))
+
                 finally:
                     workbook.close()
 
@@ -254,6 +261,7 @@ class BaseExtractor(ABC):
                 raise ValueError("Unrecognized Excel file format")
 
             text = "\n".join(lines).strip()
+
             if not text:
                 logger.warning("Spreadsheet contains no extractable text")
                 return "", ""

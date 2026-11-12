@@ -1,4 +1,4 @@
-# AskDUNE (DUNE-GPT)
+# AskDUNE
 
 AskDUNE is a retrieval-augmented generation (RAG) application for the Deep Underground Neutrino Experiment (DUNE). It retrieves scientific documentation from DUNE DocDB and Indico and uses a large language model (LLM) to answer questions with source references.
 
