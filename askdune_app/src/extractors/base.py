@@ -272,17 +272,39 @@ class BaseExtractor(ABC):
             logger.warning("Skipping unreadable spreadsheet: %s", exc)
             return "", ""
 
+
     def extract_text_from_image(self, image_content: bytes) -> tuple[str, str]:
-        """Extract text from JPEG/PNG images using RapidOCR."""
+        """Extract text from JPEG/PNG images using RapidOCR, unless disabled."""
+
+        import os
+        import time
+
+        disable_ocr = os.getenv("DISABLE_OCR", "false").strip().lower() in (
+            "true", "1", "yes", "on"
+        )
+
+        if disable_ocr:
+            logger.info("OCR disabled by DISABLE_OCR=true")
+            return "", "image"
+
         if not image_content:
             return "", "image"
 
         from rapidocr_onnxruntime import RapidOCR
 
         if not hasattr(self, "_image_ocr_engine"):
+            init_start = time.perf_counter()
             self._image_ocr_engine = RapidOCR()
+            logger.info(
+                "RapidOCR initialization time: %.2f seconds",
+                time.perf_counter() - init_start,
+            )
 
+        start = time.perf_counter()
         result, _ = self._image_ocr_engine(image_content)
+        elapsed = time.perf_counter() - start
+
+        logger.info("RapidOCR processing time: %.2f seconds", elapsed)
 
         if not result:
             return "", "image"
@@ -292,5 +314,7 @@ class BaseExtractor(ABC):
             for item in result
             if len(item) > 1 and str(item[1]).strip()
         )
+
+        logger.info("RapidOCR extracted %d characters", len(text))
 
         return text, "image"

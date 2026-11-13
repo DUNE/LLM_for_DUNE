@@ -673,6 +673,23 @@ class DocDBExtractor(BaseExtractor):
                 )
 
                 if not raw_text or not raw_text.strip():
+                    # Intentionally skip image attachments when OCR is disabled.
+                    # Preserve existing failure behavior for other attachments.
+                    import os
+
+                    disable_ocr = os.getenv(
+                        "DISABLE_OCR", "false"
+                    ).strip().lower() in ("true", "1", "yes", "on")
+
+                    if disable_ocr and content_type in (
+                        "image/jpeg", "image/png", "image/jpg"
+                    ):
+                        logger.info(
+                            f"DocDB {docid}: skipping image {filename} "
+                            f"because DISABLE_OCR=true"
+                        )
+                        continue
+
                     if extension in (".xls", ".xlsx"):
                         logger.warning(
                             f"DocDB {docid}: skipping unreadable or empty "
