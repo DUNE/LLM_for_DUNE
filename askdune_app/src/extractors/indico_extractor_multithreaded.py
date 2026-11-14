@@ -55,7 +55,7 @@ class IndicoExtractor(BaseExtractor, Session):
         self.base_url = INDICO_BASE_URL.rstrip("/")
         self.category_id = INDICO_CATEGORY_ID
         
-        self.max_file_bytes =  50 * 1024 * 1024
+        self.max_file_bytes = 250 * 1024 * 1024
         self.chroma = chroma
         self.api_token = INDICO_API_TOKEN or os.getenv("INDICO_API_TOKEN")
         self.cookies_file = (INDICO_COOKIES_FILE

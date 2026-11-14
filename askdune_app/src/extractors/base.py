@@ -272,10 +272,8 @@ class BaseExtractor(ABC):
             logger.warning("Skipping unreadable spreadsheet: %s", exc)
             return "", ""
 
-
     def extract_text_from_image(self, image_content: bytes) -> tuple[str, str]:
         """Extract text from JPEG/PNG images using RapidOCR, unless disabled."""
-
         import os
         import time
 
@@ -294,7 +292,23 @@ class BaseExtractor(ABC):
 
         if not hasattr(self, "_image_ocr_engine"):
             init_start = time.perf_counter()
-            self._image_ocr_engine = RapidOCR()
+
+            try:
+                ocr_threads = int(os.getenv("ASKDUNE_OCR_THREADS", "0"))
+            except ValueError:
+                logger.warning(
+                    "Invalid ASKDUNE_OCR_THREADS; using RapidOCR defaults"
+                )
+                ocr_threads = 0
+
+            if ocr_threads > 0:
+                self._image_ocr_engine = RapidOCR(
+                    intra_op_num_threads=ocr_threads,
+                    inter_op_num_threads=1,
+                )
+            else:
+                self._image_ocr_engine = RapidOCR()
+
             logger.info(
                 "RapidOCR initialization time: %.2f seconds",
                 time.perf_counter() - init_start,

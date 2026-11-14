@@ -15,6 +15,213 @@ class IndicoParentChildExtractor(IndicoExtractor):
     def __init__(self):
         super().__init__(chroma=None)
 
+    def _unlock_event(self, event_id):
+        """Unlock an Indico event using the configured DUNE access key."""
+        from bs4 import BeautifulSoup
+        from dotenv import load_dotenv
+
+        load_dotenv(dotenv_path=".env")
+
+        url = f"{self.base_url}/event/{event_id}/"
+
+        response = self.session.get(url, timeout=45)
+        response.raise_for_status()
+
+        soup = BeautifulSoup(response.text, "html.parser")
+        form = soup.select_one('form[action*="key-access"]')
+
+        if form is None:
+            return soup
+
+        password = os.getenv("DUNE_INDICO_ACCESS_KEY")
+        if not password:
+            raise RuntimeError(
+                f"Event {event_id} requires an access key, "
+                "but DUNE_INDICO_ACCESS_KEY is not configured"
+            )
+
+        csrf = form.select_one('input[name="csrf_token"]')
+        if csrf is None:
+            raise RuntimeError(
+                f"Missing CSRF token for event {event_id}"
+            )
+
+        unlock = self.session.post(
+            urljoin(response.url, form["action"]),
+            data={
+                "csrf_token": csrf.get("value"),
+                "access_key": password,
+            },
+            headers={"Referer": response.url},
+            timeout=45,
+        )
+        unlock.raise_for_status()
+
+        check = self.session.get(url, timeout=45)
+        check.raise_for_status()
+
+        unlocked_soup = BeautifulSoup(
+            check.text, "html.parser"
+        )
+
+        if unlocked_soup.select_one('form[action*="key-access"]'):
+            raise RuntimeError(
+                f"Unable to unlock Indico event {event_id}"
+            )
+
+        return unlocked_soup
+
+    def get_soup_parser(self, url):
+        """Fetch event HTML, unlocking protected events when needed."""
+        import re
+
+        match = re.search(r"/event/(\d+)/?", url)
+
+        if match:
+            return self._unlock_event(int(match.group(1)))
+
+        return super().get_soup_parser(url)
+
+    def discover_category_events(self, category_id):
+        """Discover visible and historical events in one Indico category."""
+        import re
+        from bs4 import BeautifulSoup
+
+        url = f"{self.base_url}/category/{category_id}/"
+        response = self.session.get(url, timeout=45)
+        response.raise_for_status()
+
+        soup = BeautifulSoup(response.text, "html.parser")
+        events = {}
+
+        def collect_events(page):
+            for anchor in page.select('a[href]'):
+                match = re.match(
+                    r"^/event/(\d+)/?$",
+                    anchor.get("href", "")
+                )
+                if match:
+                    event_id = int(match.group(1))
+                    title = anchor.get_text(" ", strip=True)
+                    events.setdefault(
+                        event_id,
+                        {"id": event_id, "title": title or "Unknown Title"}
+                    )
+
+        collect_events(soup)
+
+        historical = soup.select_one(
+            ".past-events .events[data-event-list-before]"
+        )
+
+        if historical:
+            before = historical.get("data-event-list-before")
+            endpoint = historical.get("data-event-list-url")
+
+            if not endpoint:
+                raise RuntimeError(
+                    f"Category {category_id}: missing historical endpoint"
+                )
+
+            history_response = self.session.get(
+                urljoin(self.base_url, endpoint),
+                params={"before": before},
+                headers={"X-Requested-With": "XMLHttpRequest"},
+                timeout=45,
+            )
+            history_response.raise_for_status()
+
+            data = history_response.json()
+
+            if data.get("success") is not True:
+                raise RuntimeError(
+                    f"Category {category_id}: historical request failed"
+                )
+
+            history_soup = BeautifulSoup(
+                data.get("html", ""), "html.parser"
+            )
+            collect_events(history_soup)
+
+        print(
+            f"Category {category_id}: "
+            f"{len(events)} unique events discovered",
+            flush=True,
+        )
+
+        return list(events.values())
+
+    def get_event_metadata_html(self, event_id):
+        """Extract event metadata from authenticated Indico HTML."""
+        import json
+        import re
+        from datetime import datetime
+
+        soup = self._unlock_event(event_id)
+
+        metadata = {
+            "id": event_id,
+            "title": "Unknown Title",
+            "startDate": {},
+            "location": "",
+            "description": "",
+            "conveners": "",
+        }
+
+        for script in soup.select('script[type="application/ld+json"]'):
+            try:
+                data = json.loads(script.string or script.get_text())
+            except (ValueError, TypeError):
+                continue
+
+            if not isinstance(data, dict) or data.get("@type") != "Event":
+                continue
+
+            metadata["title"] = data.get("name") or metadata["title"]
+
+            start = data.get("startDate")
+            if start:
+                dt = datetime.fromisoformat(start)
+                metadata["startDate"] = {
+                    "date": dt.date().isoformat(),
+                    "time": dt.strftime("%H:%M:%S"),
+                }
+
+            location = data.get("location") or {}
+            if isinstance(location, dict):
+                name = location.get("name") or ""
+                if name != "No location set":
+                    metadata["location"] = name
+
+            description = data.get("description") or ""
+
+            # Remove Zoom credentials and meeting information.
+            description = re.sub(
+                r"(?i)\bzoom\s+link\s*:\s*https?://\S+",
+                "",
+                description,
+            )
+            description = re.sub(
+                r"(?i)\bmeeting\s*id\s*:\s*[\d\s]+",
+                "",
+                description,
+            )
+            description = re.sub(
+                r"(?i)\b(?:passcode|password)\s*:\s*\S+",
+                "",
+                description,
+            )
+
+            metadata["description"] = " ".join(description.split())
+
+            break
+
+        chairs = soup.select_one(".chairperson-list")
+        if chairs:
+            metadata["conveners"] = chairs.get_text(" ", strip=True)
+
+        return metadata
+
     def _scrape_event_attachments_html(self, event_id):
         """Discover supported attachments while retaining contribution metadata."""
         import re
@@ -256,6 +463,19 @@ class IndicoParentChildExtractor(IndicoExtractor):
         if event_id is None:
             return
 
+        # Recover complete metadata from authenticated event HTML.
+        html_metadata = self.get_event_metadata_html(event_id)
+
+        # Preserve existing event fields, filling missing values from HTML.
+        event = {
+            **html_metadata,
+            **{
+                key: value
+                for key, value in event.items()
+                if value not in (None, "", {})
+            },
+        }
+
         event_url = f"{self.base_url}/event/{event_id}/"
         start = event.get("startDate") or {}
 
@@ -263,7 +483,7 @@ class IndicoParentChildExtractor(IndicoExtractor):
             "indico_id": str(event_id),
             "event_url": event_url,
             "meeting_name": event.get("title") or "Unknown Title",
-            "conveners": self.get_authors(event),
+            "conveners": event.get("conveners") or self.get_authors(event),
             "start_date": start.get("date") or "",
             "start_time": start.get("time") or "",
             "location": str(event.get("location") or ""),
